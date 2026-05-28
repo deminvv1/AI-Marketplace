@@ -44,38 +44,66 @@
 
 ```prisma
 model User {
-  id         String      @id @default(cuid())
-  email      String      @unique
-  name       String?
-  role       Role        @default(CUSTOMER)
-  createdAt  DateTime    @default(now())
-  profile    Profile?
-  orders     Order[]
-  messages   Message[]
-  forumPosts ForumPost[]
+  id              String                    @id @default(cuid())
+  email           String                    @unique
+  name            String?
+  role            Role                      @default(CUSTOMER)
+  isBlocked       Boolean                   @default(false)
+  createdAt       DateTime                  @default(now())
+  updatedAt       DateTime                  @updatedAt
+  profile         Profile?
+  orders          Order[]
+  orderResponses  OrderResponse[]
+  offers          Offer[]
+  sentMessages    Message[]                 @relation("SentMessages")
+  conversations   ConversationParticipant[]
+  forumPosts      ForumPost[]
+  forumComments   ForumComment[]
+  reviewsGiven    Review[]                  @relation("ReviewsGiven")
+  reviewsReceived Review[]                  @relation("ReviewsReceived")
+  complaints      Complaint[]
+  notifications   Notification[]
+  favorites       Favorite[]
+  blockedUsers    BlockedUser[]             @relation("BlockedBy")
+  blockedByUsers  BlockedUser[]             @relation("BlockedUser")
 }
 
 model Profile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  bio            String?
-  country        String?
-  language       String?
-  nickname       String?
-  phone          String?
-  avatar         String?
-  specialization String?
-  industries     String[]
-  experience     String?
-  achievements   String?
-  rating         Float    @default(0)
-  reviewsCount   Int      @default(0)
-  onlineStatus   Boolean  @default(false)
-  isPublic       Boolean  @default(true)
+  id                    String          @id @default(cuid())
+  userId                String          @unique
+  user                  User            @relation(fields: [userId], references: [id])
+  bio                   String?
+  country               String?
+  language              String?
+  nickname              String?
+  phone                 String?
+  avatar                String?
+  specialization        String?
+  industries            String[]
+  experience            String?
+  achievements          String?
+  rating                Float           @default(0)
+  reviewsCount          Int             @default(0)
+  completedProjectsCount Int            @default(0)
+  onlineStatus          Boolean         @default(false)
+  lastSeenAt            DateTime?
+  isPublic              Boolean         @default(true)
+  portfolioItems        PortfolioItem[]
+}
+
+model PortfolioItem {
+  id        String   @id @default(cuid())
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id])
+  type      String   // image | video | audio | text | case
+  url       String?
+  title     String?
+  content   String?
+  createdAt DateTime @default(now())
 }
 
 model Order {
-  id               String    @id @default(cuid())
+  id               String          @id @default(cuid())
   title            String
   shortDescription String?
   description      String
@@ -86,10 +114,26 @@ model Order {
   country          String?
   language         String?
   workFormat       String?
-  status           String    @default("open")
+  status           OrderStatus     @default(OPEN)
   authorId         String
+  author           User            @relation(fields: [authorId], references: [id])
+  executorId       String?
   attachments      String[]
-  createdAt        DateTime  @default(now())
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  responses        OrderResponse[]
+  review           Review?
+}
+
+model OrderResponse {
+  id         String      @id @default(cuid())
+  orderId    String
+  order      Order       @relation(fields: [orderId], references: [id])
+  executorId String
+  executor   User        @relation(fields: [executorId], references: [id])
+  message    String?
+  status     String      @default("pending") // pending | accepted | rejected
+  createdAt  DateTime    @default(now())
 }
 
 model Offer {
@@ -105,23 +149,41 @@ model Offer {
   language    String?
   country     String?
   authorId    String
+  author      User     @relation(fields: [authorId], references: [id])
+  viewsCount  Int      @default(0)
+  isPublished Boolean  @default(true)
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Conversation {
-  id        String    @id @default(cuid())
-  createdAt DateTime  @default(now())
-  messages  Message[]
+  id            String                    @id @default(cuid())
+  participants  ConversationParticipant[]
+  messages      Message[]
+  lastMessageAt DateTime?
+  createdAt     DateTime                  @default(now())
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  @@unique([conversationId, userId])
 }
 
 model Message {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   content        String?
   audioUrl       String?
   senderId       String
-  receiverId     String
+  sender         User         @relation("SentMessages", fields: [senderId], references: [id])
   conversationId String
-  createdAt      DateTime @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id])
+  isRead         Boolean      @default(false)
+  createdAt      DateTime     @default(now())
 }
 
 model ForumPost {
@@ -131,18 +193,29 @@ model ForumPost {
   industry   String?
   tags       String[]
   authorId   String
+  author     User           @relation(fields: [authorId], references: [id])
   isPinned   Boolean        @default(false)
+  isDeleted  Boolean        @default(false)
   likesCount Int            @default(0)
+  viewsCount Int            @default(0)
   createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
   comments   ForumComment[]
 }
 
 model ForumComment {
-  id        String   @id @default(cuid())
-  content   String
-  postId    String
-  authorId  String
-  createdAt DateTime @default(now())
+  id              String         @id @default(cuid())
+  content         String
+  postId          String
+  post            ForumPost      @relation(fields: [postId], references: [id])
+  authorId        String
+  author          User           @relation(fields: [authorId], references: [id])
+  parentCommentId String?
+  parentComment   ForumComment?  @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         ForumComment[] @relation("CommentReplies")
+  likesCount      Int            @default(0)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model Review {
@@ -150,23 +223,74 @@ model Review {
   rating     Int
   text       String?
   fromUserId String
+  fromUser   User     @relation("ReviewsGiven", fields: [fromUserId], references: [id])
   toUserId   String
+  toUser     User     @relation("ReviewsReceived", fields: [toUserId], references: [id])
+  orderId    String?  @unique
+  order      Order?   @relation(fields: [orderId], references: [id])
   createdAt  DateTime @default(now())
 }
 
 model Complaint {
-  id         String   @id @default(cuid())
-  type       String
-  targetId   String
-  targetType String
-  authorId   String
-  status     String   @default("pending")
-  createdAt  DateTime @default(now())
+  id          String    @id @default(cuid())
+  type        String
+  targetId    String
+  targetType  String
+  description String?
+  authorId    String
+  author      User      @relation(fields: [authorId], references: [id])
+  status      String    @default("pending")
+  resolvedAt  DateTime?
+  resolvedBy  String?
+  createdAt   DateTime  @default(now())
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  type      String
+  title     String
+  body      String?
+  isRead    Boolean  @default(false)
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model Favorite {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  targetId    String
+  targetType  String   // user | order | offer
+  createdAt   DateTime @default(now())
+
+  @@unique([userId, targetId, targetType])
+}
+
+model BlockedUser {
+  id          String   @id @default(cuid())
+  blockedById String
+  blockedBy   User     @relation("BlockedBy", fields: [blockedById], references: [id])
+  blockedId   String
+  blocked     User     @relation("BlockedUser", fields: [blockedId], references: [id])
+  createdAt   DateTime @default(now())
+
+  @@unique([blockedById, blockedId])
 }
 
 enum Role {
   CUSTOMER
   EXECUTOR
+  BOTH
+  ADMIN
+}
+
+enum OrderStatus {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
 }
 ```
 
