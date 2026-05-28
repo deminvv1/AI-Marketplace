@@ -1,15 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { Mail, ArrowRight, Sparkles, CheckCircle2, Loader2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-export default function RegisterPage() {
+const AUTH_ERRORS: Record<string, string> = {
+  auth: "Something went wrong. Please try again.",
+  link_expired: "The magic link has expired. Please request a new one.",
+};
+
+function RegisterForm() {
   const [step, setStep] = useState<"form" | "sent">("form");
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const e = searchParams.get("error");
+    if (e) setError(AUTH_ERRORS[e] ?? "Something went wrong. Please try again.");
+  }, [searchParams]);
 
   async function handleGoogle() {
     const supabase = createClient();
@@ -154,5 +166,13 @@ export default function RegisterPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense>
+      <RegisterForm />
+    </Suspense>
   );
 }
