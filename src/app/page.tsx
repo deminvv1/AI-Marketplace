@@ -1,13 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link"; // Роутинг Next.js вместо TanStack
-import Image from "next/image"; // Оптимизированный компонент картинок Next.js
+import Link from "next/link";
 import { Search, Sparkles, ArrowRight } from "lucide-react";
 import { COUNTRIES, flag } from "@/lib/mock-data";
-
-import earthImg from "@/assets/earth-globe.jpg";
-import mascotImg from "@/assets/mascot.png";
 
 export default function LandingPage() {
   const [q, setQ] = useState("");
@@ -57,7 +53,7 @@ export default function LandingPage() {
           {filtered.map((c) => (
             <Link
               key={c}
-              href="/welcome" // Заменили to на href
+              href={`/welcome/${c.toLowerCase().replace(/\s+/g, "-")}`}
               className="group flex items-center justify-between px-4 py-3 rounded-lg text-sm text-muted-foreground hover:text-foreground border-l-2 border-transparent hover:border-primary hover:bg-primary/10 transition-all"
             >
               <span className="flex items-center gap-3">
@@ -99,27 +95,8 @@ export default function LandingPage() {
           </div>
           <div className="absolute inset-[6%] rounded-full border border-secondary/20 animate-spin-reverse-slow" />
 
-          {/* Globe */}
-          <div className="absolute inset-[10%] rounded-full overflow-hidden animate-float-y animate-pulse-glow">
-            <Image 
-              src={earthImg} 
-              alt="Earth globe" 
-              className="w-full h-full object-cover" 
-              width={1024} 
-              height={1024}
-              priority // Загружается мгновенно без LCP-задержек
-            />
-          </div>
-
-          {/* Mascot on ring */}
-          <Image
-            src={mascotImg}
-            alt="Mascot"
-            width={160}
-            height={160}
-            priority
-            className="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-32 drop-shadow-[0_0_30px_rgba(99,102,241,0.6)]"
-          />
+          {/* Globe placeholder */}
+          <div className="absolute inset-[10%] rounded-full animate-float-y animate-pulse-glow bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-blue-500/30 border border-primary/30" />
         </div>
 
         <div className="absolute bottom-12 left-0 right-0 text-center">

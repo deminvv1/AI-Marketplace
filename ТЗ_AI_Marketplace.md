@@ -40,70 +40,171 @@
 
 ---
 
+## 2.1 АРХИТЕКТУРА БАЗ ДАННЫХ (Вариант Б)
+
+Платформа использует **две базы данных** для соответствия ФЗ-152 РФ.
+
+### Разделение данных
+
+| База | Хостинг | Кто использует | Что хранит |
+|------|---------|----------------|------------|
+| **Global DB** | Supabase EU (Frankfurt) | Все пользователи кроме РФ | Весь контент + личные данные |
+| **RU DB** | Yandex Cloud / VK Cloud | Граждане РФ (выбрали Россию) | Личные данные |
+
+### Какие таблицы в какой БД
+
+**RU DB — только личные данные (ФЗ-152):**
+- `User` — email, идентификаторы
+- `Profile` — firstName, lastName, phone
+- `PrivacySettings`
+- `Message` — приватная переписка
+- `Notification`
+
+**Global DB — публичный контент:**
+- `User` — публичная копия (id, username, avatarUrl, role)
+- `Order`, `OrderResponse`
+- `Offer`
+- `ForumPost`, `ForumComment`
+- `Review`, `Complaint`
+- `Conversation`, `ConversationParticipant`
+- `Favorite`, `BlockedUser`
+- `PortfolioItem`
+
+### Переменные окружения
+
+```env
+# Глобальная БД — Supabase EU
+DATABASE_URL=postgresql://...supabase.co.../postgres
+DIRECT_URL=postgresql://...supabase.co.../postgres
+
+# Российская БД — Yandex Cloud
+DATABASE_URL_RU=postgresql://...yandex.cloud.../postgres
+DIRECT_URL_RU=postgresql://...yandex.cloud.../postgres
+```
+
+### Логика маршрутизации
+
+```
+Пользователь выбирает страну при регистрации
+        ↓
+   Россия?
+   ├── Да → личные данные → RU DB
+   │         публичный контент → Global DB
+   └── Нет → все данные → Global DB
+```
+
+### Правило определения БД
+Определяется **один раз при регистрации** по выбранной стране.
+Хранится в `User.region` (`RU` | `GLOBAL`).
+При каждом запросе приложение читает `region` и выбирает нужное подключение.
+
+### Взаимодействие между регионами
+
+Пользователи из РФ и других стран **видят друг друга и взаимодействуют** — это ключевое для международной платформы.
+
+| Действие | Где хранится | Видимость |
+|----------|-------------|-----------|
+| Поиск исполнителей | Global DB | Все видят всех |
+| Просмотр заказов | Global DB | Все видят все заказы |
+| Публичный профиль | Global DB | Доступен всем |
+| Готовые предложения | Global DB | Доступны всем |
+| Форум | Global DB | Доступен всем |
+| Личные данные (ФИО, телефон) | RU DB | Только владелец |
+| Личные сообщения | **Global DB** | Только участники диалога |
+
+**Почему сообщения в Global DB:**
+Текст переписки не является персональными данными по ФЗ-152 (это коммуникационные данные, не идентификационные). Хранение в Global DB позволяет российским и зарубежным пользователям переписываться без сложной межбазовой логики.
+
+---
+
 ## 3. СХЕМА БАЗЫ ДАННЫХ
 
 ```prisma
+// ─── АККАУНТ ────────────────────────────────────────────────────────────────
 model User {
-  id              String                    @id @default(cuid())
-  email           String                    @unique
-  name            String?
-  role            Role                      @default(CUSTOMER)
-  isBlocked       Boolean                   @default(false)
-  createdAt       DateTime                  @default(now())
-  updatedAt       DateTime                  @updatedAt
-  profile         Profile?
-  orders          Order[]
-  orderResponses  OrderResponse[]
-  offers          Offer[]
-  sentMessages    Message[]                 @relation("SentMessages")
-  conversations   ConversationParticipant[]
-  forumPosts      ForumPost[]
-  forumComments   ForumComment[]
-  reviewsGiven    Review[]                  @relation("ReviewsGiven")
-  reviewsReceived Review[]                  @relation("ReviewsReceived")
-  complaints      Complaint[]
-  notifications   Notification[]
-  favorites       Favorite[]
-  blockedUsers    BlockedUser[]             @relation("BlockedBy")
-  blockedByUsers  BlockedUser[]             @relation("BlockedUser")
+  id                  String                    @id @db.Uuid
+  email               String                    @unique
+  username            String?                   @unique
+  avatarUrl           String?
+  role                Role                      @default(CUSTOMER)
+  region              Region                    @default(GLOBAL)
+  isBlocked           Boolean                   @default(false)
+  onboardingCompleted Boolean                   @default(false)
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+
+  // relations
+  profile             Profile?
+  privacy             PrivacySettings?
+  orders              Order[]                   @relation("OrderAuthor")
+  assignedOrders      Order[]                   @relation("OrderExecutor")
+  orderResponses      OrderResponse[]
+  offers              Offer[]
+  sentMessages        Message[]                 @relation("SentMessages")
+  conversations       ConversationParticipant[]
+  forumPosts          ForumPost[]
+  forumComments       ForumComment[]
+  reviewsGiven        Review[]                  @relation("ReviewsGiven")
+  reviewsReceived     Review[]                  @relation("ReviewsReceived")
+  complaints          Complaint[]
+  notifications       Notification[]
+  favorites           Favorite[]
+  blockedUsers        BlockedUser[]             @relation("BlockedBy")
+  blockedByUsers      BlockedUser[]             @relation("BlockedUser")
 }
 
+// ─── НАСТРОЙКИ ПРИВАТНОСТИ ───────────────────────────────────────────────────
+model PrivacySettings {
+  id              String  @id @default(uuid()) @db.Uuid
+  userId          String  @unique               @db.Uuid
+  user            User    @relation(fields: [userId], references: [id])
+  phoneVisible    Boolean @default(false)
+  emailVisible    Boolean @default(false)
+  profileVisible  Boolean @default(true)
+  onlineVisible   Boolean @default(true)
+  lastSeenVisible Boolean @default(true)
+}
+
+// ─── ПРОФИЛЬ ────────────────────────────────────────────────────────────────
 model Profile {
-  id                    String          @id @default(cuid())
-  userId                String          @unique
-  user                  User            @relation(fields: [userId], references: [id])
-  bio                   String?
-  country               String?
-  language              String?
-  nickname              String?
-  phone                 String?
-  avatar                String?
-  specialization        String?
-  industries            String[]
-  experience            String?
-  achievements          String?
-  rating                Float           @default(0)
-  reviewsCount          Int             @default(0)
-  completedProjectsCount Int            @default(0)
-  onlineStatus          Boolean         @default(false)
-  lastSeenAt            DateTime?
-  isPublic              Boolean         @default(true)
-  portfolioItems        PortfolioItem[]
+  id                     String          @id @default(uuid()) @db.Uuid
+  userId                 String          @unique              @db.Uuid
+  user                   User            @relation(fields: [userId], references: [id])
+  firstName              String?
+  lastName               String?
+  bio                    String?
+  country                String?
+  language               String?
+  nickname               String?
+  phone                  String?
+  specialization         String?
+  industries             String[]
+  experience             String?
+  achievements           String?
+  rating                 Float           @default(0)
+  reviewsCount           Int             @default(0)
+  completedProjectsCount Int             @default(0)
+  onlineStatus           Boolean         @default(false)
+  lastSeenAt             DateTime?
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+  portfolioItems         PortfolioItem[]
 }
 
 model PortfolioItem {
-  id        String   @id @default(cuid())
-  profileId String
+  id        String   @id @default(uuid()) @db.Uuid
+  profileId String                         @db.Uuid
   profile   Profile  @relation(fields: [profileId], references: [id])
   type      String   // image | video | audio | text | case
   url       String?
   title     String?
   content   String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Order {
-  id               String          @id @default(cuid())
+  id               String          @id @default(uuid()) @db.Uuid
   title            String
   shortDescription String?
   description      String
@@ -116,8 +217,9 @@ model Order {
   workFormat       String?
   status           OrderStatus     @default(OPEN)
   authorId         String
-  author           User            @relation(fields: [authorId], references: [id])
+  author           User            @relation("OrderAuthor", fields: [authorId], references: [id])
   executorId       String?
+  executor         User?           @relation("OrderExecutor", fields: [executorId], references: [id])
   attachments      String[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -126,18 +228,19 @@ model Order {
 }
 
 model OrderResponse {
-  id         String      @id @default(cuid())
-  orderId    String
-  order      Order       @relation(fields: [orderId], references: [id])
-  executorId String
-  executor   User        @relation(fields: [executorId], references: [id])
+  id         String         @id @default(uuid()) @db.Uuid
+  orderId    String                               @db.Uuid
+  order      Order          @relation(fields: [orderId], references: [id])
+  executorId String                               @db.Uuid
+  executor   User           @relation(fields: [executorId], references: [id])
   message    String?
-  status     String      @default("pending") // pending | accepted | rejected
-  createdAt  DateTime    @default(now())
+  status     ResponseStatus @default(PENDING)
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
 }
 
 model Offer {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid()) @db.Uuid
   title       String
   industry    String?
   description String
@@ -157,7 +260,7 @@ model Offer {
 }
 
 model Conversation {
-  id            String                    @id @default(cuid())
+  id            String                    @id @default(uuid()) @db.Uuid
   participants  ConversationParticipant[]
   messages      Message[]
   lastMessageAt DateTime?
@@ -165,7 +268,7 @@ model Conversation {
 }
 
 model ConversationParticipant {
-  id             String       @id @default(cuid())
+  id             String       @id @default(uuid()) @db.Uuid
   conversationId String
   conversation   Conversation @relation(fields: [conversationId], references: [id])
   userId         String
@@ -175,7 +278,7 @@ model ConversationParticipant {
 }
 
 model Message {
-  id             String       @id @default(cuid())
+  id             String       @id @default(uuid()) @db.Uuid
   content        String?
   audioUrl       String?
   senderId       String
@@ -187,7 +290,7 @@ model Message {
 }
 
 model ForumPost {
-  id         String         @id @default(cuid())
+  id         String         @id @default(uuid()) @db.Uuid
   title      String
   content    String
   industry   String?
@@ -204,7 +307,7 @@ model ForumPost {
 }
 
 model ForumComment {
-  id              String         @id @default(cuid())
+  id              String         @id @default(uuid()) @db.Uuid
   content         String
   postId          String
   post            ForumPost      @relation(fields: [postId], references: [id])
@@ -219,7 +322,7 @@ model ForumComment {
 }
 
 model Review {
-  id         String   @id @default(cuid())
+  id         String   @id @default(uuid()) @db.Uuid
   rating     Int
   text       String?
   fromUserId String
@@ -232,7 +335,7 @@ model Review {
 }
 
 model Complaint {
-  id          String    @id @default(cuid())
+  id          String    @id @default(uuid()) @db.Uuid
   type        String
   targetId    String
   targetType  String
@@ -246,7 +349,7 @@ model Complaint {
 }
 
 model Notification {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid()) @db.Uuid
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   type      String
@@ -258,7 +361,7 @@ model Notification {
 }
 
 model Favorite {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid()) @db.Uuid
   userId      String
   user        User     @relation(fields: [userId], references: [id])
   targetId    String
@@ -269,7 +372,7 @@ model Favorite {
 }
 
 model BlockedUser {
-  id          String   @id @default(cuid())
+  id          String   @id @default(uuid()) @db.Uuid
   blockedById String
   blockedBy   User     @relation("BlockedBy", fields: [blockedById], references: [id])
   blockedId   String
@@ -284,6 +387,17 @@ enum Role {
   EXECUTOR
   BOTH
   ADMIN
+}
+
+enum ResponseStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum Region {
+  GLOBAL
+  RU
 }
 
 enum OrderStatus {
