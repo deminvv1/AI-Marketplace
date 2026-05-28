@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import {
   Briefcase,
   Code2,
@@ -15,6 +16,12 @@ import {
 } from "lucide-react";
 import { COUNTRIES, flag } from "@/lib/mock-data";
 import { createClient } from "@/lib/supabase/client";
+import { getCountryCoords } from "@/lib/country-coords";
+
+const EarthGlobe = dynamic(
+  () => import("@/components/globe/EarthGlobe"),
+  { ssr: false }
+);
 
 function fromSlug(slug: string) {
   return slug
@@ -30,11 +37,13 @@ export default function WelcomePage({
 }) {
   const { country: slug } = use(params);
   const raw = fromSlug(slug);
-  const country = COUNTRIES.find(
-    (c) => c.toLowerCase() === raw.toLowerCase()
-  ) ?? raw;
+  const country =
+    COUNTRIES.find((c) => c.toLowerCase() === raw.toLowerCase()) ?? raw;
+
+  const coords = getCountryCoords(country);
 
   const [isAuthed, setIsAuthed] = useState<boolean | null>(null);
+  const [ready, setReady] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,16 +59,24 @@ export default function WelcomePage({
 
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-6 py-16">
-      <div
-        className="pointer-events-none absolute inset-0 opacity-50"
-        style={{
-          backgroundImage:
-            "radial-gradient(2px 2px at 20% 30%, white, transparent), radial-gradient(1px 1px at 70% 80%, white, transparent), radial-gradient(1px 1px at 40% 60%, white, transparent), radial-gradient(1px 1px at 90% 20%, white, transparent)",
-          backgroundSize: "400px 400px",
-        }}
-      />
+      {/* Three.js Globe */}
+      <div className="absolute inset-0" aria-hidden="true">
+        <EarthGlobe
+          lat={coords.lat}
+          lng={coords.lng}
+          onReady={() => setReady(true)}
+        />
+      </div>
 
-      <div className="relative max-w-6xl w-full text-center">
+      {/* Overlay for text readability */}
+      <div className="absolute inset-0 bg-background/50 pointer-events-none" />
+
+      {/* Page content — fades in after globe animation */}
+      <div
+        className={`relative z-10 max-w-6xl w-full text-center transition-all duration-1000 ${
+          ready ? "opacity-100 translate-y-0" : "opacity-0 translate-y-5"
+        }`}
+      >
         <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs uppercase tracking-[0.3em] text-muted-foreground">
           <span className="size-1.5 rounded-full bg-primary animate-pulse" />
           Country selected · {flag(country)} {country}
@@ -80,7 +97,9 @@ export default function WelcomePage({
         </p>
 
         <div className="mt-12 grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-          {isAuthed ? (
+          {isAuthed === null ? (
+            <div className="md:col-span-2 h-[200px]" />
+          ) : isAuthed ? (
             <div className="md:col-span-2 flex justify-center">
               <Link
                 href="/dashboard"
@@ -148,10 +167,26 @@ export default function WelcomePage({
           </h2>
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
-              { icon: MessagesSquare, label: "Forum", desc: "Discuss AI topics globally" },
-              { icon: ShoppingBag, label: "Ready Offers", desc: "Browse AI solutions for sale" },
-              { icon: ClipboardList, label: "Orders", desc: "Post or find AI projects" },
-              { icon: Users, label: "Executors", desc: "Find AI specialists worldwide" },
+              {
+                icon: MessagesSquare,
+                label: "Forum",
+                desc: "Discuss AI topics globally",
+              },
+              {
+                icon: ShoppingBag,
+                label: "Ready Offers",
+                desc: "Browse AI solutions for sale",
+              },
+              {
+                icon: ClipboardList,
+                label: "Orders",
+                desc: "Post or find AI projects",
+              },
+              {
+                icon: Users,
+                label: "Executors",
+                desc: "Find AI specialists worldwide",
+              },
             ].map(({ icon: Icon, label, desc }) => (
               <div key={label} className="glass glass-hover rounded-2xl p-6 text-left">
                 <div className="size-10 rounded-xl bg-primary/15 border border-primary/40 grid place-items-center">
