@@ -2,15 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import {
+  Loader2, Save, User, Shield, AlertTriangle,
+  Mail, AtSign, Briefcase, Eye, Clock, Phone, CheckCircle2, LogOut, ToggleLeft,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import {
   getSettings, updateAccount, updatePrivacy, deleteAccount,
 } from "@/app/actions/settings";
-import { Role } from "@prisma/client";
-import {
-  Loader2, Save, User, Shield, AlertTriangle,
-  Mail, AtSign, Briefcase, Eye, Clock, Phone, CheckCircle2,
-} from "lucide-react";
+import { useActiveMode } from "@/lib/use-active-mode";
+import { createClient } from "@/lib/supabase/client";
+
+type Role = "CUSTOMER" | "EXECUTOR" | "BOTH";
+const ROLES: Role[] = ["CUSTOMER", "EXECUTOR", "BOTH"];
 
 type Settings = Awaited<ReturnType<typeof getSettings>>;
 type Tab = "account" | "privacy" | "danger";
@@ -101,9 +105,13 @@ export default function SettingsPage() {
 
   // Account form
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState<Role>(Role.CUSTOMER);
+  const [role, setRole] = useState<Role>("CUSTOMER");
   const [accountSaving, setAccountSaving] = useState(false);
   const [accountMsg, setAccountMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  // Active mode (CUSTOMER/EXECUTOR toggle for BOTH role)
+  const { mode, setMode, mounted: modeMounted } = useActiveMode(data?.role);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   // Privacy form
   const [privacy, setPrivacy] = useState({
@@ -135,16 +143,35 @@ export default function SettingsPage() {
     });
   }, []);
 
+  function cancelAccount() {
+    if (!data) return;
+    setUsername(data.username ?? "");
+    setRole(data.role);
+    setAccountMsg(null);
+  }
+
+  function cancelPrivacy() {
+    if (!data) return;
+    setPrivacy({
+      profileVisible: data.privacy?.profileVisible ?? true,
+      onlineVisible: data.privacy?.onlineVisible ?? true,
+      lastSeenVisible: data.privacy?.lastSeenVisible ?? true,
+      emailVisible: data.privacy?.emailVisible ?? false,
+      phoneVisible: data.privacy?.phoneVisible ?? false,
+    });
+    setPrivacyMsg(null);
+  }
+
   async function saveAccount() {
     setAccountSaving(true);
     setAccountMsg(null);
     const result = await updateAccount({ username, role });
     setAccountSaving(false);
-    if (result?.error) {
+    if ("error" in result) {
       setAccountMsg({ ok: false, text: result.error });
     } else {
       setAccountMsg({ ok: true, text: "Account settings saved." });
-      setData((prev) => prev ? { ...prev, username, role } : null);
+      setData((prev: any) => prev ? { ...prev, username, role } : null);
     }
   }
 
@@ -153,7 +180,7 @@ export default function SettingsPage() {
     setPrivacyMsg(null);
     const result = await updatePrivacy(privacy);
     setPrivacySaving(false);
-    setPrivacyMsg(result?.success
+    setPrivacyMsg("success" in result
       ? { ok: true, text: "Privacy settings saved." }
       : { ok: false, text: "Failed to save." }
     );
@@ -163,6 +190,13 @@ export default function SettingsPage() {
     if (!data || deleteInput !== data.username) return;
     setDeleting(true);
     await deleteAccount();
+    router.push("/register");
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
     router.push("/register");
   }
 
@@ -221,7 +255,7 @@ export default function SettingsPage() {
 
             <Field icon={Briefcase} label="Role" hint="You can switch at any time">
               <div className="flex gap-2">
-                {([Role.CUSTOMER, Role.EXECUTOR, Role.BOTH] as const).map((r) => (
+                {ROLES.map((r) => (
                   <button
                     key={r}
                     onClick={() => { setRole(r); setAccountMsg(null); }}
@@ -237,20 +271,60 @@ export default function SettingsPage() {
               </div>
             </Field>
 
+            {modeMounted && data.role === "BOTH" && (
+              <Field icon={ToggleLeft} label="Active mode" hint="Which role you act as right now">
+                <div className="flex gap-2">
+                  {(["CUSTOMER", "EXECUTOR"] as const).map((m) => (
+                    <button
+                      key={m}
+                      onClick={() => setMode(m)}
+                      className={`h-8 px-3 rounded-lg text-xs font-medium transition-all ${
+                        mode === m
+                          ? "bg-primary/20 border border-primary/50 text-primary"
+                          : "bg-white/5 border border-border text-muted-foreground hover:bg-white/10"
+                      }`}
+                    >
+                      {m.charAt(0) + m.slice(1).toLowerCase()}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+            )}
+
             {accountMsg && (
               <p className={`text-xs px-1 ${accountMsg.ok ? "text-green-400" : "text-destructive"}`}>
                 {accountMsg.text}
               </p>
             )}
 
-            <button
-              onClick={saveAccount}
-              disabled={accountSaving}
-              className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
-            >
-              {accountSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-              Save changes
-            </button>
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={saveAccount}
+                  disabled={accountSaving}
+                  className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
+                >
+                  {accountSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                  Save changes
+                </button>
+                <button
+                  onClick={cancelAccount}
+                  disabled={accountSaving}
+                  className="h-9 px-4 rounded-xl bg-white/5 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/10 transition disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                disabled={loggingOut}
+                className="h-9 px-4 rounded-xl bg-destructive/15 border border-destructive/40 text-destructive text-sm font-medium hover:bg-destructive/25 transition flex items-center gap-2 disabled:opacity-50"
+              >
+                {loggingOut ? <Loader2 className="size-4 animate-spin" /> : <LogOut className="size-4" />}
+                Log out
+              </button>
+            </div>
           </Section>
         )}
 
@@ -278,14 +352,23 @@ export default function SettingsPage() {
               </p>
             )}
 
-            <button
-              onClick={savePrivacy}
-              disabled={privacySaving}
-              className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
-            >
-              {privacySaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-              Save changes
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={savePrivacy}
+                disabled={privacySaving}
+                className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
+              >
+                {privacySaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+                Save changes
+              </button>
+              <button
+                onClick={cancelPrivacy}
+                disabled={privacySaving}
+                className="h-9 px-4 rounded-xl bg-white/5 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/10 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
           </Section>
         )}
 
