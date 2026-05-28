@@ -2,6 +2,7 @@
 
 import Link from "next/link"; // Роутинг Next.js вместо TanStack
 import { AppShell } from "@/components/app-shell";
+import { WelcomeModal } from "@/components/welcome-modal";
 import { ORDERS, EXECUTORS, flag } from "@/lib/mock-data";
 import {
   ClipboardList,
@@ -36,6 +37,7 @@ const stats = [
 export default function DashboardPage() {
   return (
     <AppShell title="Dashboard">
+      <WelcomeModal />
       <div className="space-y-8">
         {/* Шапка дашборда */}
         <div className="flex flex-wrap items-end justify-between gap-4">
