@@ -23,12 +23,31 @@ export type FavoriteFreelancer = {
       onlineStatus: boolean;
     } | null;
   } | null;
+  project?: {
+    id: string;
+    title: string;
+    shortDescription: string | null;
+    industry: string | null;
+    budget: string | null;
+    country: string | null;
+    status: string;
+  } | null;
+  solution?: {
+    id: string;
+    title: string;
+    industry: string | null;
+    price: string | null;
+    preview: string | null;
+    isPublished: boolean;
+  } | null;
 };
+
+export type FavoriteItem = FavoriteFreelancer;
 
 export async function getFavorites(targetType?: string) {
   try {
     const qs = targetType ? `?targetType=${encodeURIComponent(targetType)}` : "";
-    return await api.get<FavoriteFreelancer[]>(`/favorites${qs}`);
+    return await api.get<FavoriteItem[]>(`/favorites${qs}`);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to load favorites";
     return { error: message };

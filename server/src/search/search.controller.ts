@@ -3,7 +3,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { SearchQueryDto } from './dto/search-query.dto';
 import { SearchService } from './search.service';
 
-/** GET /api/search?q= — один запрос вместо четырёх на клиенте */
+/** GET /api/search?q= — только залогиненные */
 @Controller('search')
 @UseGuards(AuthGuard)
 export class SearchController {

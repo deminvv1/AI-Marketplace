@@ -23,7 +23,7 @@ import {
 } from "@/app/actions/forum";
 import { flag } from "@/lib/mock-data";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
-import { ArrowLeft, Loader2, ThumbsUp, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, ThumbsUp, Trash2 } from "lucide-react";
 
 function updateCommentTree(
   items: ForumCommentItem[],
@@ -290,15 +290,24 @@ export default function ForumTopicPage() {
         </button>
 
         {isAuthor && (
-          <button
+          <div className="mt-6 flex flex-wrap gap-2">
+            <Link
+              href={`/forum/${postId}/edit`}
+              className="h-9 px-4 rounded-lg border border-border text-xs inline-flex items-center gap-2 hover:border-primary/40"
+            >
+              <Pencil className="size-4" />
+              Edit
+            </Link>
+            <button
             type="button"
             disabled={deleting}
             onClick={handleDeleteTopic}
-            className="mt-6 h-9 px-4 rounded-lg border border-destructive/50 text-destructive text-xs inline-flex items-center gap-2"
+            className="h-9 px-4 rounded-lg border border-destructive/50 text-destructive text-xs inline-flex items-center gap-2"
           >
             {deleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
             Delete topic
           </button>
+          </div>
         )}
       </article>
 

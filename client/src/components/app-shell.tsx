@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ClipboardList, Users, ShoppingBag, MessagesSquare,
-  MessageCircle, User, Settings, Sparkles, Search, Send,
+  MessageCircle, User, Settings, Sparkles, Search, Send, Bookmark,
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { getMe } from "@/app/actions/me";
@@ -18,6 +18,7 @@ const NAV = [
   { to: "/projects", label: "Projects", icon: ClipboardList },
   { to: "/proposals", label: "My proposals", icon: Send },
   { to: "/freelancers", label: "Freelancers", icon: Users },
+  { to: "/saved", label: "Saved", icon: Bookmark },
   { to: "/solutions", label: "Solutions", icon: ShoppingBag },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/messages", label: "Messages", icon: MessageCircle },

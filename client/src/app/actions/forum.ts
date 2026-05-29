@@ -105,6 +105,18 @@ export async function toggleForumPostLike(postId: string) {
   }
 }
 
+export async function updateForumPost(
+  id: string,
+  data: Partial<ForumPostInput>,
+) {
+  try {
+    return await api.patch<ForumPostDetail>(`/forum/posts/${id}`, data);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update topic";
+    return { error: message };
+  }
+}
+
 export async function deleteForumPost(id: string) {
   try {
     return await api.delete<{ success: boolean }>(`/forum/posts/${id}`);

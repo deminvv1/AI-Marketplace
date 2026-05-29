@@ -198,8 +198,8 @@ export default function DashboardPage() {
           <div className="glass rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold">Saved Freelancers</h3>
-              <Link href="/freelancers" className="text-xs text-primary hover:underline">
-                Browse catalog
+              <Link href="/saved" className="text-xs text-primary hover:underline">
+                View all saved
               </Link>
             </div>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">

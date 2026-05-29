@@ -15,13 +15,13 @@ import { FreelancersService } from './freelancers.service';
 export class FreelancersController {
   constructor(private freelancers: FreelancersService) {}
 
-  /** GET /api/freelancers?q= — каталог */
+  /** GET /api/freelancers?q= — каталог (только залогиненные) */
   @Get()
   list(@Query() query: ListFreelancersQueryDto) {
     return this.freelancers.list(query);
   }
 
-  /** GET /api/freelancers/:username — визитка + учёт просмотра (ProfileView) */
+  /** GET /api/freelancers/:username — визитка + ProfileView */
   @Get(':username')
   getOne(
     @Param('username') username: string,

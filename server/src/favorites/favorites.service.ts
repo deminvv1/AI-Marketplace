@@ -22,6 +22,25 @@ const freelancerSelect = {
   },
 } as const;
 
+const projectSelect = {
+  id: true,
+  title: true,
+  shortDescription: true,
+  industry: true,
+  budget: true,
+  country: true,
+  status: true,
+} as const;
+
+const solutionSelect = {
+  id: true,
+  title: true,
+  industry: true,
+  price: true,
+  preview: true,
+  isPublished: true,
+} as const;
+
 @Injectable()
 export class FavoritesService {
   constructor(private prisma: PrismaService) {}
@@ -60,7 +79,7 @@ export class FavoritesService {
     return { success: true };
   }
 
-  /** Список избранного; для freelancer подтягиваем карточки пользователей */
+  /** Список избранного с карточками project / freelancer / solution */
   async list(userId: string, targetType?: string) {
     const favorites = await this.prisma.favorite.findMany({
       where: {
@@ -70,20 +89,37 @@ export class FavoritesService {
       orderBy: { createdAt: 'desc' },
     });
 
-    if (targetType === 'freelancer' || (!targetType && favorites.some((f) => f.targetType === 'freelancer'))) {
-      const freelancerFavs = favorites.filter((f) => f.targetType === 'freelancer');
-      const users = await this.prisma.user.findMany({
-        where: { id: { in: freelancerFavs.map((f) => f.targetId) } },
-        select: freelancerSelect,
-      });
-      const byId = new Map(users.map((u) => [u.id, u]));
-      return favorites.map((f) => ({
-        ...f,
-        freelancer: f.targetType === 'freelancer' ? byId.get(f.targetId) ?? null : null,
-      }));
-    }
+    const ids = (type: string) =>
+      favorites.filter((f) => f.targetType === type).map((f) => f.targetId);
 
-    return favorites;
+    const [users, projects, solutions] = await Promise.all([
+      this.prisma.user.findMany({
+        where: { id: { in: ids('freelancer') } },
+        select: freelancerSelect,
+      }),
+      this.prisma.project.findMany({
+        where: { id: { in: ids('project') } },
+        select: projectSelect,
+      }),
+      this.prisma.solution.findMany({
+        where: { id: { in: ids('solution') } },
+        select: solutionSelect,
+      }),
+    ]);
+
+    const freelancers = new Map(users.map((u) => [u.id, u]));
+    const projectsById = new Map(projects.map((p) => [p.id, p]));
+    const solutionsById = new Map(solutions.map((s) => [s.id, s]));
+
+    return favorites.map((f) => ({
+      ...f,
+      freelancer:
+        f.targetType === 'freelancer' ? freelancers.get(f.targetId) ?? null : null,
+      project:
+        f.targetType === 'project' ? projectsById.get(f.targetId) ?? null : null,
+      solution:
+        f.targetType === 'solution' ? solutionsById.get(f.targetId) ?? null : null,
+    }));
   }
 
   async isFavorited(userId: string, targetId: string, targetType: string) {
