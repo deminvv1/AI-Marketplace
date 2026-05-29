@@ -10,16 +10,18 @@ import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { getMe } from "@/app/actions/me";
 import {
+  checkForumPostLiked,
   createForumComment,
   deleteForumPost,
   getForumComments,
   getForumPost,
+  toggleForumPostLike,
   type ForumCommentItem,
   type ForumPostDetail,
 } from "@/app/actions/forum";
 import { flag } from "@/lib/mock-data";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
-import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, ThumbsUp, Trash2 } from "lucide-react";
 
 function CommentBlock({
   comment,
@@ -75,6 +77,8 @@ export default function ForumTopicPage() {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [likeBusy, setLikeBusy] = useState(false);
 
   const load = useCallback(async () => {
     const [p, c, me] = await Promise.all([
@@ -86,6 +90,10 @@ export default function ForumTopicPage() {
     else if (p && "id" in p) setPost(p as ForumPostDetail);
     if (Array.isArray(c)) setComments(c);
     setMeId(me?.id ?? null);
+    if (me?.id) {
+      const status = await checkForumPostLiked(postId);
+      setLiked(!!status.liked);
+    }
   }, [postId]);
 
   useEffect(() => {
@@ -114,6 +122,22 @@ export default function ForumTopicPage() {
     setReplyToId(null);
     const c = await getForumComments(postId);
     if (Array.isArray(c)) setComments(c);
+  }
+
+  async function handleLike() {
+    setLikeBusy(true);
+    const result = await toggleForumPostLike(postId);
+    setLikeBusy(false);
+    if ("error" in result && result.error) {
+      setError(result.error);
+      return;
+    }
+    if ("liked" in result) {
+      setLiked(result.liked);
+      setPost((prev) =>
+        prev ? { ...prev, likesCount: result.likesCount } : prev,
+      );
+    }
   }
 
   async function handleDeleteTopic() {
@@ -177,6 +201,20 @@ export default function ForumTopicPage() {
           </span>
         )}
         <p className="mt-4 text-sm whitespace-pre-wrap leading-relaxed">{post.content}</p>
+
+        <button
+          type="button"
+          disabled={likeBusy}
+          onClick={handleLike}
+          className={`mt-4 h-9 px-4 rounded-lg border text-sm inline-flex items-center gap-2 transition disabled:opacity-60 ${
+            liked
+              ? "border-primary/50 bg-primary/15 text-primary"
+              : "border-border hover:border-primary/40"
+          }`}
+        >
+          <ThumbsUp className={`size-4 ${liked ? "fill-current" : ""}`} />
+          {post.likesCount} {post.likesCount === 1 ? "like" : "likes"}
+        </button>
 
         {isAuthor && (
           <button

@@ -123,6 +123,64 @@ export class ForumPostsService {
     return { success: true };
   }
 
+  /** Toggle лайка темы; синхронизируем denormalized likesCount */
+  async toggleLike(postId: string, userId: string) {
+    const post = await this.prisma.forumPost.findFirst({
+      where: { id: postId, isDeleted: false },
+      select: { id: true },
+    });
+    if (!post) throw new NotFoundException('Topic not found');
+
+    const existing = await this.prisma.forumPostLike.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+
+    if (existing) {
+      await this.prisma.$transaction([
+        this.prisma.forumPostLike.delete({
+          where: { userId_postId: { userId, postId } },
+        }),
+        this.prisma.forumPost.update({
+          where: { id: postId },
+          data: { likesCount: { decrement: 1 } },
+        }),
+      ]);
+      const updated = await this.prisma.forumPost.findUnique({
+        where: { id: postId },
+        select: { likesCount: true },
+      });
+      return { liked: false, likesCount: Math.max(0, updated?.likesCount ?? 0) };
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.forumPostLike.create({
+        data: { userId, postId },
+      }),
+      this.prisma.forumPost.update({
+        where: { id: postId },
+        data: { likesCount: { increment: 1 } },
+      }),
+    ]);
+    const updated = await this.prisma.forumPost.findUnique({
+      where: { id: postId },
+      select: { likesCount: true },
+    });
+    return { liked: true, likesCount: updated?.likesCount ?? 1 };
+  }
+
+  async isLiked(postId: string, userId: string) {
+    const post = await this.prisma.forumPost.findFirst({
+      where: { id: postId, isDeleted: false },
+      select: { id: true },
+    });
+    if (!post) throw new NotFoundException('Topic not found');
+
+    const like = await this.prisma.forumPostLike.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+    return { liked: !!like };
+  }
+
   private async assertAuthor(postId: string, userId: string) {
     const post = await this.prisma.forumPost.findUnique({
       where: { id: postId },

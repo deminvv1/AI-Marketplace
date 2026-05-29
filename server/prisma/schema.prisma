@@ -28,6 +28,7 @@ model User {
   sentMessages        Message[]                 @relation("SentMessages")
   conversations       ConversationParticipant[]
   forumPosts          ForumPost[]
+  forumPostLikes      ForumPostLike[]
   forumComments       ForumComment[]
   reviewsGiven        Review[]                  @relation("ReviewsGiven")
   reviewsReceived     Review[]                  @relation("ReviewsReceived")
@@ -212,6 +213,19 @@ model ForumPost {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   comments   ForumComment[]
+  likes      ForumPostLike[]
+}
+
+/// Кто лайкнул тему — один лайк на пользователя, счётчик в ForumPost.likesCount
+model ForumPostLike {
+  userId    String    @db.Uuid
+  postId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
 }
 
 model ForumComment {

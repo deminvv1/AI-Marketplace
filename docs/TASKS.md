@@ -141,9 +141,17 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 | API | `PATCH /api/projects/:id` — владелец, только **OPEN** |
 | Фронт | `/projects/[id]/edit`, кнопка Edit на карточке |
 
+### ✅ Лайки на форуме (сделано)
+
+| Слой | Где |
+|------|-----|
+| БД | `ForumPostLike` (миграция `20260529150000_forum_post_likes`) |
+| API | `POST /forum/posts/:id/like`, `GET .../liked` |
+| Фронт | кнопка на `/forum/[id]` |
+
 ### 🔜 Дальше (по желанию)
 
-- лайки на форуме, Job alerts / SavedSearch (`docs/new.md`)
+- лайки на комментариях, Job alerts / SavedSearch (`docs/new.md`)
 
 ---
 

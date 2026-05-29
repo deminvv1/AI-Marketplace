@@ -29,6 +29,20 @@ export class ForumPostsController {
     return this.posts.findAll(query);
   }
 
+  /** GET /api/forum/posts/:id/liked — лайкнул ли текущий пользователь */
+  @Get(':id/liked')
+  @UseGuards(AuthGuard)
+  liked(@Param('id') id: string, @CurrentUser() user: { id: string }) {
+    return this.posts.isLiked(id, user.id);
+  }
+
+  /** POST /api/forum/posts/:id/like — toggle лайка */
+  @Post(':id/like')
+  @UseGuards(AuthGuard)
+  toggleLike(@Param('id') id: string, @CurrentUser() user: { id: string }) {
+    return this.posts.toggleLike(id, user.id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.posts.findOne(id);

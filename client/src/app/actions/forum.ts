@@ -85,6 +85,26 @@ export async function createForumPost(data: ForumPostInput) {
   }
 }
 
+export async function checkForumPostLiked(postId: string) {
+  try {
+    return await api.get<{ liked: boolean }>(`/forum/posts/${postId}/liked`);
+  } catch {
+    return { liked: false };
+  }
+}
+
+export async function toggleForumPostLike(postId: string) {
+  try {
+    return await api.post<{ liked: boolean; likesCount: number }>(
+      `/forum/posts/${postId}/like`,
+      {},
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update like";
+    return { error: message };
+  }
+}
+
 export async function deleteForumPost(id: string) {
   try {
     return await api.delete<{ success: boolean }>(`/forum/posts/${id}`);
