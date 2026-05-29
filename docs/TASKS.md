@@ -31,7 +31,7 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
 | **Solution** | Готовое AI-решение | **Антон** | только mock UI |
 | **ForumPost** / **ForumComment** | Форум | **Антон** | только mock UI |
-| **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | визитка есть; CRUD портфолио — дальше |
+| **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
 | **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
 | **Review** / **Favorite** | Отзыв, избранное | **Антон** | не начато |
 | **Conversation** / **Message** | Чат | **Влад** | только mock UI |
@@ -96,17 +96,17 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 ---
 
-### 🔜 Сущность 2: **Profile** + **PortfolioItem** ← СЕЙЧАС
+### ✅ Сущность 2: **Profile** + **PortfolioItem** (сделано)
 
-| Слой | Задача |
-|------|--------|
-| Бэк | CRUD портфолио, доработать PATCH profile |
-| Фронт | `/profile` без «Coming soon» |
-| Фронт | ссылка на свою визитку `/freelancers/{username}` |
+| Слой | Где |
+|------|-----|
+| Бэк | `GET/PATCH /profile`, `POST/PATCH/DELETE /profile/portfolio/:id` |
+| Фронт | `/profile` → вкладка Portfolio (CRUD), ссылка Public page |
+| Визитка | `/freelancers/[username]` читает portfolioItems |
 
 ---
 
-### Сущность 3: **Solution**
+### 🔜 Сущность 3: **Solution** ← СЕЙЧАС
 
 `server/src/solutions/`, `/solutions` без mock.
 

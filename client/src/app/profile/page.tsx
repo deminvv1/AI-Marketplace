@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { getMyProfile, updateProfile } from "@/app/actions/profile";
+import { getMyProfile, updateProfile, type MyProfile } from "@/app/actions/profile";
+import { PortfolioTab } from "@/app/profile/portfolio-tab";
 import {
   Edit2, Save, X, Plus, Star, CheckCircle2,
-  MessageCircle, Loader2, Globe, CalendarDays, Briefcase,
+  MessageCircle, Loader2, Globe, CalendarDays, Briefcase, Eye,
 } from "lucide-react";
 
-type ProfileData = Awaited<ReturnType<typeof getMyProfile>>;
 type Tab = "about" | "portfolio" | "offers" | "completed" | "reviews";
 
 const TABS: { key: Tab; label: string }[] = [
@@ -19,7 +20,7 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "reviews", label: "Reviews" },
 ];
 
-function formFromData(data: ProfileData) {
+function formFromData(data: MyProfile) {
   return {
     firstName: data.profile?.firstName ?? "",
     lastName: data.profile?.lastName ?? "",
@@ -33,7 +34,7 @@ function formFromData(data: ProfileData) {
 }
 
 export default function ProfilePage() {
-  const [data, setData] = useState<ProfileData | null>(null);
+  const [data, setData] = useState<MyProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -44,12 +45,17 @@ export default function ProfilePage() {
   const [industryInput, setIndustryInput] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("about");
 
-  useEffect(() => {
-    getMyProfile().then((d) => {
+  const reload = useCallback(async () => {
+    const d = await getMyProfile();
+    if (d) {
       setData(d);
       setForm(formFromData(d));
-    });
+    }
   }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
 
   function startEdit() { setEditing(true); setError(""); }
   function cancelEdit() {
@@ -67,9 +73,7 @@ export default function ProfilePage() {
       setError("error" in result && result.error ? result.error : "Failed to save.");
       return;
     }
-    setData((prev: ProfileData | null) =>
-      prev ? { ...prev, profile: prev.profile ? { ...prev.profile, ...form } : null } : null
-    );
+    await reload();
     setEditing(false);
   }
   function addIndustry() {
@@ -147,9 +151,23 @@ export default function ProfilePage() {
                     <h2 className="text-2xl font-bold tracking-tight mt-2">{displayName}</h2>
                   )}
 
-                  {/* Username + country */}
+                  {/* Username + public link */}
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-sm text-muted-foreground">@{data.username}</span>
+                    {data.username ? (
+                      <>
+                        <span className="text-sm text-muted-foreground">@{data.username}</span>
+                        <Link
+                          href={`/freelancers/${data.username}`}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Public page →
+                        </Link>
+                      </>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        Set username in Settings to get a public page
+                      </span>
+                    )}
                     {editing ? (
                       <input
                         value={form.country}
@@ -356,37 +374,54 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Portfolio */}
-              <div className="glass rounded-2xl p-6 space-y-4">
-                <h3 className="font-semibold">Portfolio</h3>
-                {(data.profile?.completedProjectsCount ?? 0) === 0 ? (
-                  <p className="text-sm text-muted-foreground/50 italic text-center py-6">
-                    No portfolio items yet
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-3 gap-4">
-                    {[
-                      "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
-                      "linear-gradient(135deg, #1a4731, #2d9b6e)",
-                      "linear-gradient(135deg, #4a1942, #9b2d8e)",
-                    ].map((bg, i) => (
-                      <div
-                        key={i}
-                        className="h-36 rounded-xl flex items-end p-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                        style={{ background: bg }}
-                      >
-                        <span className="text-xs font-medium text-white/80">Project {i + 1}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Portfolio cases are managed in the{" "}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("portfolio")}
+                  className="text-primary hover:underline"
+                >
+                  Portfolio tab
+                </button>
+                .
+              </p>
             </>
           )}
 
-          {activeTab !== "about" && (
-            <div className="glass rounded-2xl p-16 flex items-center justify-center">
-              <p className="text-muted-foreground/50 italic">Coming soon</p>
+          {activeTab === "portfolio" && (
+            <PortfolioTab
+              items={data.profile?.portfolioItems ?? []}
+              onChanged={reload}
+            />
+          )}
+
+          {activeTab === "offers" && (
+            <div className="glass rounded-2xl p-10 text-center space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Ready-made AI solutions live in the Solutions section.
+              </p>
+              <Link href="/solutions" className="text-primary text-sm hover:underline">
+                Go to Solutions →
+              </Link>
+            </div>
+          )}
+
+          {activeTab === "completed" && (
+            <div className="glass rounded-2xl p-10 text-center space-y-3">
+              <p className="text-muted-foreground text-sm">
+                Completed marketplace projects appear on your dashboard and project history.
+              </p>
+              <Link href="/dashboard" className="text-primary text-sm hover:underline">
+                Open dashboard →
+              </Link>
+            </div>
+          )}
+
+          {activeTab === "reviews" && (
+            <div className="glass rounded-2xl p-10 text-center">
+              <p className="text-muted-foreground text-sm">
+                Reviews will be available after the Review entity is implemented.
+              </p>
             </div>
           )}
         </div>
@@ -401,6 +436,7 @@ export default function ProfilePage() {
               { icon: Star, label: "Rating", value: (data.profile?.rating ?? 0) > 0 ? `${data.profile!.rating.toFixed(1)} / 5` : "—", color: "text-yellow-400" },
               { icon: Globe, label: "Languages", value: data.profile?.language || "—", color: "text-primary" },
               { icon: MessageCircle, label: "Reviews", value: data.profile?.reviewsCount ?? 0, color: "text-blue-400" },
+              { icon: Eye, label: "Profile views", value: data.profile?.viewCount ?? 0, color: "text-primary" },
               { icon: CalendarDays, label: "Member since", value: memberYear, color: "text-muted-foreground" },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="flex items-center justify-between text-sm py-1 border-b border-border/40 last:border-0">
