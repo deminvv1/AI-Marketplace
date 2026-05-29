@@ -50,9 +50,10 @@ export type FreelancerPublicProfile = {
   } | null;
 };
 
-export async function listFreelancers() {
+export async function listFreelancers(filters?: { q?: string }) {
   try {
-    return await api.get<FreelancerListItem[]>("/freelancers");
+    const qs = filters?.q ? `?q=${encodeURIComponent(filters.q)}` : "";
+    return await api.get<FreelancerListItem[]>(`/freelancers${qs}`);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to load freelancers";
     return { error: message };

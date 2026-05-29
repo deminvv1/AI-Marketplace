@@ -1,6 +1,7 @@
-import { Controller, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
+import { ListFreelancersQueryDto } from './dto/list-freelancers-query.dto';
 import { FreelancersService } from './freelancers.service';
 
 /**
@@ -14,10 +15,10 @@ import { FreelancersService } from './freelancers.service';
 export class FreelancersController {
   constructor(private freelancers: FreelancersService) {}
 
-  /** GET /api/freelancers — каталог */
+  /** GET /api/freelancers?q= — каталог */
   @Get()
-  list() {
-    return this.freelancers.list();
+  list(@Query() query: ListFreelancersQueryDto) {
+    return this.freelancers.list(query);
   }
 
   /** GET /api/freelancers/:username — визитка + учёт просмотра (ProfileView) */

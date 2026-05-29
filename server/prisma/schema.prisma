@@ -36,6 +36,7 @@ model User {
   reports             Report[]
   notifications       Notification[]
   favorites           Favorite[]
+  projectAlerts       ProjectAlert[]
   blockedUsers        BlockedUser[]             @relation("BlockedBy")
   blockedByUsers      BlockedUser[]             @relation("BlockedUser")
   profileViewsMade    ProfileView[]             @relation("ProfileViewsByViewer")
@@ -295,6 +296,26 @@ model Notification {
   isRead    Boolean  @default(false)
   link      String?
   createdAt DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
+}
+
+/// Подписка фрилансера на новые OPEN-проекты (Project alerts, бывш. Job alerts)
+model ProjectAlert {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String                         @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label         String?
+  industry      String?
+  country       String?
+  q             String?
+  tags          String[] @default([])
+  notifyByEmail Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, isActive])
 }
 
 // ─── FAVORITES & BLOCKS ───────────────────────────────────────────────────────

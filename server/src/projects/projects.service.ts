@@ -9,6 +9,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { ProjectAlertsMatcherService } from '../project-alerts/project-alerts-matcher.service';
 
 /**
  * Единый набор полей Project для списков и карточки.
@@ -36,7 +37,10 @@ const projectListSelect = {
 
 @Injectable()
 export class ProjectsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private projectAlerts: ProjectAlertsMatcherService,
+  ) {}
 
   /** Публиковать проекты могут только CLIENT и BOTH (заказчик). */
   private async assertCanPostProjects(userId: string) {
@@ -54,7 +58,7 @@ export class ProjectsService {
   async create(userId: string, dto: CreateProjectDto) {
     await this.assertCanPostProjects(userId);
 
-    return this.prisma.project.create({
+    const project = await this.prisma.project.create({
       data: {
         title: dto.title.trim(),
         description: dto.description.trim(),
@@ -70,6 +74,13 @@ export class ProjectsService {
       },
       select: projectListSelect,
     });
+
+    const full = await this.prisma.project.findUnique({ where: { id: project.id } });
+    if (full) {
+      void this.projectAlerts.notifyMatchingSubscribers(full);
+    }
+
+    return project;
   }
 
   /**

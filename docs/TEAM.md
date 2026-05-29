@@ -117,7 +117,7 @@ export async function createOrder(data) {
 
 ---
 
-### 4. Не дублировать auth в заказах/форуме — только `userId` из Guard
+### 5. Не дублировать auth в заказах/форуме — только `userId` из Guard
 
 **Что это:** В модулях Orders, Forum, Messages **не пишем** свою проверку пароля, свои сессии, свой разбор JWT вручную.
 

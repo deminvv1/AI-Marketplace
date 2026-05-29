@@ -3,9 +3,10 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProfileService } from '../profile/profile.service';
+import { ListFreelancersQueryDto } from './dto/list-freelancers-query.dto';
 
 /** Поля визитки фрилансера для GET /api/freelancers/:username */
 const publicProfileSelect = {
@@ -83,13 +84,35 @@ export class FreelancersService {
    * Каталог исполнителей (для /freelancers).
    * Только пользователи с username и profileVisible, роль FREELANCER/BOTH.
    */
-  async list() {
+  async list(query: ListFreelancersQueryDto = {}) {
+    const q = query.q?.trim();
+    const where: Prisma.UserWhereInput = {
+      username: { not: null },
+      role: { in: [Role.FREELANCER, Role.BOTH] },
+      privacy: { profileVisible: true },
+      ...(q
+        ? {
+            OR: [
+              { username: { contains: q, mode: 'insensitive' } },
+              {
+                profile: {
+                  is: {
+                    OR: [
+                      { firstName: { contains: q, mode: 'insensitive' } },
+                      { lastName: { contains: q, mode: 'insensitive' } },
+                      { specialization: { contains: q, mode: 'insensitive' } },
+                      { bio: { contains: q, mode: 'insensitive' } },
+                    ],
+                  },
+                },
+              },
+            ],
+          }
+        : {}),
+    };
+
     const users = await this.prisma.user.findMany({
-      where: {
-        username: { not: null },
-        role: { in: [Role.FREELANCER, Role.BOTH] },
-        privacy: { profileVisible: true },
-      },
+      where,
       orderBy: { createdAt: 'desc' },
       take: 50,
       select: listItemSelect,

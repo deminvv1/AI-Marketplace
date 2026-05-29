@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { INDUSTRIES, flag } from "@/lib/mock-data";
-import { Search, ArrowRight, Loader2, X } from "lucide-react";
+import { Search, ArrowRight, Loader2, X, Bell } from "lucide-react";
+import { createProjectAlert } from "@/app/actions/project-alerts";
 import { StatusBadge } from "@/components/ui-bits";
 import { getProjects, type ProjectListItem } from "@/app/actions/projects";
 import {
@@ -25,6 +26,26 @@ export default function ProjectsPage() {
   const [query, setQuery] = useState("");
   const [industry, setIndustry] = useState<string | null>(null);
   const [country, setCountry] = useState("");
+  const [alertSaving, setAlertSaving] = useState(false);
+  const [alertMsg, setAlertMsg] = useState<string | null>(null);
+
+  async function saveAsAlert() {
+    if (!hasFilters) {
+      setAlertMsg("Set industry, country, or keyword first.");
+      return;
+    }
+    setAlertSaving(true);
+    setAlertMsg(null);
+    const res = await createProjectAlert({
+      industry: industry ?? undefined,
+      country: country.trim() || undefined,
+      q: query.trim() || undefined,
+      notifyByEmail: true,
+    });
+    setAlertSaving(false);
+    if ("error" in res && res.error) setAlertMsg(res.error);
+    else setAlertMsg("Alert saved! You will be notified about matching projects.");
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -93,19 +114,34 @@ export default function ProjectsPage() {
         />
       </div>
 
-      {hasFilters && (
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        {hasFilters && (
+          <button
+            type="button"
+            onClick={() => {
+              setIndustry(null);
+              setCountry("");
+              setQuery("");
+            }}
+            className="text-xs text-primary inline-flex items-center gap-1 hover:underline"
+          >
+            <X className="size-3" /> Clear filters
+          </button>
+        )}
         <button
           type="button"
-          onClick={() => {
-            setIndustry(null);
-            setCountry("");
-            setQuery("");
-          }}
-          className="mb-4 text-xs text-primary inline-flex items-center gap-1 hover:underline"
+          disabled={alertSaving || !hasFilters}
+          onClick={saveAsAlert}
+          className="text-xs inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border hover:border-primary/40 disabled:opacity-50"
         >
-          <X className="size-3" /> Clear filters
+          <Bell className="size-3.5" />
+          {alertSaving ? "Saving…" : "Save as project alert"}
         </button>
-      )}
+        <Link href="/project-alerts" className="text-xs text-muted-foreground hover:text-primary">
+          Manage alerts →
+        </Link>
+        {alertMsg && <span className="text-xs text-muted-foreground">{alertMsg}</span>}
+      </div>
 
       <div className="grid grid-cols-12 gap-6">
         <aside className="col-span-12 md:col-span-3 glass rounded-2xl p-5 h-fit sticky top-24">

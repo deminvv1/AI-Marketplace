@@ -26,7 +26,8 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 |---------------|-----------|-----|--------|
 | **User** | Пользователь, роль, email | **Влад** | почти готово |
 | **PrivacySettings** | Приватность | **Влад** | готово |
-| **Notification** | Уведомления | **Влад** | не начато |
+| **Notification** | Уведомления in-app + email (Resend) | **Антон** (v1) | list, unread, Project alert |
+| **ProjectAlert** | Подписка на новые проекты | **Антон** | CRUD + matcher при create project |
 | **Project** | Проект на бирже | **Антон** | CRUD: create, read, **update** (OPEN), complete, delete, фильтры |
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
 | **Solution** | Готовое AI-решение | **Антон** | CRUD API + каталог, new, detail |
@@ -153,9 +154,18 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 | API | `POST .../comments/:commentId/like`, `GET .../comments/likes/me` |
 
-### 🔜 Дальше (по желанию)
+### ✅ Project alerts + Notifications (сделано)
 
-- **Project alerts** (подписка на новые OPEN-проекты), общий `/search`
+| Слой | Где |
+|------|-----|
+| БД | `ProjectAlert`, индекс на `Notification` |
+| API | `/api/project-alerts`, `/api/notifications` |
+| Email | `EmailService` + `RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL` |
+| Фронт | `/project-alerts`, колокольчик в шапке, «Save as alert» на `/projects` |
+
+### ✅ Глобальный поиск `/search` (v1)
+
+Спека: `docs/SEARCH.md` · страница + поиск в шапке · `GET /freelancers?q=`
 
 ---
 

@@ -11,6 +11,8 @@ import { SolutionsModule } from './solutions/solutions.module';
 import { ForumModule } from './forum/forum.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ProjectAlertsModule } from './project-alerts/project-alerts.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { FavoritesModule } from './favorites/favorites.module';
     ForumModule,
     ReviewsModule,
     FavoritesModule,
+    NotificationsModule,
+    ProjectAlertsModule,
   ],
 })
 export class AppModule {}

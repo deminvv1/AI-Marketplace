@@ -1,18 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard, ClipboardList, Users, ShoppingBag, MessagesSquare,
-  MessageCircle, User, Settings, Sparkles, Search, Bell
+  MessageCircle, User, Settings, Sparkles, Search,
 } from "lucide-react";
 import { ReactNode, useEffect, useState } from "react";
 import { getMe } from "@/app/actions/me";
+import { NotificationsBell } from "@/components/notifications-bell";
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/search", label: "Search", icon: Search },
   { to: "/projects", label: "Projects", icon: ClipboardList },
   { to: "/freelancers", label: "Freelancers", icon: Users },
   { to: "/solutions", label: "Solutions", icon: ShoppingBag },
@@ -24,7 +26,9 @@ const NAV = [
 
 export function AppShell({ children, title }: { children: ReactNode; title?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [me, setMe] = useState<Me>(null);
+  const [headerQuery, setHeaderQuery] = useState("");
 
   useEffect(() => {
     getMe().then(setMe);
@@ -81,15 +85,23 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
         <header className="h-16 border-b border-border/60 px-8 flex items-center gap-4 sticky top-0 z-30 bg-background/60 backdrop-blur-xl">
           <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
           <div className="flex-1" />
-          <div className="relative w-72 max-w-full hidden md:block">
+          <form
+            className="relative w-72 max-w-full hidden md:block"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const q = headerQuery.trim();
+              router.push(q ? `/search?q=${encodeURIComponent(q)}` : "/search");
+            }}
+          >
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input placeholder="Search projects, freelancers, forum…"
-              className="w-full h-9 pl-9 pr-3 rounded-lg bg-white/5 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:glow-primary transition-all" />
-          </div>
-          <button className="relative size-9 grid place-items-center rounded-lg bg-white/5 border border-border hover:border-primary/50 transition">
-            <Bell className="size-4" />
-            <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-secondary animate-pulse" />
-          </button>
+            <input
+              value={headerQuery}
+              onChange={(e) => setHeaderQuery(e.target.value)}
+              placeholder="Search projects, freelancers, forum…"
+              className="w-full h-9 pl-9 pr-3 rounded-lg bg-white/5 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:glow-primary transition-all"
+            />
+          </form>
+          <NotificationsBell />
         </header>
         <main className="flex-1 p-8">{children}</main>
       </div>
