@@ -26,6 +26,7 @@ export default function ProjectAlertsPage() {
   const [industry, setIndustry] = useState("");
   const [country, setCountry] = useState("");
   const [q, setQ] = useState("");
+  const [tagsInput, setTagsInput] = useState("");
   const [notifyByEmail, setNotifyByEmail] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -42,8 +43,12 @@ export default function ProjectAlertsPage() {
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    if (!industry && !country && !q.trim()) {
-      setError("Set at least one filter: industry, country, or keyword.");
+    const tags = tagsInput
+      .split(",")
+      .map((t) => t.trim())
+      .filter(Boolean);
+    if (!industry && !country && !q.trim() && tags.length === 0) {
+      setError("Set at least one filter: industry, country, keyword, or tags.");
       return;
     }
     setSubmitting(true);
@@ -53,6 +58,7 @@ export default function ProjectAlertsPage() {
       industry: industry || undefined,
       country: country || undefined,
       q: q.trim() || undefined,
+      tags: tags.length ? tags : undefined,
       notifyByEmail,
     });
     setSubmitting(false);
@@ -65,6 +71,7 @@ export default function ProjectAlertsPage() {
     setIndustry("");
     setCountry("");
     setQ("");
+    setTagsInput("");
     await load();
   }
 
@@ -146,6 +153,15 @@ export default function ProjectAlertsPage() {
                 className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
               />
             </div>
+            <div>
+              <label className="text-sm font-medium">Tags (comma-separated)</label>
+              <input
+                value={tagsInput}
+                onChange={(e) => setTagsInput(e.target.value)}
+                placeholder="LLM, PyTorch, healthcare"
+                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              />
+            </div>
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
@@ -195,6 +211,7 @@ export default function ProjectAlertsPage() {
                     {a.industry && <span>{a.industry}</span>}
                     {a.country && <span>· {a.country}</span>}
                     {a.q && <span>· “{a.q}”</span>}
+                    {a.tags?.length > 0 && <span>· tags: {a.tags.join(", ")}</span>}
                     {a.notifyByEmail && <span>· email on</span>}
                   </div>
                 </div>

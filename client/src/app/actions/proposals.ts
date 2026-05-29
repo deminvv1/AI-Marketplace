@@ -13,6 +13,15 @@ export type ProposalItem = {
   estimatedDays: number | null;
   status: string;
   createdAt: string;
+  project?: {
+    id: string;
+    title: string;
+    status: string;
+    industry: string | null;
+    budget: string | null;
+    country: string | null;
+    client: { username: string | null };
+  };
   freelancer: {
     id: string;
     username: string | null;
@@ -45,6 +54,16 @@ export async function createProposal(projectId: string, data: CreateProposalInpu
 export async function getProjectProposals(projectId: string) {
   try {
     return await api.get<ProposalItem[]>(`/projects/${projectId}/proposals`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to load proposals";
+    return { error: message };
+  }
+}
+
+/** GET /api/proposals/mine — все отклики фрилансера */
+export async function getMyProposals() {
+  try {
+    return await api.get<ProposalItem[]>("/proposals/mine");
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to load proposals";
     return { error: message };

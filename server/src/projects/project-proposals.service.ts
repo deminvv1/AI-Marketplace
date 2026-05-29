@@ -122,6 +122,29 @@ export class ProjectProposalsService {
     });
   }
 
+  /** Все отклики фрилансера — для /proposals и дашборда */
+  async listMine(freelancerId: string) {
+    await this.assertCanPropose(freelancerId);
+    return this.prisma.proposal.findMany({
+      where: { freelancerId },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        ...proposalSelect,
+        project: {
+          select: {
+            id: true,
+            title: true,
+            status: true,
+            industry: true,
+            budget: true,
+            country: true,
+            client: { select: { username: true } },
+          },
+        },
+      },
+    });
+  }
+
   private async assertProjectOwner(projectId: string, userId: string) {
     const project = await this.prisma.project.findUnique({
       where: { id: projectId },

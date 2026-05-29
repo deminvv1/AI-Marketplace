@@ -59,7 +59,7 @@
 | Solutions | `GET /api/solutions?q=` | уже есть |
 | Forum | `GET /api/forum/posts?q=` | уже есть |
 
-Опционально позже: один `GET /api/search?q=` на Nest (тонкий агрегатор) — **не обязателен для v1**.
+**v1.1:** `GET /api/search?q=` на Nest — один запрос вместо четырёх (клиент `searchMarketplace` использует его).
 
 ---
 

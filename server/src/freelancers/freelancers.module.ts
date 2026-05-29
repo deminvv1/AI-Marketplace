@@ -7,5 +7,6 @@ import { FreelancersService } from './freelancers.service';
   imports: [ProfileModule],
   controllers: [FreelancersController],
   providers: [FreelancersService],
+  exports: [FreelancersService],
 })
 export class FreelancersModule {}

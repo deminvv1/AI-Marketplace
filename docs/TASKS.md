@@ -165,7 +165,17 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 ### ✅ Глобальный поиск `/search` (v1)
 
-Спека: `docs/SEARCH.md` · страница + поиск в шапке · `GET /freelancers?q=`
+Спека: `docs/SEARCH.md` · страница + поиск в шапке · `GET /freelancers?q=` · **`GET /api/search?q=`**
+
+### ✅ Мои отклики + polish (сделано)
+
+| Слой | Где |
+|------|-----|
+| API | `GET /api/proposals/mine` |
+| Фронт | `/proposals`, пункт в сайдбаре |
+| Дашборд | кликабельные проекты, счётчики откликов и уведомлений |
+| Solutions | Save (favorite) на карточке |
+| Alerts | поле tags в форме подписки |
 
 ---
 

@@ -8,5 +8,6 @@ import { ForumPostsService } from './forum-posts.service';
 @Module({
   controllers: [ForumPostsController, ForumCommentsController],
   providers: [ForumPostsService, ForumCommentsService],
+  exports: [ForumPostsService],
 })
 export class ForumModule {}

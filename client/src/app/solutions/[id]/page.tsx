@@ -12,6 +12,7 @@ import {
   type SolutionListItem,
 } from "@/app/actions/solutions";
 import { solutionAuthorName } from "@/lib/solutions";
+import { FavoriteButton } from "@/components/favorite-button";
 import { Stars } from "@/components/ui-bits";
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 
@@ -148,12 +149,17 @@ export default function SolutionDetailPage() {
                 {item.freelancer.profile!.rating.toFixed(1)}
               </div>
             )}
-            <Link
-              href="/messages"
-              className="mt-4 w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium grid place-items-center"
-            >
-              Contact
-            </Link>
+            <div className="mt-4 flex flex-col gap-2">
+              <Link
+                href="/messages"
+                className="w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium grid place-items-center"
+              >
+                Contact
+              </Link>
+              {!isOwner && (
+                <FavoriteButton targetId={item.id} targetType="solution" className="w-full justify-center" />
+              )}
+            </div>
           </div>
 
           {isOwner && (

@@ -9,6 +9,8 @@ import { WelcomeModal } from "@/components/welcome-modal";
 import { flag } from "@/lib/mock-data";
 import { getMe } from "@/app/actions/me";
 import { getFavorites, type FavoriteFreelancer } from "@/app/actions/favorites";
+import { getUnreadNotificationCount } from "@/app/actions/notifications";
+import { getMyProposals } from "@/app/actions/proposals";
 import { getMyProjects, type ProjectListItem } from "@/app/actions/projects";
 import { freelancerDisplayName } from "@/lib/projects";
 import { projectStatusForUi } from "@/lib/projects";
@@ -46,6 +48,8 @@ export default function DashboardPage() {
   const [displayName, setDisplayName] = useState("there");
   const [myProjects, setMyProjects] = useState<ProjectListItem[]>([]);
   const [savedFreelancers, setSavedFreelancers] = useState<FavoriteFreelancer[]>([]);
+  const [proposalCount, setProposalCount] = useState(0);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -56,18 +60,27 @@ export default function DashboardPage() {
         setDisplayName(me.username);
       }
 
-      const [mine, favs] = await Promise.all([
+      const [mine, favs, notifs, proposals] = await Promise.all([
         getMyProjects(),
         getFavorites("freelancer"),
+        getUnreadNotificationCount(),
+        getMyProposals(),
       ]);
       if (Array.isArray(mine)) setMyProjects(mine);
       if (Array.isArray(favs)) setSavedFreelancers(favs);
+      setUnreadNotifs(notifs.count ?? 0);
+      if (Array.isArray(proposals)) setProposalCount(proposals.length);
     })();
   }, []);
 
   const activeCount = myProjects.filter((p) =>
     ["OPEN", "IN_PROGRESS"].includes(p.status),
   ).length;
+
+  const responsesCount = myProjects.reduce(
+    (sum, p) => sum + (p._count?.proposals ?? 0),
+    0,
+  );
 
   const savedOnline = savedFreelancers.filter(
     (f) => f.freelancer?.profile?.onlineStatus,
@@ -115,9 +128,13 @@ export default function DashboardPage() {
               <div className="mt-5 text-3xl font-bold tracking-tight">
                 {idx === 0
                   ? String(activeCount || value)
-                  : idx === 2
-                    ? String(savedFreelancers.length)
-                    : value}
+                  : idx === 1
+                    ? String(responsesCount || proposalCount || value)
+                    : idx === 2
+                      ? String(savedFreelancers.length)
+                      : idx === 3
+                        ? String(unreadNotifs)
+                        : value}
               </div>
               <div className="text-sm text-muted-foreground">{label}</div>
             </div>
@@ -145,9 +162,10 @@ export default function DashboardPage() {
                 </p>
               ) : (
                 myProjects.slice(0, 3).map((o) => (
-                  <div
+                  <Link
                     key={o.id}
-                    className="p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
+                    href={`/projects/${o.id}`}
+                    className="block p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
@@ -170,7 +188,7 @@ export default function DashboardPage() {
                       </div>
                       <StatusBadge status={projectStatusForUi(o.status)} />
                     </div>
-                  </div>
+                  </Link>
                 ))
               )}
             </div>
