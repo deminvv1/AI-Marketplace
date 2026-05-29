@@ -1,14 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { getMyProfile, updateProfile } from "@/app/actions/profile";
+import { getMyProfile, updateProfile, type MyProfile } from "@/app/actions/profile";
+import {
+  getMyCompletedProjects,
+  type CompletedProjectsMine,
+} from "@/app/actions/projects";
+import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
+import { StatusBadge } from "@/components/ui-bits";
+import { flag } from "@/lib/mock-data";
+import { formatPostedAt, projectStatusForUi } from "@/lib/projects";
+import { getTaxonomy, type TaxonomyCategory } from "@/app/actions/taxonomy";
+import { CategoryMultiPicker } from "@/components/category-picker";
+import { PortfolioTab } from "@/app/profile/portfolio-tab";
+import { ReviewsList } from "@/components/reviews-list";
 import {
   Edit2, Save, X, Plus, Star, CheckCircle2,
-  MessageCircle, Loader2, Globe, CalendarDays, Briefcase,
+  MessageCircle, Loader2, Globe, CalendarDays, Briefcase, Eye,
 } from "lucide-react";
 
-type ProfileData = Awaited<ReturnType<typeof getMyProfile>>;
 type Tab = "about" | "portfolio" | "offers" | "completed" | "reviews";
 
 const TABS: { key: Tab; label: string }[] = [
@@ -19,7 +31,66 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "reviews", label: "Reviews" },
 ];
 
-function formFromData(data: ProfileData) {
+type CompletedProjectRow = CompletedProjectsMine["asClient"][number];
+
+function CompletedProjectsSection({
+  title,
+  empty,
+  projects,
+  showFreelancer = true,
+}: {
+  title: string;
+  empty: string;
+  projects: CompletedProjectRow[];
+  showFreelancer?: boolean;
+}) {
+  return (
+    <div className="glass rounded-2xl p-6">
+      <h2 className="font-semibold mb-4">{title}</h2>
+      {projects.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{empty}</p>
+      ) : (
+        <div className="space-y-3">
+          {projects.map((p) => (
+            <Link
+              key={p.id}
+              href={`/projects/${p.id}`}
+              className="block p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{p.title}</div>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    {p.industry && (
+                      <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary">
+                        {p.industry}
+                      </span>
+                    )}
+                    {p.budget && <span>{p.budget}</span>}
+                    {p.country && (
+                      <span>
+                        {flag(p.country)} {p.country}
+                      </span>
+                    )}
+                    <span>{formatPostedAt(p.createdAt)}</span>
+                    {showFreelancer && p.freelancer?.username && (
+                      <span>
+                        · Freelancer @{p.freelancer.username}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <StatusBadge status={projectStatusForUi(p.status)} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formFromData(data: MyProfile) {
   return {
     firstName: data.profile?.firstName ?? "",
     lastName: data.profile?.lastName ?? "",
@@ -33,7 +104,7 @@ function formFromData(data: ProfileData) {
 }
 
 export default function ProfilePage() {
-  const [data, setData] = useState<ProfileData | null>(null);
+  const [data, setData] = useState<MyProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -41,13 +112,66 @@ export default function ProfilePage() {
     firstName: "", lastName: "", bio: "", specialization: "",
     industries: [] as string[], experience: "", country: "", phone: "",
   });
-  const [industryInput, setIndustryInput] = useState("");
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("about");
+  const [myReviews, setMyReviews] = useState<ReviewItem[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [completed, setCompleted] = useState<CompletedProjectsMine | null>(null);
+  const [completedLoading, setCompletedLoading] = useState(false);
+  const [completedError, setCompletedError] = useState<string | null>(null);
 
   useEffect(() => {
-    getMyProfile().then((d) => {
+    if (activeTab !== "reviews" || !data?.id) return;
+    let cancelled = false;
+    setReviewsLoading(true);
+    (async () => {
+      const res = await getReviewsForUser(data.id);
+      if (!cancelled) {
+        if (Array.isArray(res)) setMyReviews(res);
+        setReviewsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, data?.id]);
+
+  useEffect(() => {
+    if (activeTab !== "completed") return;
+    let cancelled = false;
+    setCompletedLoading(true);
+    setCompletedError(null);
+    (async () => {
+      const res = await getMyCompletedProjects();
+      if (cancelled) return;
+      if ("error" in res && res.error) {
+        setCompletedError(res.error);
+        setCompleted(null);
+      } else if (res && "asClient" in res) {
+        setCompleted(res);
+      }
+      setCompletedLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
+  const reload = useCallback(async () => {
+    const d = await getMyProfile();
+    if (d) {
       setData(d);
       setForm(formFromData(d));
+    }
+  }, []);
+
+  useEffect(() => {
+    reload();
+  }, [reload]);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) setCategories(res);
     });
   }, []);
 
@@ -67,21 +191,9 @@ export default function ProfilePage() {
       setError("error" in result && result.error ? result.error : "Failed to save.");
       return;
     }
-    setData((prev: ProfileData | null) =>
-      prev ? { ...prev, profile: prev.profile ? { ...prev.profile, ...form } : null } : null
-    );
+    await reload();
     setEditing(false);
   }
-  function addIndustry() {
-    const tag = industryInput.trim();
-    if (!tag || form.industries.includes(tag)) return;
-    setForm((f) => ({ ...f, industries: [...f.industries, tag] }));
-    setIndustryInput("");
-  }
-  function removeIndustry(tag: string) {
-    setForm((f) => ({ ...f, industries: f.industries.filter((i) => i !== tag) }));
-  }
-
   if (!data) {
     return (
       <AppShell title="Profile">
@@ -147,9 +259,23 @@ export default function ProfilePage() {
                     <h2 className="text-2xl font-bold tracking-tight mt-2">{displayName}</h2>
                   )}
 
-                  {/* Username + country */}
+                  {/* Username + public link */}
                   <div className="flex items-center gap-2 mt-1 flex-wrap">
-                    <span className="text-sm text-muted-foreground">@{data.username}</span>
+                    {data.username ? (
+                      <>
+                        <span className="text-sm text-muted-foreground">@{data.username}</span>
+                        <Link
+                          href={`/freelancers/${data.username}`}
+                          className="text-xs text-primary hover:underline"
+                        >
+                          Public page →
+                        </Link>
+                      </>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">
+                        Set username in Settings to get a public page
+                      </span>
+                    )}
                     {editing ? (
                       <input
                         value={form.country}
@@ -303,33 +429,20 @@ export default function ProfilePage() {
                         className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-white/5 border border-border"
                       >
                         {tag}
-                        {editing && (
-                          <button onClick={() => removeIndustry(tag)} className="hover:text-destructive transition">
-                            <X className="size-3" />
-                          </button>
-                        )}
                       </span>
                     ))}
                     {industries.length === 0 && !editing && (
                       <span className="text-sm italic text-muted-foreground/50">Not specified</span>
                     )}
                   </div>
-                  {editing && (
-                    <div className="flex gap-2 mt-1">
-                      <input
-                        value={industryInput}
-                        onChange={(e) => setIndustryInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addIndustry(); } }}
-                        placeholder="Add industry and press Enter…"
-                        className="flex-1 h-8 px-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
-                      />
-                      <button
-                        onClick={addIndustry}
-                        className="size-8 rounded-lg bg-primary/15 border border-primary/30 text-primary grid place-items-center hover:bg-primary/25 transition"
-                      >
-                        <Plus className="size-4" />
-                      </button>
-                    </div>
+                  {editing && categories.length > 0 && (
+                    <CategoryMultiPicker
+                      categories={categories}
+                      selected={form.industries}
+                      onChange={(names) =>
+                        setForm((f) => ({ ...f, industries: names }))
+                      }
+                    />
                   )}
                 </div>
 
@@ -356,37 +469,85 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              {/* Portfolio */}
-              <div className="glass rounded-2xl p-6 space-y-4">
-                <h3 className="font-semibold">Portfolio</h3>
-                {(data.profile?.completedProjectsCount ?? 0) === 0 ? (
-                  <p className="text-sm text-muted-foreground/50 italic text-center py-6">
-                    No portfolio items yet
-                  </p>
-                ) : (
-                  <div className="grid grid-cols-3 gap-4">
-                    {[
-                      "linear-gradient(135deg, #1e3a5f, #2d6a9f)",
-                      "linear-gradient(135deg, #1a4731, #2d9b6e)",
-                      "linear-gradient(135deg, #4a1942, #9b2d8e)",
-                    ].map((bg, i) => (
-                      <div
-                        key={i}
-                        className="h-36 rounded-xl flex items-end p-3 cursor-pointer hover:scale-[1.02] transition-transform"
-                        style={{ background: bg }}
-                      >
-                        <span className="text-xs font-medium text-white/80">Project {i + 1}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              <p className="text-xs text-muted-foreground">
+                Portfolio cases are managed in the{" "}
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("portfolio")}
+                  className="text-primary hover:underline"
+                >
+                  Portfolio tab
+                </button>
+                .
+              </p>
             </>
           )}
 
-          {activeTab !== "about" && (
-            <div className="glass rounded-2xl p-16 flex items-center justify-center">
-              <p className="text-muted-foreground/50 italic">Coming soon</p>
+          {activeTab === "portfolio" && (
+            <PortfolioTab
+              items={data.profile?.portfolioItems ?? []}
+              onChanged={reload}
+            />
+          )}
+
+          {activeTab === "offers" && (
+            <div className="glass rounded-2xl p-10 text-center space-y-4">
+              <p className="text-muted-foreground text-sm">
+                Publish and manage your ready-made AI solutions.
+              </p>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/solutions/new"
+                  className="h-10 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium"
+                >
+                  Publish solution
+                </Link>
+                <Link href="/solutions" className="h-10 px-5 rounded-xl border border-border text-sm">
+                  Browse catalog
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "completed" && (
+            <div className="space-y-6">
+              {completedLoading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : completedError ? (
+                <p className="text-sm text-destructive">{completedError}</p>
+              ) : (
+                <>
+                  <CompletedProjectsSection
+                    title="Posted as client"
+                    empty="No completed projects you posted yet."
+                    projects={completed?.asClient ?? []}
+                  />
+                  <CompletedProjectsSection
+                    title="Worked as freelancer"
+                    empty="No completed projects you delivered on yet."
+                    projects={completed?.asFreelancer ?? []}
+                    showFreelancer={false}
+                  />
+                </>
+              )}
+            </div>
+          )}
+
+          {activeTab === "reviews" && (
+            <div className="glass rounded-2xl p-6">
+              <h2 className="font-semibold mb-4">Reviews about you</h2>
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <ReviewsList
+                  reviews={myReviews}
+                  emptyMessage="No reviews yet. Reviews appear after clients rate completed projects."
+                />
+              )}
             </div>
           )}
         </div>
@@ -401,6 +562,7 @@ export default function ProfilePage() {
               { icon: Star, label: "Rating", value: (data.profile?.rating ?? 0) > 0 ? `${data.profile!.rating.toFixed(1)} / 5` : "—", color: "text-yellow-400" },
               { icon: Globe, label: "Languages", value: data.profile?.language || "—", color: "text-primary" },
               { icon: MessageCircle, label: "Reviews", value: data.profile?.reviewsCount ?? 0, color: "text-blue-400" },
+              { icon: Eye, label: "Profile views", value: data.profile?.viewCount ?? 0, color: "text-primary" },
               { icon: CalendarDays, label: "Member since", value: memberYear, color: "text-muted-foreground" },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="flex items-center justify-between text-sm py-1 border-b border-border/40 last:border-0">

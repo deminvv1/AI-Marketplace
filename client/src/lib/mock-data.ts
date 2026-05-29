@@ -68,6 +68,7 @@ export const CONVERSATIONS = [
   { name: "Priya Sharma", last: "Pipeline is up and ingesting. Will share Looker link shortly.", time: "Sun", unread: 0, online: true },
 ];
 
+/** @deprecated Prefer GET /api/taxonomy — fallback if API unavailable */
 export const INDUSTRIES = [
   { name: "Medicine", icon: "🩺" },
   { name: "Art", icon: "🎨" },

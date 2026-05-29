@@ -1,0 +1,202 @@
+import { api } from "@/lib/api";
+
+/**
+ * Форум: темы (ForumPost) + комментарии (ForumComment).
+ * /api/forum/posts, /api/forum/posts/:id/comments
+ */
+
+export type ForumPostListItem = {
+  id: string;
+  title: string;
+  content: string;
+  industry: string | null;
+  tags: string[];
+  isPinned: boolean;
+  likesCount: number;
+  viewsCount: number;
+  createdAt: string;
+  updatedAt: string;
+  author: {
+    id: string;
+    username: string | null;
+    avatarUrl: string | null;
+    profile: {
+      firstName: string | null;
+      lastName: string | null;
+      country: string | null;
+    } | null;
+  };
+  _count: { comments: number };
+};
+
+export type ForumPostDetail = ForumPostListItem & { authorId: string };
+
+export type ForumCommentItem = {
+  id: string;
+  content: string;
+  postId: string;
+  parentCommentId: string | null;
+  likesCount: number;
+  createdAt: string;
+  author: {
+    id: string;
+    username: string | null;
+    avatarUrl: string | null;
+    profile: { firstName: string | null; lastName: string | null } | null;
+  };
+  replies?: ForumCommentItem[];
+};
+
+export type ForumPostInput = {
+  title: string;
+  content: string;
+  industry?: string;
+  tags?: string[];
+};
+
+export async function getForumPosts(filters?: {
+  industry?: string;
+  tag?: string;
+  q?: string;
+}) {
+  try {
+    const params = new URLSearchParams();
+    if (filters?.industry) params.set("industry", filters.industry);
+    if (filters?.tag) params.set("tag", filters.tag);
+    if (filters?.q) params.set("q", filters.q);
+    const qs = params.toString();
+    return await api.get<ForumPostListItem[]>(`/forum/posts${qs ? `?${qs}` : ""}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to load topics";
+    return { error: message };
+  }
+}
+
+export async function getForumPost(id: string) {
+  try {
+    return await api.get<ForumPostDetail>(`/forum/posts/${id}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Topic not found";
+    return { error: message };
+  }
+}
+
+export async function createForumPost(data: ForumPostInput) {
+  try {
+    return await api.post<ForumPostListItem>("/forum/posts", data);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to create topic";
+    return { error: message };
+  }
+}
+
+export async function checkForumPostLiked(postId: string) {
+  try {
+    return await api.get<{ liked: boolean }>(`/forum/posts/${postId}/liked`);
+  } catch {
+    return { liked: false };
+  }
+}
+
+export async function toggleForumPostLike(postId: string) {
+  try {
+    return await api.post<{ liked: boolean; likesCount: number }>(
+      `/forum/posts/${postId}/like`,
+      {},
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update like";
+    return { error: message };
+  }
+}
+
+export async function updateForumPost(
+  id: string,
+  data: Partial<ForumPostInput>,
+) {
+  try {
+    return await api.patch<ForumPostDetail>(`/forum/posts/${id}`, data);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update topic";
+    return { error: message };
+  }
+}
+
+export async function deleteForumPost(id: string) {
+  try {
+    return await api.delete<{ success: boolean }>(`/forum/posts/${id}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to delete topic";
+    return { error: message };
+  }
+}
+
+export async function getMyForumCommentLikes(postId: string) {
+  try {
+    return await api.get<{ commentIds: string[] }>(
+      `/forum/posts/${postId}/comments/likes/me`,
+    );
+  } catch {
+    return { commentIds: [] as string[] };
+  }
+}
+
+export async function toggleForumCommentLike(postId: string, commentId: string) {
+  try {
+    return await api.post<{ liked: boolean; likesCount: number }>(
+      `/forum/posts/${postId}/comments/${commentId}/like`,
+      {},
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update like";
+    return { error: message };
+  }
+}
+
+export async function getForumComments(postId: string) {
+  try {
+    return await api.get<ForumCommentItem[]>(`/forum/posts/${postId}/comments`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to load comments";
+    return { error: message };
+  }
+}
+
+export async function createForumComment(
+  postId: string,
+  data: { content: string; parentCommentId?: string },
+) {
+  try {
+    return await api.post<ForumCommentItem>(`/forum/posts/${postId}/comments`, data);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to post comment";
+    return { error: message };
+  }
+}
+
+export async function updateForumComment(
+  postId: string,
+  commentId: string,
+  content: string,
+) {
+  try {
+    return await api.patch<ForumCommentItem>(
+      `/forum/posts/${postId}/comments/${commentId}`,
+      { content },
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update comment";
+    return { error: message };
+  }
+}
+
+export async function deleteForumComment(postId: string, commentId: string) {
+  try {
+    return await api.delete<{ success: boolean }>(
+      `/forum/posts/${postId}/comments/${commentId}`,
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to delete comment";
+    return { error: message };
+  }
+}

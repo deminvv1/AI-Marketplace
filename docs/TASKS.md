@@ -1,9 +1,11 @@
 # Задачи — простое деление (Влад + Антон)
 
-**Идея:** каждый берёт **свои сущности в БД** и доводит **сам**: Nest API → Server Actions → страницы.  
-Так проект не «рвётся» между людьми.
+**Идея:** каждый берёт **свои сущности в БД** и доводит **сам**: Nest API → Server Actions → страницы.
 
-**Ветки:** `vlad` · `anton` · сливаем в `dev`
+**Ветки:** `vlad` · `anton` · сливаем в **`dev`**
+
+**Имена в коде (не путать):** Order → **Project**, OrderResponse → **Proposal**, Offer → **Solution**, Executor → **Freelancer**.  
+URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/orders`, `/executors` редиректятся в `proxy.ts`).
 
 ---
 
@@ -12,7 +14,7 @@
 ```
 ┌─────────────────────────────┐     ┌─────────────────────────────┐
 │  ВЛАД — «Аккаунт»           │     │  АНТОН — «Маркетплейс»       │
-│  Кто ты, вход, настройки    │     │  Заказы, люди, форум, офферы  │
+│  Вход, настройки, чат       │     │  Проекты, профили, форум      │
 └─────────────────────────────┘     └─────────────────────────────┘
 ```
 
@@ -24,181 +26,221 @@
 |---------------|-----------|-----|--------|
 | **User** | Пользователь, роль, email | **Влад** | почти готово |
 | **PrivacySettings** | Приватность | **Влад** | готово |
-| **Notification** | Уведомления | **Влад** | не начато |
-| **Project** | Проект на бирже (было Order) | **Антон** | не начато |
-| **Proposal** | Отклик (было OrderResponse) | **Антон** | не начато |
-| **Solution** | Готовое AI-решение (было Offer) | **Антон** | только mock UI |
-| **ForumPost** | Тема форума | **Антон** | только mock UI |
-| **ForumComment** | Комментарий | **Антон** | только mock UI |
-| **Profile** | Профиль (bio, skills…) | **Антон** | частично (API есть) |
-| **ProfileView** | Просмотры публичного профиля | **Антон** | schema + `recordProfileView()` |
-| **PortfolioItem** | Портфолио | **Антон** | не начато |
-| **Review** | Отзыв | **Антон** | не начато |
-| **Favorite** | Избранное | **Антон** | не начато |
-| **Conversation** | Диалог | **Влад** | только mock UI |
-| **Message** | Сообщение | **Влад** | только mock UI |
-| **Report** | Жалоба (UI: Report) | **Влад** | модель есть, API нет |
-| **BlockedUser** | Чёрный список | **Влад** | модель есть, API нет |
-
-**Общее правило:** чужую сущность не трогаем. Нужно поле в чужой таблице — пишем в чат.
+| **Notification** | Уведомления in-app + email (Resend) | **Антон** (v1) | list, unread, Project alert |
+| **ProjectAlert** | Подписка на новые проекты | **Антон** | CRUD + matcher при create project |
+| **Project** | Проект на бирже | **Антон** | CRUD: create, read, **update** (OPEN), complete, delete, фильтры |
+| **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
+| **Solution** | Готовое AI-решение | **Антон** | CRUD API + каталог, new, detail |
+| **ForumPost** / **ForumComment** | Форум | **Антон** | API + /forum, new, thread |
+| **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
+| **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
+| **Review** / **Favorite** | Отзыв, избранное | **Антон** | API + UI (отзыв после COMPLETED, Save на визитке) |
+| **Conversation** / **Message** | Чат | **Антон** (v1) | API + `/messages`; доработка с **Владом** (real-time) |
+| **Report** / **BlockedUser** | Жалоба, блок | **Антон** | API + UI (профиль, проект, solution, форум, чат; blocked в Settings) |
+| **Taxonomy** Category/Skill | Справочник industry/tags | **Антон** | `GET /api/taxonomy`, seed, pickers, `?tag=` в каталогах |
+| **Proposal notify** | In-app + email accept/reject | **Антон** | `PROPOSAL_ACCEPTED` / `PROPOSAL_REJECTED` + Resend |
 
 ---
 
-## ВЛАД — сущность «Аккаунт»
+## ВЛАД — «Аккаунт»
 
-**Одна цель:** человек зашёл на сайт → зарегистрировался → выбрал роль → настроил аккаунт → может пользоваться сайтом.
+### Следующие задачи
 
-### Что входит (всё сам, бэк + фронт)
+1. Починить **роль** на onboarding  
+2. **Region** RU/GLOBAL по стране  
+3. **Messages** — после merge: согласовать owner с Антоном (база уже в `dev`, без mock)  
 
-| Шаг | Что сделать | Где |
-|-----|-------------|-----|
-| 1 | Google + email вход | `register`, `auth/callback` |
-| 2 | Создать User в БД после входа | `POST /api/onboarding/init` |
-| 3 | Username + **роль** (заказчик/исполнитель) | `onboarding` |
-| 4 | Страна → **region** RU/GLOBAL | welcome + `init` |
-| 5 | Настройки: ник, роль, privacy | `/settings` + API |
-| 6 | Удаление аккаунта | `DELETE /api/settings` |
-| 7 | Уведомления | `Notification` + API + UI |
-| 8 | Сообщения (чат) | `Conversation`, `Message` |
-| 9 | Report + блокировка | `Complaint`, `BlockedUser` |
-| 10 | Доп. OAuth (Apple и т.д.) | по желанию |
+### После merge ветки Антона в `dev`
 
-### Уже готово у Влада
-
-- [x] Вход Google + email  
-- [x] User в БД, settings, privacy  
-- [~] Роль с welcome (баг: на onboarding всегда CUSTOMER)  
-
-### Следующие 3 задачи Влада (по порядку)
-
-1. **Починить роль** на onboarding (2–4 часа)  
-2. **Region** по стране (полдня)  
-3. **Messages** — первый рабочий чат (1–2 недели)  
-
----
-
-## АНТОН — сущности «Маркетплейс»
-
-**Одна цель:** на сайте можно разместить заказ, увидеть заказы, найти исполнителя, форум, готовые решения.
-
-### Порядок сущностей (каждую — до конца, потом следующая)
-
-```
-Order (+ отклики)  →  Profile/Portfolio  →  Executors каталог
-        ↓
-     Offer  →  Forum  →  Review / Favorite
+```bash
+git pull origin dev
+cd server && npx prisma migrate deploy && npx prisma generate
 ```
 
-Не прыгать между ними — иначе везде по половине.
+Миграции: `docs/MERGE_ANTON_TO_DEV.md` (включая `20260529180000_taxonomy`).  
+Подробнее: `docs/MIGRATION_RENAME.md`.
 
 ---
 
-### Сущность 1: **Order** + **OrderResponse** ← СЕЙЧАС
+## АНТОН — «Маркетплейс»
 
-| Слой | Задача |
-|------|--------|
-| БД | Модели уже есть; при необходимости — одна миграция (пишешь в чат Владу) |
-| Бэк | `server/src/orders/` — создать, список, мой список, одна карточка |
-| Actions | `client/src/app/actions/orders.ts` |
-| Фронт | `/post-order` — отправка формы |
-| Фронт | `/orders` — список (без mock) |
-| Фронт | `/dashboard` — «мои заказы» |
+### Порядок (не прыгать между сущностями)
 
-**Готово когда:** заказчик создал заказ → он виден в списке и в dashboard.
+```
+Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Review / Favorite
+      [готово]                                              [готово]
+```
 
 ---
 
-### Сущность 2: **Profile** + **PortfolioItem**
+### ✅ Сущность 1: **Project** + **Proposal** (сделано)
 
-| Слой | Задача |
-|------|--------|
-| Бэк | Доработать profile API, публичный `GET /profile/:username` |
-| Бэк | CRUD портфолио |
-| Фронт | `/profile` — все вкладки, не «Coming soon» |
-| Фронт | `/executors` — каталог людей из API |
-| Фронт | `/executors/[id]` или по username |
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/projects/` |
+| Actions | `client/src/app/actions/projects.ts`, `proposals.ts` |
+| Фронт | `/projects`, `/projects/new`, `/projects/[id]`, dashboard |
+| API | accept/reject, `PATCH .../:id` (OPEN), `PATCH .../complete` → COMPLETED |
+| Каталог | `GET /projects?industry=&country=&q=` (только **OPEN**) |
 
-**Готово когда:** открыл исполнителя — видишь bio и портфолио.
-
----
-
-### Сущность 3: **OrderResponse** (отклики) — если не вместе с п.1
-
-| Слой | Задача |
-|------|--------|
-| Бэк | `POST /orders/:id/responses` — только роль исполнитель |
-| Фронт | На странице заказа — список откликов + кнопка «Откликнуться» |
-
-**Готово когда:** исполнитель откликнулся → заказчик видит отклик.
+**Владу для проверки:** роль CLIENT/BOTH — создать проект; FREELANCER/BOTH — отклик; CLIENT — Accept → IN_PROGRESS → Complete.
 
 ---
 
-### Сущность 4: **Offer**
+### ✅ Визитки фрилансеров (сделано)
 
-| Слой | Задача |
-|------|--------|
-| Бэк | `server/src/offers/` CRUD |
-| Фронт | `/offers` без mock, создание оффера |
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/freelancers/` |
+| Фронт | `/freelancers`, `/freelancers/[username]` |
+| ProfileView | `recordProfileView` в `profile.service.ts` |
 
----
-
-### Сущность 5: **ForumPost** + **ForumComment**
-
-| Слой | Задача |
-|------|--------|
-| Бэк | `server/src/forum/` |
-| Фронт | `/forum` — темы, комментарии |
+«Публичный» = виден **залогиненным** пользователям, не гостям с улицы (`proxy.ts`).
 
 ---
 
-### Сущность 6: **Review** + **Favorite**
+### ✅ Сущность 2: **Profile** + **PortfolioItem** (сделано)
 
-После заказов — отзывы и избранное.
-
----
-
-### Уже сделано у Антона
-
-- [x] Текстуры глобуса  
-- [x] Mock-страницы (orders, forum…) — заменять по мере сущностей  
+| Слой | Где |
+|------|-----|
+| Бэк | `GET/PATCH /profile`, `POST/PATCH/DELETE /profile/portfolio/:id` |
+| Фронт | `/profile` → вкладка Portfolio (CRUD), ссылка Public page |
+| Визитка | `/freelancers/[username]` читает portfolioItems |
 
 ---
 
-## Как работать параллельно (просто)
+### ✅ Сущность 3: **Solution** (сделано)
+
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/solutions/` — CRUD + фильтры |
+| Фронт | `/solutions`, `/solutions/new`, `/solutions/[id]` |
+
+---
+
+### ✅ Сущность 4: **Forum** (сделано)
+
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/forum/` — темы + комментарии (ответы) |
+| Фронт | `/forum`, `/forum/new`, `/forum/[id]` |
+
+---
+
+### ✅ Сущность 5: **Review** + **Favorite** (сделано)
+
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/reviews/`, `server/src/favorites/` |
+| Actions | `client/src/app/actions/reviews.ts`, `favorites.ts` |
+| Фронт | отзыв на `/projects/[id]` (COMPLETED), Reviews на визитке и `/profile`, Save + dashboard |
+
+**Правила:** отзыв по проекту — только CLIENT, один раз; избранное: `freelancer` \| `project` \| `solution`.
+
+### ✅ Редактирование проекта (сделано)
+
+| Слой | Где |
+|------|-----|
+| API | `PATCH /api/projects/:id` — владелец, только **OPEN** |
+| Фронт | `/projects/[id]/edit`, кнопка Edit на карточке |
+
+### ✅ Лайки на форуме (сделано)
+
+| Слой | Где |
+|------|-----|
+| БД | `ForumPostLike` (миграция `20260529150000_forum_post_likes`) |
+| API | `POST /forum/posts/:id/like`, `GET .../liked` |
+| Фронт | кнопка на `/forum/[id]` |
+
+### ✅ Лайки на комментариях (сделано)
+
+| API | `POST .../comments/:commentId/like`, `GET .../comments/likes/me` |
+
+### ✅ Project alerts + Notifications (сделано)
+
+| Слой | Где |
+|------|-----|
+| БД | `ProjectAlert`, индекс на `Notification` |
+| API | `/api/project-alerts`, `/api/notifications` |
+| Email | `EmailService` + `RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL` |
+| Фронт | `/project-alerts`, колокольчик в шапке, «Save as alert» на `/projects` |
+
+### ✅ Глобальный поиск `/search` (v1 + фильтры)
+
+Спека: `docs/SEARCH.md` · **`GET /api/search?q=&tag=&industry=`** · UI: keyword + taxonomy chips
+
+### ✅ Taxonomy + каталоги из API (сделано)
+
+| Слой | Где |
+|------|-----|
+| БД | `Category`, `Skill` — миграция `20260529180000_taxonomy` |
+| API | `server/src/taxonomy/` |
+| UI | `CategoryPicker`, `SkillTagPicker`, `catalog-taxonomy-filters` |
+| Валидация | create/update project, forum, solution, alerts, profile industries |
+
+### ✅ Proposal fields + уведомления (сделано)
+
+| Поле / событие | Где |
+|----------------|-----|
+| `coverLetter`, `proposedBudget`, `estimatedDays` | форма отклика, `/proposals` |
+| Accept / reject / auto-reject | in-app + **email** (`EmailService.sendProposalUpdate`) |
+
+### ✅ Forum polish (сделано)
+
+| Фича | API / UI |
+|------|----------|
+| Edit комментария | `PATCH .../comments/:id` |
+| Delete комментария (+ replies) | `DELETE .../comments/:id` |
+| Completed projects на `/profile` | `GET /api/projects/completed/mine` |
+
+### ✅ Messages + Safety (сделано, v1)
+
+| Слой | Где |
+|------|-----|
+| Чат | `server/src/messages/`, `/messages`, `?with=userId` |
+| Reports | `server/src/reports/` — target: user, project, solution, forum_post |
+| Blocks | `server/src/blocks/`, Settings → Privacy |
+| UI | `UserSafetyActions` на карточках и в чате |
+
+**Дальше (не в этом PR):** WebSocket/SSE для чата, админка модерации reports.
+
+### ✅ Порядок «без поломок» (сделано)
+
+| Шаг | Что |
+|-----|-----|
+| 1 | Редактирование темы форума — `/forum/[id]/edit` |
+| 2 | Страница **`/saved`** — все типы избранного |
+| 3 | **`docs/MERGE_ANTON_TO_DEV.md`** — чеклист для merge в `dev` |
+| 4 | ~~Публичный каталог без логина~~ — **не делаем**: весь маркетплейс только после регистрации (`proxy.ts` + JWT на API) |
+
+### ✅ Мои отклики + polish (сделано)
+
+| Слой | Где |
+|------|-----|
+| API | `GET /api/proposals/mine` |
+| Фронт | `/proposals`, пункт в сайдбаре |
+| Дашборд | кликабельные проекты, счётчики откликов и уведомлений |
+| Solutions | Save (favorite) на карточке |
+| Alerts | поле tags в форме подписки |
+
+---
+
+## Как работать параллельно
 
 | Влад | Антон |
 |------|-------|
-| User, onboarding, settings | Order — API + страницы |
-| Не открывает `orders/` | Не открывает `auth/`, `onboarding/` |
-| Меняет schema: User, Message… | Меняет schema: Order, Forum… |
-| PR в `dev` | PR в `dev` |
+| `auth/`, `users/`, `onboarding/`, `settings/` | `projects/`, `freelancers/`, `solutions/`, `forum/`, `messages/` (v1) |
+| schema: User… | schema: Project, Category, Skill… (согласовать в чате) |
+| PR → `dev` | PR → `dev` |
 
-**Конфликтов почти нет** — разные таблицы, разные папки.
-
-Единственный стык: Влад должен **сначала** починить **роль** (чтобы Антон мог проверять «исполнитель откликается»).
-
----
-
-## Одна фраза каждому
-
-**Влад:** «Я делаю всё про **вход и аккаунт** — User, настройки, чат, жалобы.»
-
-**Антон:** «Я делаю всё про **рынок** — заказы, профили, офферы, форум, отзывы — каждую таблицу от API до экрана.»
-
----
-
-## schema.prisma — одно правило
-
-Перед правкой schema — сообщение в чат: **«беру Order»** / **«беру User»**.  
-После merge напарнику: `cd server && npx prisma generate`.
+**schema.prisma:** перед правкой — сообщение в чат. После pull: `npx prisma generate` (обоим).
 
 ---
 
 ## Команды
 
 ```bash
-git checkout vlad    # Влад
-git checkout anton   # Антон
+git checkout anton   # или vlad
 git pull origin dev
 
 cd server && npm run dev

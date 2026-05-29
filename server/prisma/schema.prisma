@@ -28,12 +28,15 @@ model User {
   sentMessages        Message[]                 @relation("SentMessages")
   conversations       ConversationParticipant[]
   forumPosts          ForumPost[]
+  forumPostLikes      ForumPostLike[]
   forumComments       ForumComment[]
+  forumCommentLikes   ForumCommentLike[]
   reviewsGiven        Review[]                  @relation("ReviewsGiven")
   reviewsReceived     Review[]                  @relation("ReviewsReceived")
   reports             Report[]
   notifications       Notification[]
   favorites           Favorite[]
+  projectAlerts       ProjectAlert[]
   blockedUsers        BlockedUser[]             @relation("BlockedBy")
   blockedByUsers      BlockedUser[]             @relation("BlockedUser")
   profileViewsMade    ProfileView[]             @relation("ProfileViewsByViewer")
@@ -102,6 +105,27 @@ model PortfolioItem {
   updatedAt DateTime @updatedAt
 }
 
+// ─── TAXONOMY (industry + skills справочник) ─────────────────────────────────
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  sortOrder Int      @default(0)
+  skills    Skill[]
+}
+
+model Skill {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  slug       String    @unique
+  categoryId String?                        @db.Uuid
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder  Int       @default(0)
+
+  @@index([categoryId])
+}
+
 // ─── PROJECTS (marketplace jobs) ──────────────────────────────────────────────
 model Project {
   id               String          @id @default(uuid()) @db.Uuid
@@ -139,6 +163,9 @@ model Proposal {
   status          ResponseStatus @default(PENDING)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+
+  // Один фрилансер — один отклик на проект (защита на уровне БД)
+  @@unique([projectId, freelancerId])
 }
 
 // ─── READY-MADE SOLUTIONS ─────────────────────────────────────────────────────
@@ -209,6 +236,19 @@ model ForumPost {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   comments   ForumComment[]
+  likes      ForumPostLike[]
+}
+
+/// Кто лайкнул тему — один лайк на пользователя, счётчик в ForumPost.likesCount
+model ForumPostLike {
+  userId    String    @db.Uuid
+  postId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
 }
 
 model ForumComment {
@@ -224,6 +264,19 @@ model ForumComment {
   likesCount      Int            @default(0)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  likes           ForumCommentLike[]
+}
+
+/// Лайк комментария — один на пользователя
+model ForumCommentLike {
+  userId    String       @db.Uuid
+  commentId String     @db.Uuid
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   ForumComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@id([userId, commentId])
+  @@index([commentId])
 }
 
 // ─── REVIEWS, REPORTS, NOTIFICATIONS ─────────────────────────────────────────
@@ -264,6 +317,26 @@ model Notification {
   isRead    Boolean  @default(false)
   link      String?
   createdAt DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
+}
+
+/// Подписка фрилансера на новые OPEN-проекты (Project alerts, бывш. Job alerts)
+model ProjectAlert {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String                         @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label         String?
+  industry      String?
+  country       String?
+  q             String?
+  tags          String[] @default([])
+  notifyByEmail Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, isActive])
 }
 
 // ─── FAVORITES & BLOCKS ───────────────────────────────────────────────────────
