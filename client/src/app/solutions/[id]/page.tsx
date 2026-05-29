@@ -13,6 +13,7 @@ import {
 } from "@/app/actions/solutions";
 import { solutionAuthorName } from "@/lib/solutions";
 import { FavoriteButton } from "@/components/favorite-button";
+import { UserSafetyActions } from "@/components/user-safety-actions";
 import { Stars } from "@/components/ui-bits";
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 
@@ -102,7 +103,16 @@ export default function SolutionDetailPage() {
 
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
-          <h1 className="text-3xl font-bold">{item.title}</h1>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <h1 className="text-3xl font-bold">{item.title}</h1>
+            {!isOwner && meId && (
+              <UserSafetyActions
+                targetId={id}
+                targetType="solution"
+                targetLabel={item.title}
+              />
+            )}
+          </div>
           {item.preview && (
             <p className="text-lg text-muted-foreground">{item.preview}</p>
           )}
@@ -151,7 +161,7 @@ export default function SolutionDetailPage() {
             )}
             <div className="mt-4 flex flex-col gap-2">
               <Link
-                href="/messages"
+                href={`/messages?with=${item.freelancer.id}`}
                 className="w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium grid place-items-center"
               >
                 Contact

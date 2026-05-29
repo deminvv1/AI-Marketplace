@@ -7,7 +7,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import {
   createProjectAlert,
   deleteProjectAlert,
@@ -26,7 +27,9 @@ export default function ProjectAlertsPage() {
   const [industry, setIndustry] = useState("");
   const [country, setCountry] = useState("");
   const [q, setQ] = useState("");
-  const [tagsInput, setTagsInput] = useState("");
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
   const [notifyByEmail, setNotifyByEmail] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -39,14 +42,16 @@ export default function ProjectAlertsPage() {
 
   useEffect(() => {
     load();
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+      }
+    });
   }, []);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    const tags = tagsInput
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
     if (!industry && !country && !q.trim() && tags.length === 0) {
       setError("Set at least one filter: industry, country, keyword, or tags.");
       return;
@@ -71,7 +76,7 @@ export default function ProjectAlertsPage() {
     setIndustry("");
     setCountry("");
     setQ("");
-    setTagsInput("");
+    setTags([]);
     await load();
   }
 
@@ -128,8 +133,8 @@ export default function ProjectAlertsPage() {
                 className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
               >
                 <option value="">Any</option>
-                {INDUSTRIES.map((i) => (
-                  <option key={i.name} value={i.name}>
+                {categories.map((i) => (
+                  <option key={i.id} value={i.name}>
                     {i.name}
                   </option>
                 ))}
@@ -153,15 +158,9 @@ export default function ProjectAlertsPage() {
                 className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
               />
             </div>
-            <div>
-              <label className="text-sm font-medium">Tags (comma-separated)</label>
-              <input
-                value={tagsInput}
-                onChange={(e) => setTagsInput(e.target.value)}
-                placeholder="LLM, PyTorch, healthcare"
-                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
-              />
-            </div>
+            {allSkills.length > 0 && (
+              <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+            )}
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"

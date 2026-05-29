@@ -9,8 +9,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
 import { getProject, updateProject } from "@/app/actions/projects";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { CategoryPicker } from "@/components/category-picker";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 function deadlineInputValue(iso: string | null): string {
@@ -28,7 +30,10 @@ export default function EditProjectPage() {
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState<string | null>(null);
   const [title, setTitle] = useState("");
-  const [industry, setIndustry] = useState(INDUSTRIES[0]?.name ?? "");
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
+  const [industry, setIndustry] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState("");
@@ -36,6 +41,15 @@ export default function EditProjectPage() {
   const [country, setCountry] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!projectId) return;
@@ -57,7 +71,8 @@ export default function EditProjectPage() {
         return;
       }
       setTitle(result.title);
-      setIndustry(result.industry ?? INDUSTRIES[0]?.name ?? "");
+      setIndustry(result.industry ?? "");
+      setTags(result.tags ?? []);
       setShortDescription(result.shortDescription ?? "");
       setDescription(result.description);
       setBudget(result.budget ?? "");
@@ -77,6 +92,7 @@ export default function EditProjectPage() {
       description,
       shortDescription: shortDescription || undefined,
       industry: industry || undefined,
+      tags,
       budget: budget || undefined,
       deadline: deadline || undefined,
       country: country || undefined,
@@ -139,22 +155,16 @@ export default function EditProjectPage() {
             />
           </div>
 
-          <div>
-            <label className="text-sm font-medium">Industry</label>
-            <div className="mt-3 grid grid-cols-3 md:grid-cols-5 gap-3">
-              {INDUSTRIES.slice(0, 10).map((i) => (
-                <button
-                  key={i.name}
-                  type="button"
-                  onClick={() => setIndustry(i.name)}
-                  className={`aspect-square rounded-xl border flex flex-col items-center justify-center gap-2 transition ${industry === i.name ? "bg-primary/15 border-primary/50 glow-primary" : "bg-white/5 border-border hover:border-primary/40"}`}
-                >
-                  <span className="text-2xl">{i.icon}</span>
-                  <span className="text-xs">{i.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          {categories.length > 0 && (
+            <CategoryPicker
+              categories={categories}
+              value={industry}
+              onChange={setIndustry}
+            />
+          )}
+          {allSkills.length > 0 && (
+            <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+          )}
 
           <div>
             <div className="flex items-center justify-between">

@@ -39,6 +39,13 @@ export class ProjectsController {
     return this.projects.findMine(user.id);
   }
 
+  /** GET /api/projects/completed/mine — COMPLETED как client и freelancer */
+  @Get('completed/mine')
+  @UseGuards(AuthGuard)
+  findCompletedMine(@CurrentUser() user: { id: string }) {
+    return this.projects.findCompletedMine(user.id);
+  }
+
   /** PATCH /api/projects/:id/complete — заказчик завершает проект */
   @Patch(':id/complete')
   @UseGuards(AuthGuard)

@@ -9,6 +9,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { getMyProposals, type ProposalItem } from "@/app/actions/proposals";
 import { projectStatusForUi } from "@/lib/projects";
+import { proposalStatusLabel } from "@/lib/taxonomy";
 import { StatusBadge } from "@/components/ui-bits";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 
@@ -66,7 +67,9 @@ export default function MyProposalsPage() {
       )}
 
       <ul className="space-y-3 max-w-3xl">
-        {items.map((p) => (
+        {items.map((p) => {
+          const ps = proposalStatusLabel(p.status, p.project?.status);
+          return (
           <li key={p.id}>
             <Link
               href={p.project ? `/projects/${p.project.id}` : `/projects/${p.projectId}`}
@@ -86,10 +89,21 @@ export default function MyProposalsPage() {
                       <span>· {p.estimatedDays} days</span>
                     )}
                   </div>
+                  {ps.hint && (
+                    <p className="text-xs text-muted-foreground mt-1">{ps.hint}</p>
+                  )}
                 </div>
                 <div className="flex flex-col items-end gap-1">
-                  <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                    proposal: {p.status.toLowerCase()}
+                  <span
+                    className={`text-[10px] uppercase tracking-widest font-medium ${
+                      p.status === "ACCEPTED"
+                        ? "text-green-400"
+                        : p.status === "REJECTED"
+                          ? "text-muted-foreground"
+                          : "text-primary"
+                    }`}
+                  >
+                    {ps.label}
                   </span>
                   {p.project && (
                     <StatusBadge status={projectStatusForUi(p.project.status)} />
@@ -101,7 +115,8 @@ export default function MyProposalsPage() {
               </p>
             </Link>
           </li>
-        ))}
+        );
+        })}
       </ul>
     </AppShell>
   );

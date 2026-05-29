@@ -35,8 +35,10 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
 | **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
 | **Review** / **Favorite** | Отзыв, избранное | **Антон** | API + UI (отзыв после COMPLETED, Save на визитке) |
-| **Conversation** / **Message** | Чат | **Влад** | только mock UI |
-| **Report** / **BlockedUser** | Жалоба, блок | **Влад** | модель есть, API нет |
+| **Conversation** / **Message** | Чат | **Антон** (v1) | API + `/messages`; доработка с **Владом** (real-time) |
+| **Report** / **BlockedUser** | Жалоба, блок | **Антон** | API + UI (профиль, проект, solution, форум, чат; blocked в Settings) |
+| **Taxonomy** Category/Skill | Справочник industry/tags | **Антон** | `GET /api/taxonomy`, seed, pickers, `?tag=` в каталогах |
+| **Proposal notify** | In-app + email accept/reject | **Антон** | `PROPOSAL_ACCEPTED` / `PROPOSAL_REJECTED` + Resend |
 
 ---
 
@@ -46,7 +48,7 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 
 1. Починить **роль** на onboarding  
 2. **Region** RU/GLOBAL по стране  
-3. **Messages** — первый рабочий чат  
+3. **Messages** — после merge: согласовать owner с Антоном (база уже в `dev`, без mock)  
 
 ### После merge ветки Антона в `dev`
 
@@ -55,7 +57,7 @@ git pull origin dev
 cd server && npx prisma migrate deploy && npx prisma generate
 ```
 
-Миграции лежат в `server/prisma/migrations/` (переименование сущностей, ProfileView, unique Proposal).  
+Миграции: `docs/MERGE_ANTON_TO_DEV.md` (включая `20260529180000_taxonomy`).  
 Подробнее: `docs/MIGRATION_RENAME.md`.
 
 ---
@@ -163,9 +165,44 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 | Email | `EmailService` + `RESEND_API_KEY`, `EMAIL_FROM`, `APP_URL` |
 | Фронт | `/project-alerts`, колокольчик в шапке, «Save as alert» на `/projects` |
 
-### ✅ Глобальный поиск `/search` (v1)
+### ✅ Глобальный поиск `/search` (v1 + фильтры)
 
-Спека: `docs/SEARCH.md` · страница + поиск в шапке · `GET /freelancers?q=` · **`GET /api/search?q=`**
+Спека: `docs/SEARCH.md` · **`GET /api/search?q=&tag=&industry=`** · UI: keyword + taxonomy chips
+
+### ✅ Taxonomy + каталоги из API (сделано)
+
+| Слой | Где |
+|------|-----|
+| БД | `Category`, `Skill` — миграция `20260529180000_taxonomy` |
+| API | `server/src/taxonomy/` |
+| UI | `CategoryPicker`, `SkillTagPicker`, `catalog-taxonomy-filters` |
+| Валидация | create/update project, forum, solution, alerts, profile industries |
+
+### ✅ Proposal fields + уведомления (сделано)
+
+| Поле / событие | Где |
+|----------------|-----|
+| `coverLetter`, `proposedBudget`, `estimatedDays` | форма отклика, `/proposals` |
+| Accept / reject / auto-reject | in-app + **email** (`EmailService.sendProposalUpdate`) |
+
+### ✅ Forum polish (сделано)
+
+| Фича | API / UI |
+|------|----------|
+| Edit комментария | `PATCH .../comments/:id` |
+| Delete комментария (+ replies) | `DELETE .../comments/:id` |
+| Completed projects на `/profile` | `GET /api/projects/completed/mine` |
+
+### ✅ Messages + Safety (сделано, v1)
+
+| Слой | Где |
+|------|-----|
+| Чат | `server/src/messages/`, `/messages`, `?with=userId` |
+| Reports | `server/src/reports/` — target: user, project, solution, forum_post |
+| Blocks | `server/src/blocks/`, Settings → Privacy |
+| UI | `UserSafetyActions` на карточках и в чате |
+
+**Дальше (не в этом PR):** WebSocket/SSE для чата, админка модерации reports.
 
 ### ✅ Порядок «без поломок» (сделано)
 
@@ -192,8 +229,8 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 | Влад | Антон |
 |------|-------|
-| `auth/`, `users/`, `onboarding/`, `settings/` | `projects/`, `freelancers/`, `solutions/`, `forum/` |
-| schema: User, Message… | schema: Project, Forum… (согласовать в чате) |
+| `auth/`, `users/`, `onboarding/`, `settings/` | `projects/`, `freelancers/`, `solutions/`, `forum/`, `messages/` (v1) |
+| schema: User… | schema: Project, Category, Skill… (согласовать в чате) |
 | PR → `dev` | PR → `dev` |
 
 **schema.prisma:** перед правкой — сообщение в чат. После pull: `npx prisma generate` (обоим).

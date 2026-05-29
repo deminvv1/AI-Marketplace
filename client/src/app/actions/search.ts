@@ -15,9 +15,20 @@ export type SearchResults = {
   forum: ForumPostListItem[];
 };
 
-export async function searchMarketplace(q: string): Promise<SearchResults> {
-  const trimmed = q.trim();
-  if (!trimmed) {
+export type SearchFilters = {
+  q?: string;
+  tag?: string;
+  industry?: string;
+};
+
+export async function searchMarketplace(
+  filters: SearchFilters,
+): Promise<SearchResults> {
+  const q = filters.q?.trim() ?? "";
+  const tag = filters.tag?.trim();
+  const industry = filters.industry?.trim();
+
+  if (!q && !tag && !industry) {
     return {
       projects: [],
       freelancers: [],
@@ -27,9 +38,12 @@ export async function searchMarketplace(q: string): Promise<SearchResults> {
   }
 
   try {
-    return await api.get<SearchResults>(
-      `/search?q=${encodeURIComponent(trimmed)}`,
-    );
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (tag) params.set("tag", tag);
+    if (industry) params.set("industry", industry);
+    const qs = params.toString();
+    return await api.get<SearchResults>(`/search${qs ? `?${qs}` : ""}`);
   } catch {
     return {
       projects: [],

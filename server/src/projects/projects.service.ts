@@ -10,6 +10,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectAlertsMatcherService } from '../project-alerts/project-alerts-matcher.service';
+import { TaxonomyService } from '../taxonomy/taxonomy.service';
 
 /**
  * Единый набор полей Project для списков и карточки.
@@ -40,6 +41,7 @@ export class ProjectsService {
   constructor(
     private prisma: PrismaService,
     private projectAlerts: ProjectAlertsMatcherService,
+    private taxonomy: TaxonomyService,
   ) {}
 
   /** Публиковать проекты могут только CLIENT и BOTH (заказчик). */
@@ -58,13 +60,16 @@ export class ProjectsService {
   async create(userId: string, dto: CreateProjectDto) {
     await this.assertCanPostProjects(userId);
 
+    const industry = this.taxonomy.normalizeIndustry(dto.industry);
+    const tags = this.taxonomy.normalizeTags(dto.tags);
+
     const project = await this.prisma.project.create({
       data: {
         title: dto.title.trim(),
         description: dto.description.trim(),
         shortDescription: dto.shortDescription?.trim() || null,
-        industry: dto.industry?.trim() || null,
-        tags: dto.tags ?? [],
+        industry,
+        tags,
         budget: dto.budget?.trim() || null,
         deadline: dto.deadline ? new Date(dto.deadline) : null,
         country: dto.country?.trim() || null,
@@ -108,8 +113,10 @@ export class ProjectsService {
     if (dto.shortDescription !== undefined) {
       data.shortDescription = dto.shortDescription.trim() || null;
     }
-    if (dto.industry !== undefined) data.industry = dto.industry.trim() || null;
-    if (dto.tags !== undefined) data.tags = dto.tags;
+    if (dto.industry !== undefined) {
+      data.industry = this.taxonomy.normalizeIndustry(dto.industry);
+    }
+    if (dto.tags !== undefined) data.tags = this.taxonomy.normalizeTags(dto.tags);
     if (dto.budget !== undefined) data.budget = dto.budget.trim() || null;
     if (dto.deadline !== undefined) {
       data.deadline = dto.deadline ? new Date(dto.deadline) : null;
@@ -137,14 +144,17 @@ export class ProjectsService {
   /** Публичный каталог: только OPEN + опциональные фильтры из query. */
   findAll(query: ListProjectsQueryDto = {}) {
     const industry = query.industry?.trim();
+    const tag = query.tag?.trim().toLowerCase();
     const country = query.country?.trim();
     const q = query.q?.trim();
+    const industryName = industry
+      ? this.taxonomy.normalizeIndustry(industry)
+      : null;
 
     const where: Prisma.ProjectWhereInput = {
       status: 'OPEN',
-      ...(industry
-        ? { industry: { equals: industry, mode: 'insensitive' } }
-        : {}),
+      ...(industryName ? { industry: industryName } : {}),
+      ...(tag ? { tags: { has: tag } } : {}),
       ...(country
         ? { country: { contains: country, mode: 'insensitive' } }
         : {}),
@@ -201,6 +211,32 @@ export class ProjectsService {
       orderBy: { createdAt: 'desc' },
       select: projectListSelect,
     });
+  }
+
+  /** Завершённые проекты: как заказчик и как исполнитель. */
+  async findCompletedMine(userId: string) {
+    const select = {
+      ...projectListSelect,
+      freelancerId: true,
+      freelancer: {
+        select: { id: true, username: true, avatarUrl: true },
+      },
+    } as const;
+
+    const [asClient, asFreelancer] = await Promise.all([
+      this.prisma.project.findMany({
+        where: { clientId: userId, status: 'COMPLETED' },
+        orderBy: { updatedAt: 'desc' },
+        select,
+      }),
+      this.prisma.project.findMany({
+        where: { freelancerId: userId, status: 'COMPLETED' },
+        orderBy: { updatedAt: 'desc' },
+        select,
+      }),
+    ]);
+
+    return { asClient, asFreelancer };
   }
 
   /** Детальная страница /projects/[id] — без списка откликов (отдельный endpoint proposals). */

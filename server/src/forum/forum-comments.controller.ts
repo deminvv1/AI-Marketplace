@@ -1,7 +1,17 @@
-import { Body, Controller, Delete, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
 import { CreateForumCommentDto } from './dto/create-forum-comment.dto';
+import { UpdateForumCommentDto } from './dto/update-forum-comment.dto';
 import { ForumCommentsService } from './forum-comments.service';
 
 /**
@@ -44,6 +54,16 @@ export class ForumCommentsController {
     @Body() dto: CreateForumCommentDto,
   ) {
     return this.comments.create(postId, user.id, dto);
+  }
+
+  @Patch(':commentId')
+  @UseGuards(AuthGuard)
+  update(
+    @Param('commentId') commentId: string,
+    @CurrentUser() user: { id: string },
+    @Body() dto: UpdateForumCommentDto,
+  ) {
+    return this.comments.update(commentId, user.id, dto);
   }
 
   @Delete(':commentId')

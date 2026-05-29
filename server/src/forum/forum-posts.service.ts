@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateForumPostDto } from './dto/create-forum-post.dto';
 import { ListForumPostsQueryDto } from './dto/list-forum-posts-query.dto';
 import { UpdateForumPostDto } from './dto/update-forum-post.dto';
+import { TaxonomyService } from '../taxonomy/taxonomy.service';
 
 const authorSelect = {
   id: true,
@@ -35,18 +36,23 @@ const postListSelect = {
 
 @Injectable()
 export class ForumPostsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private taxonomy: TaxonomyService,
+  ) {}
 
   /** Лента тем: не удалённые, закреплённые сверху */
   findAll(query: ListForumPostsQueryDto = {}) {
-    const industry = query.industry?.trim();
+    const industryName = query.industry?.trim()
+      ? this.taxonomy.normalizeIndustry(query.industry)
+      : null;
+    const tag = query.tag?.trim().toLowerCase();
     const q = query.q?.trim();
 
     const where: Prisma.ForumPostWhereInput = {
       isDeleted: false,
-      ...(industry
-        ? { industry: { equals: industry, mode: 'insensitive' } }
-        : {}),
+      ...(industryName ? { industry: industryName } : {}),
+      ...(tag ? { tags: { has: tag } } : {}),
       ...(q
         ? {
             OR: [
@@ -89,8 +95,8 @@ export class ForumPostsService {
       data: {
         title: dto.title.trim(),
         content: dto.content.trim(),
-        industry: dto.industry?.trim() || null,
-        tags: dto.tags ?? [],
+        industry: this.taxonomy.normalizeIndustry(dto.industry),
+        tags: this.taxonomy.normalizeTags(dto.tags),
         authorId,
       },
       select: postListSelect,
@@ -105,9 +111,11 @@ export class ForumPostsService {
         ...(dto.title !== undefined ? { title: dto.title.trim() } : {}),
         ...(dto.content !== undefined ? { content: dto.content.trim() } : {}),
         ...(dto.industry !== undefined
-          ? { industry: dto.industry?.trim() || null }
+          ? { industry: this.taxonomy.normalizeIndustry(dto.industry) }
           : {}),
-        ...(dto.tags !== undefined ? { tags: dto.tags } : {}),
+        ...(dto.tags !== undefined
+          ? { tags: this.taxonomy.normalizeTags(dto.tags) }
+          : {}),
       },
       select: postListSelect,
     });

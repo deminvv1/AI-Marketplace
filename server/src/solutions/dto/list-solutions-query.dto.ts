@@ -19,6 +19,11 @@ export class ListSolutionsQueryDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(64)
+  tag?: string;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(200)
   q?: string;
 }

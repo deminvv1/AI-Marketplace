@@ -11,6 +11,6 @@ export class SearchController {
 
   @Get()
   findAll(@Query() query: SearchQueryDto) {
-    return this.search.search(query.q);
+    return this.search.search(query);
   }
 }

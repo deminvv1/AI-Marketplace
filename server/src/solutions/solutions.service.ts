@@ -8,6 +8,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateSolutionDto } from './dto/create-solution.dto';
 import { ListSolutionsQueryDto } from './dto/list-solutions-query.dto';
 import { UpdateSolutionDto } from './dto/update-solution.dto';
+import { TaxonomyService } from '../taxonomy/taxonomy.service';
 
 const solutionSelect = {
   id: true,
@@ -44,7 +45,10 @@ const solutionSelect = {
 
 @Injectable()
 export class SolutionsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private taxonomy: TaxonomyService,
+  ) {}
 
   private async assertCanPublishSolutions(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -71,16 +75,18 @@ export class SolutionsService {
 
   /** Каталог: только опубликованные решения */
   findAll(query: ListSolutionsQueryDto = {}) {
-    const industry = query.industry?.trim();
+    const industryName = query.industry?.trim()
+      ? this.taxonomy.normalizeIndustry(query.industry)
+      : null;
+    const tag = query.tag?.trim().toLowerCase();
     const format = query.format?.trim();
     const country = query.country?.trim();
     const q = query.q?.trim();
 
     const where: Prisma.SolutionWhereInput = {
       isPublished: true,
-      ...(industry
-        ? { industry: { equals: industry, mode: 'insensitive' } }
-        : {}),
+      ...(industryName ? { industry: industryName } : {}),
+      ...(tag ? { tags: { has: tag } } : {}),
       ...(format ? { format: { equals: format, mode: 'insensitive' } } : {}),
       ...(country
         ? { country: { contains: country, mode: 'insensitive' } }
@@ -135,12 +141,12 @@ export class SolutionsService {
       data: {
         title: dto.title.trim(),
         description: dto.description.trim(),
-        industry: dto.industry?.trim() || null,
+        industry: this.taxonomy.normalizeIndustry(dto.industry),
         format: dto.format?.trim() || null,
         price: dto.price?.trim() || null,
         preview: dto.preview?.trim() || null,
         mediaUrls: dto.mediaUrls ?? [],
-        tags: dto.tags ?? [],
+        tags: this.taxonomy.normalizeTags(dto.tags),
         language: dto.language?.trim() || null,
         country: dto.country?.trim() || null,
         isPublished: dto.isPublished ?? true,
@@ -161,7 +167,7 @@ export class SolutionsService {
           ? { description: dto.description.trim() }
           : {}),
         ...(dto.industry !== undefined
-          ? { industry: dto.industry?.trim() || null }
+          ? { industry: this.taxonomy.normalizeIndustry(dto.industry) }
           : {}),
         ...(dto.format !== undefined
           ? { format: dto.format?.trim() || null }
@@ -171,7 +177,9 @@ export class SolutionsService {
           ? { preview: dto.preview?.trim() || null }
           : {}),
         ...(dto.mediaUrls !== undefined ? { mediaUrls: dto.mediaUrls } : {}),
-        ...(dto.tags !== undefined ? { tags: dto.tags } : {}),
+        ...(dto.tags !== undefined
+          ? { tags: this.taxonomy.normalizeTags(dto.tags) }
+          : {}),
         ...(dto.language !== undefined
           ? { language: dto.language?.trim() || null }
           : {}),

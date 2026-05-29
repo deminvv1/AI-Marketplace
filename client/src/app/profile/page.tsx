@@ -4,7 +4,16 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { getMyProfile, updateProfile, type MyProfile } from "@/app/actions/profile";
+import {
+  getMyCompletedProjects,
+  type CompletedProjectsMine,
+} from "@/app/actions/projects";
 import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
+import { StatusBadge } from "@/components/ui-bits";
+import { flag } from "@/lib/mock-data";
+import { formatPostedAt, projectStatusForUi } from "@/lib/projects";
+import { getTaxonomy, type TaxonomyCategory } from "@/app/actions/taxonomy";
+import { CategoryMultiPicker } from "@/components/category-picker";
 import { PortfolioTab } from "@/app/profile/portfolio-tab";
 import { ReviewsList } from "@/components/reviews-list";
 import {
@@ -21,6 +30,65 @@ const TABS: { key: Tab; label: string }[] = [
   { key: "completed", label: "Completed Projects" },
   { key: "reviews", label: "Reviews" },
 ];
+
+type CompletedProjectRow = CompletedProjectsMine["asClient"][number];
+
+function CompletedProjectsSection({
+  title,
+  empty,
+  projects,
+  showFreelancer = true,
+}: {
+  title: string;
+  empty: string;
+  projects: CompletedProjectRow[];
+  showFreelancer?: boolean;
+}) {
+  return (
+    <div className="glass rounded-2xl p-6">
+      <h2 className="font-semibold mb-4">{title}</h2>
+      {projects.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{empty}</p>
+      ) : (
+        <div className="space-y-3">
+          {projects.map((p) => (
+            <Link
+              key={p.id}
+              href={`/projects/${p.id}`}
+              className="block p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="font-medium truncate">{p.title}</div>
+                  <div className="flex flex-wrap items-center gap-2 mt-1 text-xs text-muted-foreground">
+                    {p.industry && (
+                      <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary">
+                        {p.industry}
+                      </span>
+                    )}
+                    {p.budget && <span>{p.budget}</span>}
+                    {p.country && (
+                      <span>
+                        {flag(p.country)} {p.country}
+                      </span>
+                    )}
+                    <span>{formatPostedAt(p.createdAt)}</span>
+                    {showFreelancer && p.freelancer?.username && (
+                      <span>
+                        · Freelancer @{p.freelancer.username}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <StatusBadge status={projectStatusForUi(p.status)} />
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function formFromData(data: MyProfile) {
   return {
@@ -44,10 +112,13 @@ export default function ProfilePage() {
     firstName: "", lastName: "", bio: "", specialization: "",
     industries: [] as string[], experience: "", country: "", phone: "",
   });
-  const [industryInput, setIndustryInput] = useState("");
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>("about");
   const [myReviews, setMyReviews] = useState<ReviewItem[]>([]);
   const [reviewsLoading, setReviewsLoading] = useState(false);
+  const [completed, setCompleted] = useState<CompletedProjectsMine | null>(null);
+  const [completedLoading, setCompletedLoading] = useState(false);
+  const [completedError, setCompletedError] = useState<string | null>(null);
 
   useEffect(() => {
     if (activeTab !== "reviews" || !data?.id) return;
@@ -65,6 +136,27 @@ export default function ProfilePage() {
     };
   }, [activeTab, data?.id]);
 
+  useEffect(() => {
+    if (activeTab !== "completed") return;
+    let cancelled = false;
+    setCompletedLoading(true);
+    setCompletedError(null);
+    (async () => {
+      const res = await getMyCompletedProjects();
+      if (cancelled) return;
+      if ("error" in res && res.error) {
+        setCompletedError(res.error);
+        setCompleted(null);
+      } else if (res && "asClient" in res) {
+        setCompleted(res);
+      }
+      setCompletedLoading(false);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
   const reload = useCallback(async () => {
     const d = await getMyProfile();
     if (d) {
@@ -76,6 +168,12 @@ export default function ProfilePage() {
   useEffect(() => {
     reload();
   }, [reload]);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) setCategories(res);
+    });
+  }, []);
 
   function startEdit() { setEditing(true); setError(""); }
   function cancelEdit() {
@@ -96,16 +194,6 @@ export default function ProfilePage() {
     await reload();
     setEditing(false);
   }
-  function addIndustry() {
-    const tag = industryInput.trim();
-    if (!tag || form.industries.includes(tag)) return;
-    setForm((f) => ({ ...f, industries: [...f.industries, tag] }));
-    setIndustryInput("");
-  }
-  function removeIndustry(tag: string) {
-    setForm((f) => ({ ...f, industries: f.industries.filter((i) => i !== tag) }));
-  }
-
   if (!data) {
     return (
       <AppShell title="Profile">
@@ -341,33 +429,20 @@ export default function ProfilePage() {
                         className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-white/5 border border-border"
                       >
                         {tag}
-                        {editing && (
-                          <button onClick={() => removeIndustry(tag)} className="hover:text-destructive transition">
-                            <X className="size-3" />
-                          </button>
-                        )}
                       </span>
                     ))}
                     {industries.length === 0 && !editing && (
                       <span className="text-sm italic text-muted-foreground/50">Not specified</span>
                     )}
                   </div>
-                  {editing && (
-                    <div className="flex gap-2 mt-1">
-                      <input
-                        value={industryInput}
-                        onChange={(e) => setIndustryInput(e.target.value)}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addIndustry(); } }}
-                        placeholder="Add industry and press Enter…"
-                        className="flex-1 h-8 px-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
-                      />
-                      <button
-                        onClick={addIndustry}
-                        className="size-8 rounded-lg bg-primary/15 border border-primary/30 text-primary grid place-items-center hover:bg-primary/25 transition"
-                      >
-                        <Plus className="size-4" />
-                      </button>
-                    </div>
+                  {editing && categories.length > 0 && (
+                    <CategoryMultiPicker
+                      categories={categories}
+                      selected={form.industries}
+                      onChange={(names) =>
+                        setForm((f) => ({ ...f, industries: names }))
+                      }
+                    />
                   )}
                 </div>
 
@@ -435,13 +510,28 @@ export default function ProfilePage() {
           )}
 
           {activeTab === "completed" && (
-            <div className="glass rounded-2xl p-10 text-center space-y-3">
-              <p className="text-muted-foreground text-sm">
-                Completed marketplace projects appear on your dashboard and project history.
-              </p>
-              <Link href="/dashboard" className="text-primary text-sm hover:underline">
-                Open dashboard →
-              </Link>
+            <div className="space-y-6">
+              {completedLoading ? (
+                <div className="flex justify-center py-12">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : completedError ? (
+                <p className="text-sm text-destructive">{completedError}</p>
+              ) : (
+                <>
+                  <CompletedProjectsSection
+                    title="Posted as client"
+                    empty="No completed projects you posted yet."
+                    projects={completed?.asClient ?? []}
+                  />
+                  <CompletedProjectsSection
+                    title="Worked as freelancer"
+                    empty="No completed projects you delivered on yet."
+                    projects={completed?.asFreelancer ?? []}
+                    showFreelancer={false}
+                  />
+                </>
+              )}
             </div>
           )}
 

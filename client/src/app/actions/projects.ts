@@ -55,6 +55,7 @@ export async function getProject(id: string) {
 
 export type ProjectCatalogFilters = {
   industry?: string;
+  tag?: string;
   country?: string;
   q?: string;
 };
@@ -64,6 +65,7 @@ export async function getProjects(filters?: ProjectCatalogFilters) {
   try {
     const params = new URLSearchParams();
     if (filters?.industry) params.set("industry", filters.industry);
+    if (filters?.tag) params.set("tag", filters.tag);
     if (filters?.country) params.set("country", filters.country);
     if (filters?.q) params.set("q", filters.q);
     const qs = params.toString();
@@ -102,6 +104,28 @@ export async function getMyProjects() {
     return await api.get<ProjectListItem[]>("/projects/mine");
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to load your projects";
+    return { error: message };
+  }
+}
+
+export type CompletedProjectsMine = {
+  asClient: (ProjectListItem & {
+    freelancerId: string | null;
+    freelancer: { id: string; username: string | null; avatarUrl: string | null } | null;
+  })[];
+  asFreelancer: (ProjectListItem & {
+    freelancerId: string | null;
+    freelancer: { id: string; username: string | null; avatarUrl: string | null } | null;
+  })[];
+};
+
+/** GET /api/projects/completed/mine */
+export async function getMyCompletedProjects() {
+  try {
+    return await api.get<CompletedProjectsMine>("/projects/completed/mine");
+  } catch (e: unknown) {
+    const message =
+      e instanceof Error ? e.message : "Failed to load completed projects";
     return { error: message };
   }
 }

@@ -4,12 +4,13 @@
  * Публикация Solution: POST /api/solutions (FREELANCER / BOTH)
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
 import { createSolution } from "@/app/actions/solutions";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { SOLUTION_FORMATS } from "@/lib/solutions";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
@@ -18,24 +19,31 @@ export default function NewSolutionPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [preview, setPreview] = useState("");
-  const [industry, setIndustry] = useState(INDUSTRIES[0]?.name ?? "");
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
+  const [industry, setIndustry] = useState("");
   const [format, setFormat] = useState<string>(SOLUTION_FORMATS[0]);
   const [price, setPrice] = useState("");
   const [country, setCountry] = useState("");
   const [language, setLanguage] = useState("English");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+        setIndustry((prev) => prev || res[0]?.name || "");
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSubmitting(true);
-
-    const tagList = tags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
 
     const result = await createSolution({
       title,
@@ -46,7 +54,7 @@ export default function NewSolutionPage() {
       price: price || undefined,
       country: country || undefined,
       language: language || undefined,
-      tags: tagList.length ? tagList : undefined,
+      tags: tags.length ? tags : undefined,
       isPublished: true,
     });
 
@@ -139,8 +147,8 @@ export default function NewSolutionPage() {
             onChange={(e) => setIndustry(e.target.value)}
             className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
           >
-            {INDUSTRIES.map((i) => (
-              <option key={i.name} value={i.name}>
+            {categories.map((i) => (
+              <option key={i.id} value={i.name}>
                 {i.name}
               </option>
             ))}
@@ -166,15 +174,9 @@ export default function NewSolutionPage() {
           </div>
         </div>
 
-        <div>
-          <label className="text-sm font-medium">Tags (comma-separated)</label>
-          <input
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="LLM, NLP, SaaS"
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
-          />
-        </div>
+        {allSkills.length > 0 && (
+          <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+        )}
 
         {error && <p className="text-sm text-destructive">{error}</p>}
 

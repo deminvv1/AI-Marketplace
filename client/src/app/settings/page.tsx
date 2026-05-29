@@ -10,6 +10,8 @@ import { AppShell } from "@/components/app-shell";
 import {
   getSettings, updateAccount, updatePrivacy, deleteAccount,
 } from "@/app/actions/settings";
+import { getBlockedUsers, unblockUser, type BlockedUserRow } from "@/app/actions/blocks";
+import { messageUserName } from "@/lib/messages";
 import { useActiveMode } from "@/lib/use-active-mode";
 import { createClient } from "@/lib/supabase/client";
 import { normalizeRole } from "@/lib/roles";
@@ -124,10 +126,27 @@ export default function SettingsPage() {
   });
   const [privacySaving, setPrivacySaving] = useState(false);
   const [privacyMsg, setPrivacyMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [blocked, setBlocked] = useState<BlockedUserRow[]>([]);
+  const [blockedLoading, setBlockedLoading] = useState(false);
+  const [unblockBusyId, setUnblockBusyId] = useState<string | null>(null);
 
   // Delete account
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== "privacy") return;
+    let cancelled = false;
+    setBlockedLoading(true);
+    getBlockedUsers().then((res) => {
+      if (cancelled) return;
+      if (Array.isArray(res)) setBlocked(res);
+      setBlockedLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
 
   useEffect(() => {
     getSettings().then((d) => {
@@ -369,6 +388,46 @@ export default function SettingsPage() {
               >
                 Cancel
               </button>
+            </div>
+
+            <div className="border-t border-border/60 pt-5 space-y-3">
+              <p className="text-sm font-medium">Blocked users</p>
+              <p className="text-xs text-muted-foreground">
+                Blocked users cannot start or continue conversations with you.
+              </p>
+              {blockedLoading ? (
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              ) : blocked.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No blocked users.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {blocked.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white/5 border border-border text-sm"
+                    >
+                      <span>{messageUserName(row.blocked)}</span>
+                      <button
+                        type="button"
+                        disabled={unblockBusyId === row.blockedId}
+                        onClick={async () => {
+                          setUnblockBusyId(row.blockedId);
+                          const res = await unblockUser(row.blockedId);
+                          setUnblockBusyId(null);
+                          if (!("error" in res && res.error)) {
+                            setBlocked((prev) =>
+                              prev.filter((b) => b.blockedId !== row.blockedId),
+                            );
+                          }
+                        }}
+                        className="text-xs text-primary hover:underline disabled:opacity-50"
+                      >
+                        Unblock
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </Section>
         )}

@@ -18,6 +18,7 @@ import { flag } from "@/lib/mock-data";
 import { freelancerDisplayName } from "@/lib/projects";
 import { Stars } from "@/components/ui-bits";
 import { FavoriteButton } from "@/components/favorite-button";
+import { UserSafetyActions } from "@/components/user-safety-actions";
 import { ReviewsList } from "@/components/reviews-list";
 import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
 import { ArrowLeft, Loader2, MessageCircle, Eye } from "lucide-react";
@@ -133,15 +134,25 @@ export default function FreelancerProfilePage() {
               )}
             </div>
           </div>
-          <div className="flex flex-wrap gap-2">
-            <FavoriteButton targetId={profile.id} targetType="freelancer" />
-            <Link
-              href="/messages"
-              className="h-10 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary inline-flex items-center gap-2"
-            >
-              <MessageCircle className="size-4" />
-              Write
-            </Link>
+          <div className="flex flex-col gap-3 items-end">
+            <div className="flex flex-wrap gap-2 justify-end">
+              <FavoriteButton targetId={profile.id} targetType="freelancer" />
+              <Link
+                href={`/messages?with=${profile.id}`}
+                className="h-10 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary inline-flex items-center gap-2"
+              >
+                <MessageCircle className="size-4" />
+                Write
+              </Link>
+            </div>
+            <UserSafetyActions
+              targetId={profile.id}
+              targetType="user"
+              targetLabel={freelancerDisplayName({
+                username: profile.username,
+                profile: profile.profile,
+              })}
+            />
           </div>
         </div>
       </div>

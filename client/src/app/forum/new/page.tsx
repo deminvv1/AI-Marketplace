@@ -2,38 +2,46 @@
 
 /** Новая тема: POST /api/forum/posts */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
 import { createForumPost } from "@/app/actions/forum";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 export default function NewForumTopicPage() {
   const router = useRouter();
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [industry, setIndustry] = useState(INDUSTRIES[0]?.name ?? "");
-  const [tags, setTags] = useState("");
+  const [industry, setIndustry] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+        if (res[0]) setIndustry(res[0].name);
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
 
-    const tagList = tags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const result = await createForumPost({
       title,
       content,
       industry: industry || undefined,
-      tags: tagList.length ? tagList : undefined,
+      tags: tags.length ? tags : undefined,
     });
 
     setSubmitting(false);
@@ -86,21 +94,16 @@ export default function NewForumTopicPage() {
             onChange={(e) => setIndustry(e.target.value)}
             className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
           >
-            {INDUSTRIES.map((i) => (
-              <option key={i.name} value={i.name}>
+            {categories.map((i) => (
+              <option key={i.id} value={i.name}>
                 {i.name}
               </option>
             ))}
           </select>
         </div>
-        <div>
-          <label className="text-sm font-medium">Tags (comma-separated)</label>
-          <input
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
-          />
-        </div>
+        {allSkills.length > 0 && (
+          <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+        )}
         {error && <p className="text-sm text-destructive">{error}</p>}
         <button
           type="submit"

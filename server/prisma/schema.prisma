@@ -105,6 +105,27 @@ model PortfolioItem {
   updatedAt DateTime @updatedAt
 }
 
+// ─── TAXONOMY (industry + skills справочник) ─────────────────────────────────
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  sortOrder Int      @default(0)
+  skills    Skill[]
+}
+
+model Skill {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  slug       String    @unique
+  categoryId String?                        @db.Uuid
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder  Int       @default(0)
+
+  @@index([categoryId])
+}
+
 // ─── PROJECTS (marketplace jobs) ──────────────────────────────────────────────
 model Project {
   id               String          @id @default(uuid()) @db.Uuid

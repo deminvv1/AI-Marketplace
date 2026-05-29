@@ -54,10 +54,15 @@ export type ForumPostInput = {
   tags?: string[];
 };
 
-export async function getForumPosts(filters?: { industry?: string; q?: string }) {
+export async function getForumPosts(filters?: {
+  industry?: string;
+  tag?: string;
+  q?: string;
+}) {
   try {
     const params = new URLSearchParams();
     if (filters?.industry) params.set("industry", filters.industry);
+    if (filters?.tag) params.set("tag", filters.tag);
     if (filters?.q) params.set("q", filters.q);
     const qs = params.toString();
     return await api.get<ForumPostListItem[]>(`/forum/posts${qs ? `?${qs}` : ""}`);
@@ -165,6 +170,33 @@ export async function createForumComment(
     return await api.post<ForumCommentItem>(`/forum/posts/${postId}/comments`, data);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to post comment";
+    return { error: message };
+  }
+}
+
+export async function updateForumComment(
+  postId: string,
+  commentId: string,
+  content: string,
+) {
+  try {
+    return await api.patch<ForumCommentItem>(
+      `/forum/posts/${postId}/comments/${commentId}`,
+      { content },
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update comment";
+    return { error: message };
+  }
+}
+
+export async function deleteForumComment(postId: string, commentId: string) {
+  try {
+    return await api.delete<{ success: boolean }>(
+      `/forum/posts/${postId}/comments/${commentId}`,
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to delete comment";
     return { error: message };
   }
 }

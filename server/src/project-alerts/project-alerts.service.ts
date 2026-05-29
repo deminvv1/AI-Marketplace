@@ -7,10 +7,14 @@ import { Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectAlertDto } from './dto/create-project-alert.dto';
 import { UpdateProjectAlertDto } from './dto/update-project-alert.dto';
+import { TaxonomyService } from '../taxonomy/taxonomy.service';
 
 @Injectable()
 export class ProjectAlertsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private taxonomy: TaxonomyService,
+  ) {}
 
   private async assertFreelancer(userId: string) {
     const user = await this.prisma.user.findUnique({
@@ -36,10 +40,10 @@ export class ProjectAlertsService {
       data: {
         userId,
         label: dto.label?.trim() || null,
-        industry: dto.industry?.trim() || null,
+        industry: this.taxonomy.normalizeIndustry(dto.industry),
         country: dto.country?.trim() || null,
         q: dto.q?.trim() || null,
-        tags: dto.tags ?? [],
+        tags: this.taxonomy.normalizeTags(dto.tags),
         notifyByEmail: dto.notifyByEmail ?? true,
       },
     });
@@ -52,13 +56,15 @@ export class ProjectAlertsService {
       data: {
         ...(dto.label !== undefined ? { label: dto.label.trim() || null } : {}),
         ...(dto.industry !== undefined
-          ? { industry: dto.industry.trim() || null }
+          ? { industry: this.taxonomy.normalizeIndustry(dto.industry) }
           : {}),
         ...(dto.country !== undefined
           ? { country: dto.country.trim() || null }
           : {}),
         ...(dto.q !== undefined ? { q: dto.q.trim() || null } : {}),
-        ...(dto.tags !== undefined ? { tags: dto.tags } : {}),
+        ...(dto.tags !== undefined
+          ? { tags: this.taxonomy.normalizeTags(dto.tags) }
+          : {}),
         ...(dto.notifyByEmail !== undefined
           ? { notifyByEmail: dto.notifyByEmail }
           : {}),

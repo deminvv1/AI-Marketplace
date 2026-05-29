@@ -21,7 +21,7 @@ cd ../client && npm run build
 ```
 
 4. Влад: проверить onboarding, register, settings (его зона)
-5. Антон: smoke — projects, proposals, forum, search, project-alerts
+5. Антон: smoke — projects, proposals, forum, search, project-alerts, taxonomy, messages, reports
 
 ---
 
@@ -35,6 +35,7 @@ cd ../client && npm run build
 | `20260529150000_forum_post_likes` | ForumPostLike |
 | `20260529160000_forum_comment_likes` | ForumCommentLike |
 | `20260529170000_project_alerts` | ProjectAlert + индекс Notification |
+| **`20260529180000_taxonomy`** | **Category + Skill, seed industries/skills** |
 
 Если `migrate deploy` падает по сети — повторить; не делать `migrate reset` на shared Supabase.
 
@@ -43,7 +44,7 @@ cd ../client && npm run build
 ## Новые env (server `.env`)
 
 ```env
-# Опционально — email для Project alerts
+# Опционально — email (project alerts + proposal accept/reject)
 RESEND_API_KEY=
 EMAIL_FROM=AI Marketplace <onboarding@resend.dev>
 APP_URL=http://localhost:3000
@@ -53,14 +54,52 @@ APP_URL=http://localhost:3000
 
 ---
 
+## Новые Nest-модули (после merge)
+
+| Модуль | API |
+|--------|-----|
+| `server/src/taxonomy/` | `GET /api/taxonomy`, `GET /api/taxonomy/skills` |
+| `server/src/messages/` | conversations 1:1, send/list |
+| `server/src/reports/` | `POST /api/reports` |
+| `server/src/blocks/` | `POST/DELETE /api/blocks`, list blocked |
+
+Подключены в `app.module.ts`.
+
+---
+
 ## Что не трогает Влада (остаётся его зона)
 
-- `auth/`, `onboarding/`, `users/`, `settings/`
-- Сообщения `/messages` — mock UI
+- `auth/`, `onboarding/`, `users/`, `settings/` (кроме blocked list в Privacy — read-only UI)
 
-## Что добавляет Антон (маркетплейс)
+## Согласовать с Владом после merge
 
-См. `docs/TASKS.md` — всё с ✅ до Project alerts / Search / Proposals.
+- **`/messages`** — рабочий API + UI (не mock). Owner на доработку: один человек (real-time, вложения).
+- **schema.prisma** — если Влад менял `User` / `Message` в `dev` параллельно.
+
+## Что добавляет этот PR (маркетплейс)
+
+- **Taxonomy** — справочник industry/skills, валидация при create/update, фильтры `?tag=` в каталогах
+- **Proposal** — `coverLetter`, `proposedBudget`, `estimatedDays`; `PROPOSAL_ACCEPTED` / `PROPOSAL_REJECTED`; email на accept/reject
+- **Search** — `GET /api/search?q=&tag=&industry=`
+- **Forum** — edit/delete своих комментариев; edit темы
+- **Profile** — completed projects (`GET /api/projects/completed/mine`)
+- **Messages** — 1:1 чат, block check, polling UI
+- **Safety** — reports (user, project, solution, forum_post), blocks; UI на карточках + settings
+- См. `docs/TASKS.md`, `docs/new.md`, `docs/problems.md`
+
+---
+
+## Smoke после merge (5–10 мин)
+
+| # | Действие |
+|---|----------|
+| 1 | Два пользователя: CLIENT создаёт проект (industry + skills из picker) |
+| 2 | FREELANCER отклик с cover letter / budget / days |
+| 3 | CLIENT Accept → IN_PROGRESS; второй отклик → REJECTED + уведомления (и email если Resend) |
+| 4 | `/search?tag=` и фильтры industry на `/search` |
+| 5 | `/messages?with=` с визитки / solution Contact |
+| 6 | Report на проект / тему; Block в чате |
+| 7 | `GET /api/taxonomy` — формы не принимают произвольные tags |
 
 ---
 

@@ -5,17 +5,22 @@
  * POST → /api/projects через createProject() в actions/projects.ts
  */
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
 import { createProject } from "@/app/actions/projects";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { CategoryPicker } from "@/components/category-picker";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { Check, Loader2 } from "lucide-react";
 
 export default function PostProjectPage() {
   const router = useRouter();
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
   const [title, setTitle] = useState("");
-  const [industry, setIndustry] = useState(INDUSTRIES[0]?.name ?? "");
+  const [industry, setIndustry] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [shortDescription, setShortDescription] = useState("");
   const [description, setDescription] = useState("");
   const [budget, setBudget] = useState("");
@@ -23,6 +28,16 @@ export default function PostProjectPage() {
   const [country, setCountry] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+        setIndustry((prev) => prev || res[0]?.name || "");
+      }
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -34,6 +49,7 @@ export default function PostProjectPage() {
       description,
       shortDescription: shortDescription || undefined,
       industry: industry || undefined,
+      tags: tags.length ? tags : undefined,
       budget: budget || undefined,
       deadline: deadline || undefined,
       country: country || undefined,
@@ -66,22 +82,17 @@ export default function PostProjectPage() {
             />
           </div>
 
-          <div>
-            <label className="text-sm font-medium">Industry</label>
-            <div className="mt-3 grid grid-cols-3 md:grid-cols-5 gap-3">
-              {INDUSTRIES.slice(0, 10).map((i) => (
-                <button
-                  key={i.name}
-                  type="button"
-                  onClick={() => setIndustry(i.name)}
-                  className={`aspect-square rounded-xl border flex flex-col items-center justify-center gap-2 transition ${industry === i.name ? "bg-primary/15 border-primary/50 glow-primary" : "bg-white/5 border-border hover:border-primary/40"}`}
-                >
-                  <span className="text-2xl">{i.icon}</span>
-                  <span className="text-xs">{i.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+          {categories.length > 0 && (
+            <CategoryPicker
+              categories={categories}
+              value={industry}
+              onChange={setIndustry}
+            />
+          )}
+
+          {allSkills.length > 0 && (
+            <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+          )}
 
           <div>
             <div className="flex items-center justify-between">

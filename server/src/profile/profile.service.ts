@@ -6,6 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service';
 import { CreatePortfolioItemDto } from './dto/create-portfolio-item.dto';
 import { UpdatePortfolioItemDto } from './dto/update-portfolio-item.dto';
+import { TaxonomyService } from '../taxonomy/taxonomy.service';
 
 const portfolioSelect = {
   id: true,
@@ -19,7 +20,10 @@ const portfolioSelect = {
 
 @Injectable()
 export class ProfileService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private taxonomy: TaxonomyService,
+  ) {}
 
   /** Свой профиль + портфолио (вкладка /profile). */
   async getProfile(userId: string) {
@@ -111,18 +115,31 @@ export class ProfileService {
     country?: string;
     phone?: string;
   }) {
+    const data: {
+      firstName?: string | null;
+      lastName?: string | null;
+      bio?: string | null;
+      specialization?: string | null;
+      industries?: string[];
+      experience?: string | null;
+      country?: string | null;
+      phone?: string | null;
+    } = {
+      firstName: dto.firstName?.trim() || null,
+      lastName: dto.lastName?.trim() || null,
+      bio: dto.bio?.trim() || null,
+      specialization: dto.specialization?.trim() || null,
+      experience: dto.experience?.trim() || null,
+      country: dto.country?.trim() || null,
+      phone: dto.phone?.trim() || null,
+    };
+    if (dto.industries !== undefined) {
+      data.industries = this.taxonomy.normalizeIndustries(dto.industries);
+    }
+
     await this.prisma.profile.update({
       where: { userId },
-      data: {
-        firstName: dto.firstName?.trim() || null,
-        lastName: dto.lastName?.trim() || null,
-        bio: dto.bio?.trim() || null,
-        specialization: dto.specialization?.trim() || null,
-        industries: dto.industries ?? [],
-        experience: dto.experience?.trim() || null,
-        country: dto.country?.trim() || null,
-        phone: dto.phone?.trim() || null,
-      },
+      data,
     });
     return { success: true };
   }

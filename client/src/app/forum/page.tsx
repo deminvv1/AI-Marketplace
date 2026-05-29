@@ -7,8 +7,14 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { flag, INDUSTRIES } from "@/lib/mock-data";
+import { flag } from "@/lib/mock-data";
+import {
+  CatalogIndustryList,
+  CatalogSkillChips,
+} from "@/components/catalog-taxonomy-filters";
 import { getForumPosts, type ForumPostListItem } from "@/app/actions/forum";
+import { useTaxonomy } from "@/lib/use-taxonomy";
+import { skillLabel } from "@/lib/taxonomy";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
 import { Loader2, MessageSquare, Plus, Search, ThumbsUp } from "lucide-react";
 
@@ -17,7 +23,9 @@ export default function ForumPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { categories, skills } = useTaxonomy();
   const [industry, setIndustry] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -25,6 +33,7 @@ export default function ForumPage() {
       setLoading(true);
       const result = await getForumPosts({
         industry: industry ?? undefined,
+        tag: tag ?? undefined,
         q: query.trim() || undefined,
       });
       if (cancelled) return;
@@ -40,40 +49,22 @@ export default function ForumPage() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, industry]);
+  }, [query, industry, tag]);
 
   return (
     <AppShell title="Forum">
       <div className="grid grid-cols-12 gap-6">
-        <aside className="col-span-12 lg:col-span-3 glass rounded-2xl p-5 h-fit">
-          <h3 className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
-            Categories
-          </h3>
-          <ul className="space-y-1">
-            <li>
-              <button
-                type="button"
-                onClick={() => setIndustry(null)}
-                className={`w-full px-3 py-2 rounded-lg text-sm text-left ${!industry ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5"}`}
-              >
-                All topics
-              </button>
-            </li>
-            {INDUSTRIES.map((c) => (
-              <li key={c.name}>
-                <button
-                  type="button"
-                  onClick={() => setIndustry(c.name)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${industry === c.name ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5"}`}
-                >
-                  {c.icon} {c.name}
-                </button>
-              </li>
-            ))}
-          </ul>
-          <p className="text-[10px] text-muted-foreground mt-4">
-            Sidebar counts are decorative until we add category stats API.
-          </p>
+        <aside className="col-span-12 lg:col-span-3 glass rounded-2xl p-5 h-fit space-y-6">
+          {categories.length > 0 && (
+            <CatalogIndustryList
+              categories={categories}
+              value={industry}
+              onChange={setIndustry}
+              title="Categories"
+              allLabel="All topics"
+            />
+          )}
+          <CatalogSkillChips skills={skills} value={tag} onChange={setTag} />
         </aside>
 
         <div className="col-span-12 lg:col-span-9 space-y-4">
@@ -142,11 +133,21 @@ export default function ForumPage() {
                     )}
                   </div>
                   <h4 className="mt-2 font-semibold leading-snug">{t.title}</h4>
-                  {t.industry && (
-                    <span className="mt-2 inline-block px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30 text-xs">
-                      {t.industry}
-                    </span>
-                  )}
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {t.industry && (
+                      <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30 text-xs">
+                        {t.industry}
+                      </span>
+                    )}
+                    {t.tags?.slice(0, 4).map((slug) => (
+                      <span
+                        key={slug}
+                        className="px-2 py-0.5 rounded-md bg-white/5 border border-border text-xs text-muted-foreground"
+                      >
+                        {skillLabel(slug, skills)}
+                      </span>
+                    ))}
+                  </div>
                   <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
                     {t.content}
                   </p>

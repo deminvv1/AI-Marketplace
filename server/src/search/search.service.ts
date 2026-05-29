@@ -3,6 +3,7 @@ import { ForumPostsService } from '../forum/forum-posts.service';
 import { FreelancersService } from '../freelancers/freelancers.service';
 import { ProjectsService } from '../projects/projects.service';
 import { SolutionsService } from '../solutions/solutions.service';
+import { SearchQueryDto } from './dto/search-query.dto';
 
 /** Агрегатор глобального поиска — без новой таблицы, см. docs/SEARCH.md */
 @Injectable()
@@ -14,9 +15,12 @@ export class SearchService {
     private forum: ForumPostsService,
   ) {}
 
-  async search(q?: string) {
-    const trimmed = q?.trim() ?? '';
-    if (!trimmed) {
+  async search(query: SearchQueryDto = {}) {
+    const trimmed = query.q?.trim() ?? '';
+    const tag = query.tag?.trim();
+    const industry = query.industry?.trim();
+
+    if (!trimmed && !tag && !industry) {
       return {
         projects: [],
         freelancers: [],
@@ -25,11 +29,19 @@ export class SearchService {
       };
     }
 
+    const listQuery = {
+      ...(trimmed ? { q: trimmed } : {}),
+      ...(tag ? { tag } : {}),
+      ...(industry ? { industry } : {}),
+    };
+
     const [projects, freelancers, solutions, forum] = await Promise.all([
-      this.projects.findAll({ q: trimmed }),
-      this.freelancers.list({ q: trimmed }),
-      this.solutions.findAll({ q: trimmed }),
-      this.forum.findAll({ q: trimmed }),
+      this.projects.findAll(listQuery),
+      trimmed
+        ? this.freelancers.list({ q: trimmed })
+        : Promise.resolve([]),
+      this.solutions.findAll(listQuery),
+      this.forum.findAll(listQuery),
     ]);
 
     return { projects, freelancers, solutions, forum };

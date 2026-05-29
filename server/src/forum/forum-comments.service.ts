@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateForumCommentDto } from './dto/create-forum-comment.dto';
+import { UpdateForumCommentDto } from './dto/update-forum-comment.dto';
 
 const authorSelect = {
   id: true,
@@ -150,6 +151,31 @@ export class ForumCommentsService {
     return { liked: true, likesCount: updated?.likesCount ?? 1 };
   }
 
+  async update(commentId: string, userId: string, dto: UpdateForumCommentDto) {
+    const comment = await this.prisma.forumComment.findUnique({
+      where: { id: commentId },
+      select: { id: true, authorId: true },
+    });
+    if (!comment) throw new NotFoundException('Comment not found');
+    if (comment.authorId !== userId) {
+      throw new ForbiddenException('Only the author can edit this comment');
+    }
+
+    return this.prisma.forumComment.update({
+      where: { id: commentId },
+      data: { content: dto.content.trim() },
+      select: {
+        id: true,
+        content: true,
+        postId: true,
+        parentCommentId: true,
+        likesCount: true,
+        createdAt: true,
+        author: { select: authorSelect },
+      },
+    });
+  }
+
   async remove(commentId: string, userId: string) {
     const comment = await this.prisma.forumComment.findUnique({
       where: { id: commentId },
@@ -159,7 +185,21 @@ export class ForumCommentsService {
     if (comment.authorId !== userId) {
       throw new ForbiddenException('Only the author can delete this comment');
     }
-    await this.prisma.forumComment.delete({ where: { id: commentId } });
+
+    await this.prisma.$transaction(async (tx) => {
+      const deleteWithReplies = async (id: string) => {
+        const children = await tx.forumComment.findMany({
+          where: { parentCommentId: id },
+          select: { id: true },
+        });
+        for (const child of children) {
+          await deleteWithReplies(child.id);
+        }
+        await tx.forumComment.delete({ where: { id } });
+      };
+      await deleteWithReplies(commentId);
+    });
+
     return { success: true };
   }
 }

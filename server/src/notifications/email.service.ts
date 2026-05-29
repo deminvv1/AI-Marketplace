@@ -15,15 +15,27 @@ export class EmailService {
     to: string,
     payload: { title: string; body: string; link: string },
   ): Promise<{ sent: boolean }> {
+    return this.send(to, payload.title, payload.body, payload.link, 'View project');
+  }
+
+  /** Proposal accepted / rejected — тот же Resend, что project alerts */
+  async sendProposalUpdate(
+    to: string,
+    payload: { title: string; body: string; link: string },
+  ): Promise<{ sent: boolean }> {
+    return this.send(to, payload.title, payload.body, payload.link, 'Open marketplace');
+  }
+
+  private async send(
+    to: string,
+    subject: string,
+    body: string,
+    link: string,
+    linkLabel: string,
+  ): Promise<{ sent: boolean }> {
     const apiKey = this.config.get<string>('RESEND_API_KEY');
     const from =
       this.config.get<string>('EMAIL_FROM') ?? 'AI Marketplace <onboarding@resend.dev>';
-
-    const subject = payload.title;
-    const html = `
-      <p>${payload.body ?? ''}</p>
-      <p><a href="${payload.link}">View project</a></p>
-    `;
 
     if (!apiKey) {
       this.log.log(`[email skipped] to=${to} subject=${subject}`);
@@ -32,9 +44,12 @@ export class EmailService {
 
     const appUrl =
       this.config.get<string>('APP_URL') ?? 'http://localhost:3000';
-    const link = payload.link.startsWith('http')
-      ? payload.link
-      : `${appUrl}${payload.link}`;
+    const href = link.startsWith('http') ? link : `${appUrl}${link}`;
+
+    const html = `
+      <p>${body ?? ''}</p>
+      <p><a href="${href}">${linkLabel}</a></p>
+    `;
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -46,7 +61,7 @@ export class EmailService {
         from,
         to: [to],
         subject,
-        html: html.replace(payload.link, link),
+        html,
       }),
     });
 

@@ -50,6 +50,7 @@ export type SolutionInput = {
 
 export type SolutionCatalogFilters = {
   industry?: string;
+  tag?: string;
   format?: string;
   country?: string;
   q?: string;
@@ -59,6 +60,7 @@ export async function getSolutions(filters?: SolutionCatalogFilters) {
   try {
     const params = new URLSearchParams();
     if (filters?.industry) params.set("industry", filters.industry);
+    if (filters?.tag) params.set("tag", filters.tag);
     if (filters?.format) params.set("format", filters.format);
     if (filters?.country) params.set("country", filters.country);
     if (filters?.q) params.set("q", filters.q);

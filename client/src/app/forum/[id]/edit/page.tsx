@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
 import { getMe } from "@/app/actions/me";
 import { getForumPost, updateForumPost } from "@/app/actions/forum";
+import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
+import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 export default function EditForumTopicPage() {
@@ -16,14 +17,25 @@ export default function EditForumTopicPage() {
   const router = useRouter();
   const postId = typeof params.id === "string" ? params.id : "";
 
+  const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
+  const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [forbidden, setForbidden] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [industry, setIndustry] = useState("");
-  const [tags, setTags] = useState("");
+  const [tags, setTags] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    getTaxonomy().then((res) => {
+      if (Array.isArray(res)) {
+        setCategories(res);
+        setAllSkills(res.flatMap((c) => c.skills));
+      }
+    });
+  }, []);
 
   useEffect(() => {
     if (!postId) return;
@@ -49,7 +61,7 @@ export default function EditForumTopicPage() {
       setTitle(result.title);
       setContent(result.content);
       setIndustry(result.industry ?? "");
-      setTags(result.tags?.join(", ") ?? "");
+      setTags(result.tags ?? []);
       setLoading(false);
     })();
   }, [postId]);
@@ -59,16 +71,11 @@ export default function EditForumTopicPage() {
     setSubmitting(true);
     setError(null);
 
-    const tagList = tags
-      .split(",")
-      .map((t) => t.trim())
-      .filter(Boolean);
-
     const result = await updateForumPost(postId, {
       title,
       content,
       industry: industry || undefined,
-      tags: tagList.length ? tagList : undefined,
+      tags: tags.length ? tags : undefined,
     });
 
     setSubmitting(false);
@@ -129,8 +136,8 @@ export default function EditForumTopicPage() {
             className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
           >
             <option value="">—</option>
-            {INDUSTRIES.map((i) => (
-              <option key={i.name} value={i.name}>
+            {categories.map((i) => (
+              <option key={i.id} value={i.name}>
                 {i.name}
               </option>
             ))}
@@ -147,14 +154,9 @@ export default function EditForumTopicPage() {
             className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
           />
         </div>
-        <div>
-          <label className="text-sm font-medium">Tags (comma-separated)</label>
-          <input
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
-          />
-        </div>
+        {allSkills.length > 0 && (
+          <SkillTagPicker skills={allSkills} selected={tags} onChange={setTags} />
+        )}
         {error && <p className="text-sm text-destructive">{error}</p>}
         <button
           type="submit"

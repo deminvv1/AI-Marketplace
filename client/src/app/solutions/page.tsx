@@ -7,8 +7,13 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES } from "@/lib/mock-data";
+import {
+  CatalogIndustryChips,
+  CatalogSkillChips,
+} from "@/components/catalog-taxonomy-filters";
 import { getSolutions, type SolutionListItem } from "@/app/actions/solutions";
+import { useTaxonomy } from "@/lib/use-taxonomy";
+import { skillLabel } from "@/lib/taxonomy";
 import { solutionAuthorName, SOLUTION_FORMATS } from "@/lib/solutions";
 import { Stars } from "@/components/ui-bits";
 import { Loader2, Plus, Search } from "lucide-react";
@@ -27,7 +32,9 @@ export default function SolutionsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { categories, skills } = useTaxonomy();
   const [industry, setIndustry] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
   const [format, setFormat] = useState<string | null>(null);
 
   useEffect(() => {
@@ -36,6 +43,7 @@ export default function SolutionsPage() {
       setLoading(true);
       const result = await getSolutions({
         industry: industry ?? undefined,
+        tag: tag ?? undefined,
         format: format ?? undefined,
         q: query.trim() || undefined,
       });
@@ -52,7 +60,7 @@ export default function SolutionsPage() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, industry, format]);
+  }, [query, industry, tag, format]);
 
   return (
     <AppShell title="Solutions">
@@ -101,25 +109,22 @@ export default function SolutionsPage() {
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-8">
-        <button
-          type="button"
-          onClick={() => setIndustry(null)}
-          className={`h-8 px-3 rounded-lg text-xs ${!industry ? "text-primary" : "text-muted-foreground"}`}
-        >
-          All industries
-        </button>
-        {INDUSTRIES.slice(0, 8).map((i) => (
-          <button
-            key={i.name}
-            type="button"
-            onClick={() => setIndustry(i.name)}
-            className={`h-8 px-3 rounded-lg text-xs border ${industry === i.name ? "border-primary/50 text-primary" : "border-border text-muted-foreground"}`}
-          >
-            {i.icon} {i.name}
-          </button>
-        ))}
-      </div>
+      {categories.length > 0 && (
+        <div className="mb-4">
+          <CatalogIndustryChips
+            categories={categories}
+            value={industry}
+            onChange={setIndustry}
+          />
+        </div>
+      )}
+
+      <CatalogSkillChips
+        skills={skills}
+        value={tag}
+        onChange={setTag}
+        className="mb-8"
+      />
 
       {loading && (
         <div className="flex justify-center py-16">
@@ -153,11 +158,21 @@ export default function SolutionsPage() {
               <p className="text-sm text-muted-foreground line-clamp-2">
                 {o.preview || o.description}
               </p>
-              {o.industry && (
-                <span className="w-fit px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30 text-xs">
-                  {o.industry}
-                </span>
-              )}
+              <div className="flex flex-wrap gap-1.5">
+                {o.industry && (
+                  <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30 text-xs">
+                    {o.industry}
+                  </span>
+                )}
+                {o.tags?.slice(0, 3).map((slug) => (
+                  <span
+                    key={slug}
+                    className="px-2 py-0.5 rounded-md bg-white/5 border border-border text-xs text-muted-foreground"
+                  >
+                    {skillLabel(slug, skills)}
+                  </span>
+                ))}
+              </div>
               <div className="text-base font-bold mt-auto pt-3 border-t border-border">
                 {o.price || "Price on request"}
               </div>

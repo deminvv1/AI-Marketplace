@@ -8,23 +8,31 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
-import { INDUSTRIES, flag } from "@/lib/mock-data";
+import { flag } from "@/lib/mock-data";
 import { Search, ArrowRight, Loader2, X, Bell } from "lucide-react";
 import { createProjectAlert } from "@/app/actions/project-alerts";
 import { StatusBadge } from "@/components/ui-bits";
+import {
+  CatalogIndustryList,
+  CatalogSkillChips,
+} from "@/components/catalog-taxonomy-filters";
 import { getProjects, type ProjectListItem } from "@/app/actions/projects";
 import {
   formatDeadline,
   formatPostedAt,
   projectStatusForUi,
 } from "@/lib/projects";
+import { useTaxonomy } from "@/lib/use-taxonomy";
+import { skillLabel } from "@/lib/taxonomy";
 
 export default function ProjectsPage() {
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const { categories, skills } = useTaxonomy();
   const [industry, setIndustry] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
   const [country, setCountry] = useState("");
   const [alertSaving, setAlertSaving] = useState(false);
   const [alertMsg, setAlertMsg] = useState<string | null>(null);
@@ -40,6 +48,7 @@ export default function ProjectsPage() {
       industry: industry ?? undefined,
       country: country.trim() || undefined,
       q: query.trim() || undefined,
+      tags: tag ? [tag] : undefined,
       notifyByEmail: true,
     });
     setAlertSaving(false);
@@ -54,6 +63,7 @@ export default function ProjectsPage() {
       setError(null);
       const result = await getProjects({
         industry: industry ?? undefined,
+        tag: tag ?? undefined,
         country: country.trim() || undefined,
         q: query.trim() || undefined,
       });
@@ -71,9 +81,9 @@ export default function ProjectsPage() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query, industry, country]);
+  }, [query, industry, tag, country]);
 
-  const hasFilters = !!(industry || country.trim() || query.trim());
+  const hasFilters = !!(industry || tag || country.trim() || query.trim());
 
   return (
     <AppShell title="Projects">
@@ -120,6 +130,7 @@ export default function ProjectsPage() {
             type="button"
             onClick={() => {
               setIndustry(null);
+              setTag(null);
               setCountry("");
               setQuery("");
             }}
@@ -144,32 +155,19 @@ export default function ProjectsPage() {
       </div>
 
       <div className="grid grid-cols-12 gap-6">
-        <aside className="col-span-12 md:col-span-3 glass rounded-2xl p-5 h-fit sticky top-24">
-          <h3 className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-4">
-            Industries
-          </h3>
-          <ul className="space-y-1">
-            <li>
-              <button
-                type="button"
-                onClick={() => setIndustry(null)}
-                className={`w-full px-3 py-2 rounded-lg text-sm text-left transition ${!industry ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5"}`}
-              >
-                All industries
-              </button>
-            </li>
-            {INDUSTRIES.map((i) => (
-              <li key={i.name}>
-                <button
-                  type="button"
-                  onClick={() => setIndustry(i.name)}
-                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${industry === i.name ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"}`}
-                >
-                  {i.icon} {i.name}
-                </button>
-              </li>
-            ))}
-          </ul>
+        <aside className="col-span-12 md:col-span-3 glass rounded-2xl p-5 h-fit sticky top-24 space-y-6">
+          {categories.length > 0 && (
+            <CatalogIndustryList
+              categories={categories}
+              value={industry}
+              onChange={setIndustry}
+            />
+          )}
+          <CatalogSkillChips
+            skills={skills}
+            value={tag}
+            onChange={setTag}
+          />
         </aside>
 
         <div className="col-span-12 md:col-span-9">
@@ -213,6 +211,14 @@ export default function ProjectsPage() {
                       {o.industry}
                     </span>
                   )}
+                  {o.tags?.slice(0, 3).map((t) => (
+                    <span
+                      key={t}
+                      className="px-2 py-1 rounded-md bg-white/5 border border-border text-muted-foreground"
+                    >
+                      {skillLabel(t, skills)}
+                    </span>
+                  ))}
                   {o.country && (
                     <span className="px-2 py-1 rounded-md bg-white/5 border border-border text-muted-foreground">
                       {flag(o.country)} {o.country}

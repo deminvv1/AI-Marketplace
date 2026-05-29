@@ -8,9 +8,15 @@ import { useEffect, useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { searchMarketplace, type SearchTab } from "@/app/actions/search";
+import {
+  searchMarketplace,
+  type SearchFilters,
+  type SearchTab,
+} from "@/app/actions/search";
+import { CatalogIndustryChips, CatalogSkillChips } from "@/components/catalog-taxonomy-filters";
 import { freelancerDisplayName } from "@/lib/projects";
 import { forumAuthorName } from "@/lib/forum";
+import { useTaxonomy } from "@/lib/use-taxonomy";
 import { Search, Loader2, ArrowRight } from "lucide-react";
 
 const TABS: { key: SearchTab; label: string }[] = [
@@ -27,27 +33,42 @@ function SearchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") ?? "";
+  const initialTag = searchParams.get("tag");
+  const initialIndustry = searchParams.get("industry");
   const initialTab = (searchParams.get("tab") as SearchTab) || "all";
+  const { categories, skills } = useTaxonomy();
 
   const [query, setQuery] = useState(initialQ);
+  const [tag, setTag] = useState<string | null>(initialTag);
+  const [industry, setIndustry] = useState<string | null>(initialIndustry);
   const [tab, setTab] = useState<SearchTab>(initialTab);
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<Awaited<ReturnType<typeof searchMarketplace>> | null>(null);
 
-  useEffect(() => {
-    setQuery(initialQ);
-    setTab(initialTab);
-  }, [initialQ, initialTab]);
+  const filters: SearchFilters = {
+    ...(query.trim() ? { q: query.trim() } : {}),
+    ...(tag ? { tag } : {}),
+    ...(industry ? { industry } : {}),
+  };
+
+  const hasFilters = !!(filters.q || filters.tag || filters.industry);
 
   useEffect(() => {
-    if (!query.trim()) {
+    setQuery(initialQ);
+    setTag(initialTag);
+    setIndustry(initialIndustry);
+    setTab(initialTab);
+  }, [initialQ, initialTag, initialIndustry, initialTab]);
+
+  useEffect(() => {
+    if (!hasFilters) {
       setResults(null);
       return;
     }
     let cancelled = false;
     const timer = setTimeout(async () => {
       setLoading(true);
-      const data = await searchMarketplace(query);
+      const data = await searchMarketplace(filters);
       if (!cancelled) {
         setResults(data);
         setLoading(false);
@@ -57,11 +78,18 @@ function SearchContent() {
       cancelled = true;
       clearTimeout(timer);
     };
-  }, [query]);
+  }, [query, tag, industry, hasFilters]);
 
-  function applyUrl(nextQ: string, nextTab: SearchTab) {
+  function applyUrl(
+    nextQ: string,
+    nextTab: SearchTab,
+    nextTag: string | null,
+    nextIndustry: string | null,
+  ) {
     const params = new URLSearchParams();
     if (nextQ.trim()) params.set("q", nextQ.trim());
+    if (nextTag) params.set("tag", nextTag);
+    if (nextIndustry) params.set("industry", nextIndustry);
     if (nextTab !== "all") params.set("tab", nextTab);
     const qs = params.toString();
     router.replace(`/search${qs ? `?${qs}` : ""}`);
@@ -69,7 +97,7 @@ function SearchContent() {
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
-    applyUrl(query, tab);
+    applyUrl(query, tab, tag, industry);
   }
 
   const r = results ?? {
@@ -110,6 +138,25 @@ function SearchContent() {
         </button>
       </form>
 
+      <CatalogIndustryChips
+        categories={categories}
+        value={industry}
+        onChange={(v) => {
+          setIndustry(v);
+          applyUrl(query, tab, tag, v);
+        }}
+      />
+
+      <CatalogSkillChips
+        skills={skills}
+        value={tag}
+        onChange={(v) => {
+          setTag(v);
+          applyUrl(query, tab, v, industry);
+        }}
+        className="mt-2"
+      />
+
       <div className="flex flex-wrap gap-2">
         {TABS.map((t) => (
           <button
@@ -117,7 +164,7 @@ function SearchContent() {
             type="button"
             onClick={() => {
               setTab(t.key);
-              applyUrl(query, t.key);
+              applyUrl(query, t.key, tag, industry);
             }}
             className={`h-8 px-3 rounded-lg text-sm border transition ${
               tab === t.key
@@ -130,25 +177,27 @@ function SearchContent() {
         ))}
       </div>
 
-      {!query.trim() && (
+      {!hasFilters && (
         <p className="text-sm text-muted-foreground text-center py-12">
-          Enter a keyword to search across the marketplace.
+          Enter a keyword or pick a skill / industry to search the marketplace.
         </p>
       )}
 
-      {query.trim() && loading && (
+      {hasFilters && loading && (
         <div className="flex justify-center py-16">
           <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
       )}
 
-      {query.trim() && !loading && total === 0 && (
+      {hasFilters && !loading && total === 0 && (
         <p className="text-sm text-muted-foreground text-center py-12">
-          Nothing found for &ldquo;{query}&rdquo;.
+          Nothing found{query.trim() ? ` for “${query}”` : ""}
+          {tag ? ` with skill “${tag}”` : ""}
+          {industry ? ` in ${industry}` : ""}.
         </p>
       )}
 
-      {query.trim() && !loading && showProjects && r.projects.length > 0 && (
+      {hasFilters && !loading && showProjects && r.projects.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
             title="Projects"
@@ -156,7 +205,7 @@ function SearchContent() {
             showLink={tab === "all"}
             onViewAll={() => {
               setTab("projects");
-              applyUrl(query, "projects");
+              applyUrl(query, "projects", tag, industry);
             }}
           />
           {r.projects.slice(0, limit).map((p) => (
@@ -174,7 +223,7 @@ function SearchContent() {
         </section>
       )}
 
-      {query.trim() && !loading && showFreelancers && r.freelancers.length > 0 && (
+      {hasFilters && !loading && showFreelancers && r.freelancers.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
             title="Freelancers"
@@ -182,7 +231,7 @@ function SearchContent() {
             showLink={tab === "all"}
             onViewAll={() => {
               setTab("freelancers");
-              applyUrl(query, "freelancers");
+              applyUrl(query, "freelancers", tag, industry);
             }}
           />
           {r.freelancers.slice(0, limit).map((u) => (
@@ -203,7 +252,7 @@ function SearchContent() {
         </section>
       )}
 
-      {query.trim() && !loading && showSolutions && r.solutions.length > 0 && (
+      {hasFilters && !loading && showSolutions && r.solutions.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
             title="Solutions"
@@ -211,7 +260,7 @@ function SearchContent() {
             showLink={tab === "all"}
             onViewAll={() => {
               setTab("solutions");
-              applyUrl(query, "solutions");
+              applyUrl(query, "solutions", tag, industry);
             }}
           />
           {r.solutions.slice(0, limit).map((s) => (
@@ -229,7 +278,7 @@ function SearchContent() {
         </section>
       )}
 
-      {query.trim() && !loading && showForum && r.forum.length > 0 && (
+      {hasFilters && !loading && showForum && r.forum.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
             title="Forum"
@@ -237,7 +286,7 @@ function SearchContent() {
             showLink={tab === "all"}
             onViewAll={() => {
               setTab("forum");
-              applyUrl(query, "forum");
+              applyUrl(query, "forum", tag, industry);
             }}
           />
           {r.forum.slice(0, limit).map((t) => (

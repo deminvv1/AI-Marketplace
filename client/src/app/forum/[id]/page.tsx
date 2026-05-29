@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
+import { UserSafetyActions } from "@/components/user-safety-actions";
 import { getMe } from "@/app/actions/me";
 import {
   checkForumPostLiked,
@@ -18,6 +19,8 @@ import {
   getMyForumCommentLikes,
   toggleForumCommentLike,
   toggleForumPostLike,
+  deleteForumComment,
+  updateForumComment,
   type ForumCommentItem,
   type ForumPostDetail,
 } from "@/app/actions/forum";
@@ -28,30 +31,84 @@ import { ArrowLeft, Loader2, Pencil, ThumbsUp, Trash2 } from "lucide-react";
 function updateCommentTree(
   items: ForumCommentItem[],
   commentId: string,
-  likesCount: number,
+  patch: Partial<Pick<ForumCommentItem, "likesCount" | "content">>,
 ): ForumCommentItem[] {
   return items.map((c) => {
-    if (c.id === commentId) return { ...c, likesCount };
+    if (c.id === commentId) return { ...c, ...patch };
     if (c.replies?.length) {
-      return { ...c, replies: updateCommentTree(c.replies, commentId, likesCount) };
+      return { ...c, replies: updateCommentTree(c.replies, commentId, patch) };
     }
     return c;
   });
 }
 
+function removeCommentFromTree(
+  items: ForumCommentItem[],
+  commentId: string,
+): ForumCommentItem[] {
+  return items
+    .filter((c) => c.id !== commentId)
+    .map((c) =>
+      c.replies?.length
+        ? { ...c, replies: removeCommentFromTree(c.replies, commentId) }
+        : c,
+    );
+}
+
 function CommentBlock({
   comment,
+  postId,
+  meId,
   onReply,
   isLiked,
   likeBusyId,
   onLike,
+  onEdited,
+  onDeleted,
 }: {
   comment: ForumCommentItem;
+  postId: string;
+  meId: string | null;
   onReply: (parentId: string) => void;
   isLiked: (id: string) => boolean;
   likeBusyId: string | null;
   onLike: (commentId: string) => void;
+  onEdited: (commentId: string, content: string) => void;
+  onDeleted: (commentId: string) => void;
 }) {
+  const isAuthor = !!(meId && comment.author.id === meId);
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(comment.content);
+  const [saving, setSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete() {
+    if (!confirm("Delete this comment and its replies?")) return;
+    setDeleting(true);
+    const result = await deleteForumComment(postId, comment.id);
+    setDeleting(false);
+    if ("error" in result && result.error) {
+      setEditError(result.error);
+      return;
+    }
+    onDeleted(comment.id);
+  }
+
+  async function handleSaveEdit() {
+    if (!draft.trim()) return;
+    setSaving(true);
+    setEditError(null);
+    const result = await updateForumComment(postId, comment.id, draft.trim());
+    setSaving(false);
+    if ("error" in result && result.error) {
+      setEditError(result.error);
+      return;
+    }
+    onEdited(comment.id, draft.trim());
+    setEditing(false);
+  }
+
   return (
     <div className={comment.parentCommentId ? "ml-6 mt-2" : ""}>
       <div className="flex gap-2 p-3 rounded-xl bg-white/5 border border-border">
@@ -66,7 +123,41 @@ function CommentBlock({
             {" · "}
             {formatForumTime(comment.createdAt)}
           </div>
-          <p className="text-sm mt-1 whitespace-pre-wrap">{comment.content}</p>
+          {editing ? (
+            <div className="mt-2 space-y-2">
+              <textarea
+                value={draft}
+                onChange={(e) => setDraft(e.target.value)}
+                rows={3}
+                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm resize-none"
+              />
+              {editError && <p className="text-xs text-destructive">{editError}</p>}
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={handleSaveEdit}
+                  className="h-8 px-3 rounded-lg bg-gradient-primary text-white text-xs disabled:opacity-60"
+                >
+                  {saving ? "Saving…" : "Save"}
+                </button>
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => {
+                    setDraft(comment.content);
+                    setEditing(false);
+                    setEditError(null);
+                  }}
+                  className="h-8 px-3 rounded-lg border border-border text-xs"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-sm mt-1 whitespace-pre-wrap">{comment.content}</p>
+          )}
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <button
               type="button"
@@ -92,6 +183,30 @@ function CommentBlock({
                 Reply
               </button>
             )}
+            {isAuthor && !editing && (
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraft(comment.content);
+                    setEditing(true);
+                  }}
+                  className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+                >
+                  <Pencil className="size-3" />
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  disabled={deleting}
+                  onClick={handleDelete}
+                  className="text-xs text-destructive hover:underline inline-flex items-center gap-1 disabled:opacity-50"
+                >
+                  <Trash2 className="size-3" />
+                  {deleting ? "…" : "Delete"}
+                </button>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -99,10 +214,14 @@ function CommentBlock({
         <CommentBlock
           key={r.id}
           comment={r}
+          postId={postId}
+          meId={meId}
           onReply={onReply}
           isLiked={isLiked}
           likeBusyId={likeBusyId}
           onLike={onLike}
+          onEdited={onEdited}
+          onDeleted={onDeleted}
         />
       ))}
     </div>
@@ -208,7 +327,7 @@ export default function ForumTopicPage() {
         return next;
       });
       setComments((prev) =>
-        updateCommentTree(prev, commentId, result.likesCount),
+        updateCommentTree(prev, commentId, { likesCount: result.likesCount }),
       );
     }
   }
@@ -267,7 +386,16 @@ export default function ForumTopicPage() {
           <span>{formatForumTime(post.createdAt)}</span>
           <span>{post.viewsCount} views</span>
         </div>
-        <h1 className="text-2xl font-bold">{post.title}</h1>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <h1 className="text-2xl font-bold">{post.title}</h1>
+          {meId && post.author.id !== meId && (
+            <UserSafetyActions
+              targetId={postId}
+              targetType="forum_post"
+              targetLabel={post.title}
+            />
+          )}
+        </div>
         {post.industry && (
           <span className="mt-3 inline-block px-2 py-0.5 rounded-md bg-primary/15 text-primary text-xs">
             {post.industry}
@@ -318,6 +446,8 @@ export default function ForumTopicPage() {
           <CommentBlock
             key={c.id}
             comment={c}
+            postId={postId}
+            meId={meId}
             onReply={(id) => {
               setReplyToId(id);
               setReply(`@${forumAuthorName(c.author)} `);
@@ -325,6 +455,14 @@ export default function ForumTopicPage() {
             isLiked={(id) => likedCommentIds.has(id)}
             likeBusyId={commentLikeBusyId}
             onLike={handleCommentLike}
+            onEdited={(commentId, content) => {
+              setComments((prev) =>
+                updateCommentTree(prev, commentId, { content }),
+              );
+            }}
+            onDeleted={(commentId) => {
+              setComments((prev) => removeCommentFromTree(prev, commentId));
+            }}
           />
         ))}
 

@@ -6,6 +6,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { ResponseStatus, Role } from '@prisma/client';
+import { EmailService } from '../notifications/email.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProposalDto } from './dto/create-proposal.dto';
 
@@ -36,7 +38,11 @@ const proposalSelect = {
 
 @Injectable()
 export class ProjectProposalsService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private notifications: NotificationsService,
+    private email: EmailService,
+  ) {}
 
   /** Только FREELANCER и BOTH могут откликаться на чужие OPEN-проекты. */
   private async assertCanPropose(userId: string) {
@@ -175,7 +181,16 @@ export class ProjectProposalsService {
       throw new BadRequestException('Only pending proposals can be accepted');
     }
 
-    return this.prisma.$transaction(async (tx) => {
+    const otherPending = await this.prisma.proposal.findMany({
+      where: {
+        projectId,
+        status: ResponseStatus.PENDING,
+        id: { not: proposalId },
+      },
+      select: { freelancerId: true },
+    });
+
+    const accepted = await this.prisma.$transaction(async (tx) => {
       await tx.proposal.updateMany({
         where: {
           projectId,
@@ -190,24 +205,49 @@ export class ProjectProposalsService {
         data: { status: ResponseStatus.ACCEPTED },
       });
 
-      await tx.project.update({
+      const updatedProject = await tx.project.update({
         where: { id: projectId },
         data: {
           freelancerId: proposal.freelancerId,
           status: 'IN_PROGRESS',
         },
+        select: { id: true, title: true },
       });
 
-      return tx.proposal.findUnique({
+      const result = await tx.proposal.findUnique({
         where: { id: proposalId },
         select: proposalSelect,
       });
+
+      return { result, projectTitle: updatedProject.title };
     });
+
+    await this.notifications.create({
+      userId: proposal.freelancerId,
+      type: 'PROPOSAL_ACCEPTED',
+      title: `Proposal accepted: ${accepted.projectTitle}`,
+      body: 'The client hired you for this project. Work is now in progress.',
+      link: `/projects/${projectId}`,
+    });
+
+    await this.notifyProposalsRejected(
+      otherPending.map((p) => p.freelancerId),
+      accepted.projectTitle,
+      'hired_other',
+    );
+
+    return accepted.result;
   }
 
   /** Отклонить один отклик (проект остаётся OPEN, freelancerId не меняется). */
   async reject(projectId: string, proposalId: string, clientId: string) {
     await this.assertProjectOwner(projectId, clientId);
+
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { title: true },
+    });
+    if (!project) throw new NotFoundException('Project not found');
 
     const proposal = await this.prisma.proposal.findFirst({
       where: { id: proposalId, projectId },
@@ -217,10 +257,67 @@ export class ProjectProposalsService {
       throw new BadRequestException('Only pending proposals can be rejected');
     }
 
-    return this.prisma.proposal.update({
+    const result = await this.prisma.proposal.update({
       where: { id: proposalId },
       data: { status: ResponseStatus.REJECTED },
       select: proposalSelect,
     });
+
+    await this.notifyProposalsRejected(
+      [proposal.freelancerId],
+      project.title,
+      'declined',
+    );
+
+    return result;
+  }
+
+  private async notifyProposalsRejected(
+    freelancerIds: string[],
+    projectTitle: string,
+    reason: 'declined' | 'hired_other',
+  ) {
+    const body =
+      reason === 'hired_other'
+        ? 'Another freelancer was hired for this project. It is now in progress.'
+        : 'The client declined your proposal. The project is still open for others.';
+
+    const uniqueIds = [...new Set(freelancerIds)];
+    const title = `Proposal not selected: ${projectTitle}`;
+    const link = '/proposals';
+
+    await Promise.all(
+      uniqueIds.map((userId) =>
+        this.notifications.create({
+          userId,
+          type: 'PROPOSAL_REJECTED',
+          title,
+          body,
+          link,
+        }),
+      ),
+    );
+
+    await this.sendProposalEmails(uniqueIds, title, body, link);
+  }
+
+  private async sendProposalEmails(
+    userIds: string[],
+    title: string,
+    body: string,
+    link: string,
+  ) {
+    if (userIds.length === 0) return;
+
+    const users = await this.prisma.user.findMany({
+      where: { id: { in: userIds } },
+      select: { id: true, email: true },
+    });
+
+    await Promise.all(
+      users.map((u) =>
+        this.email.sendProposalUpdate(u.email, { title, body, link }),
+      ),
+    );
   }
 }

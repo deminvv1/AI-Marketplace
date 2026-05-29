@@ -15,11 +15,16 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { ProjectAlertsModule } from './project-alerts/project-alerts.module';
 import { ProposalsModule } from './proposals/proposals.module';
 import { SearchModule } from './search/search.module';
+import { MessagesModule } from './messages/messages.module';
+import { ReportsModule } from './reports/reports.module';
+import { BlocksModule } from './blocks/blocks.module';
+import { TaxonomyModule } from './taxonomy/taxonomy.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     PrismaModule,
+    TaxonomyModule,
     UsersModule,
     ProfileModule,
     SettingsModule,
@@ -34,6 +39,9 @@ import { SearchModule } from './search/search.module';
     ProjectAlertsModule,
     ProposalsModule,
     SearchModule,
+    MessagesModule,
+    ReportsModule,
+    BlocksModule,
   ],
 })
 export class AppModule {}

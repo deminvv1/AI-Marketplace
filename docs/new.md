@@ -11,141 +11,98 @@ Search (поиск) — строка «найти по слову» + фильт
 Upwork: Browse Jobs, Find Freelancers
 У вас: `/projects`, `/freelancers`, общий **`/search`** (см. `docs/SEARCH.md`)
 Почему «нет в БД»
-Данные уже есть в таблицах Order, Profile, Offer.
+Данные уже есть в таблицах Project, Profile, Solution.
 Каталог — это не новая сущность, а способ показать то, что в БД:
 
-БД: Order (100 записей)
+БД: Project (100 записей)
      ↓
-API: GET /api/orders?industry=healthcare&country=DE
+API: GET /api/projects?industry=healthcare&country=DE
      ↓
 Страница: список карточек + фильтры слева
 Новая таблица Catalog не нужна — нужны страница + API с фильтрами.
 
-Зачем это вам
-Без каталога и поиска люди не находят друг друга — только если знают прямую ссылку.
-Для трафика и удобства это обязательно, но делает Антон (страницы + GET /orders с query-параметрами), без новой модели в Prisma.
+**Статус:** сделано (каталог + `/search`).
 
 
-
-2. Project alerts (бывш. Job alerts) — «сильный рычаг удержания»
-Что это
-**Project alert** = подписка: «Пришли уведомление, когда появится новый **OPEN Project** по моим критериям».
-
-Пример:
-
-Фрилансер выбрал: keyword LLM, industry Healthcare, country Germany
-Вышел новый Project с совпадением
-Ему приходит in-app + email: «New project: Fine-tune GPT for legal docs» → клик → `/projects/[id]`
-Зачем
-Без alerts	С alerts
-Зашёл один раз, не нашёл — ушёл
-Платформа сама возвращает человека
-Фрилансер постоянно проверяет сайт
-Приходит повод зайти
-Это удержание (retention), не оплата. Upwork/Freelancer так делают годами.
-
-Реализация (сделано на ветке anton)
+2. Project alerts (бывш. Job alerts)
+**Статус:** сделано на ветке anton
 - Таблица **ProjectAlert** (`industry`, `country`, `q`, `tags`, `notifyByEmail`)
-- При `POST /api/projects` — matcher → **Notification** (`type: PROJECT_ALERT`) + email через Resend (`RESEND_API_KEY`)
-- UI: `/project-alerts`, кнопка «Save as project alert» на `/projects`
+- При `POST /api/projects` — matcher → **Notification** + email (Resend)
+- UI: `/project-alerts`, кнопка на `/projects`
 - API: `/api/project-alerts`, `/api/notifications`
 
 
 
-3. Skills / categories — строки vs справочник
-Что сейчас
-В Order и Profile есть:
+3. Skills / categories — справочник
+**Статус:** сделано
 
-industry — одна строка, например "Healthcare"
-tags[] — массив строк: ["NLP", "PyTorch", "LLM"]
-Это свободный ввод: каждый пишет как хочет.
+Таблицы в БД:
+- **Category** — industry (Medicine, Finance, …): `name`, `slug`, `icon`
+- **Skill** — навыки для `tags[]`: `name`, `slug` (например `machine-learning`, `nlp`)
 
-Проблема позже
-Пользователь A	Пользователь B
-тег machine learning
-тег Machine Learning
-industry AI
-industry Artificial Intelligence
-Фильтр «показать все ML» не найдёт половину — разное написание.
+API:
+- `GET /api/taxonomy` — категории + вложенные skills
+- `GET /api/taxonomy/skills` — плоский список skills
 
-Что такое справочник (таблица Category / Skill)
-Отдельная таблица фиксированных вариантов:
+Правила:
+- При создании/редактировании Project, Forum, Solution, ProjectAlert, Profile.industries — **только значения из справочника**
+- В БД в `tags[]` хранятся **slug** навыков (единый фильтр)
+- В `industry` хранится **каноническое имя** категории
 
-Skill: id, name "Natural Language Processing", slug "nlp"
-В форме — выбор из списка, не ручной ввод. Фильтры работают точно.
-
-Зачем и когда
-Этап	Решение
-Старт (MVP)
-tags + industry строками — достаточно, быстрее запуск
-Позже (много проектов)
-Таблица Skill / Category — Антон
-Итог: на launch новую таблицу не обязательно; «потом справочник» = когда фильтры начнут врать из-за опечаток.
+UI:
+- `CategoryPicker` / `CategoryMultiPicker` — выбор industry
+- `SkillTagPicker` — выбор skills чипами
+- Миграция: `20260529180000_taxonomy` + seed
 
 
 
-4. OrderResponse + proposal — подробно
-Что такое OrderResponse у вас
-Когда заказчик выложил проект (Order), фрилансер нажимает «Откликнуться».
-В БД создаётся строка OrderResponse — один отклик одного человека на один проект.
+4. Proposal (отклик) — поля заявки
+**Статус:** сделано (не «только message»)
 
-Сейчас там по сути только message — короткий текст.
+| Поле в БД | UI на `/projects/[id]` | Зачем |
+|-----------|------------------------|--------|
+| `coverLetter` | Cover letter | Почему именно этот исполнитель |
+| `proposedBudget` | Budget | Вилка цены без 10 переписок |
+| `estimatedDays` | Timeline (days) | Сравнение сроков |
 
-Что такое proposal на Upwork
-Proposal = не «привет, возьмите меня», а мини-заявка:
+Заказчик видит список на странице проекта; фрилансер — `/proposals`.
 
-Часть	Пример
-Cover letter
-«Делал 5 похожих чат-ботов для fintech…»
-Price
-«$3,000 за весь проект» или «$80/час»
-Timeline
-«Сдам за 3 недели»
-Заказчик открывает 10 откликов и сравнивает: кто дешевле, кто быстрее, кто убедительнее.
-
-Зачем поля (даже без оплаты на сайте)
-Оплаты на платформе нет — но цифры всё равно нужны для переговоров в чате.
-
-Поле	Что значит	Зачем
-proposedBudget
-«Готов сделать за $X» (или €, или «договорная»)
-Заказчик сразу видит вилку, не пишет 10 людям «сколько стоит?»
-estimatedDays
-«Займёт N дней/недель»
-Сравнение сроков
-coverLetter
-Развёрнутый текст (сейчас это message, можно расширить)
-Почему именно он, опыт, подход
-Без этого: 10 откликов «Hello, I can do it» — платформа не помогает выбрать → уходят на Upwork.
-
-С этим: маркетплейс реально помогает отобрать людей → остаются и пишут в Messages.
-
-Кто делает
-Антон — сущность OrderResponse, одна миграция, форма отклика на странице проекта.
+Уведомления по откликам:
+- **Accept** → `PROPOSAL_ACCEPTED` победителю (колокольчик)
+- **Reject** (ручной) → `PROPOSAL_REJECTED` отклонённому
+- **Accept** (auto-reject остальных pending) → `PROPOSAL_REJECTED` всем не выбранным («наняли другого»)
 
 
 
-5.
-ProfileView (опционально)
-Счётчик просмотров профиля
-Мотивация фрилансерам заполнить профиль
-
-6.
-Skills справочник
-Позже; сначала хватит tags строками
+5. ProfileView
+**Статус:** сделано — счётчик на профиле, `ProfileView` в БД
 
 
 
+6. Completed projects на /profile
+**Статус:** сделано — `GET /api/projects/completed/mine`, вкладка не заглушка
+
+
+
+7. Forum comment edit
+**Статус:** сделано — `PATCH` комментария, Edit на `/forum/[id]`
+
+
+
+8. Messages, Report, BlockedUser
+**Статус:** сделано
+- `/messages` — реальный API 1:1, не mock
+- `POST /api/reports`, `POST/DELETE /api/blocks`
+- Report/Block на профиле фрилансера; blocked list в Settings → Privacy
 
 
 
 Общая цепочка (логика продукта)
 
 1. Вход и роль         
-2. Client создаёт Project
+2. Client создаёт Project (industry + skills из справочника)
 3. Залогиненные видят каталог (только после регистрации)
-4. Freelancer → Proposal
-5. Client видит proposals
-6. Сообщения в чате
-7. Профили + просмотры
-8. Solutions, Forum, …
+4. Freelancer → Proposal (cover letter, budget, days)
+5. Client Accept → IN_PROGRESS + уведомления; остальные REJECTED + уведомления
+6. Messages между пользователями (кроме block)
+7. Профили + просмотры, Solutions, Forum, Reviews, Favorites, Search, Alerts

@@ -27,6 +27,8 @@ import {
   type ProposalItem,
 } from "@/app/actions/proposals";
 import { flag } from "@/lib/mock-data";
+import { useTaxonomy } from "@/lib/use-taxonomy";
+import { skillLabel } from "@/lib/taxonomy";
 import { normalizeRole } from "@/lib/roles";
 import { useActiveMode } from "@/lib/use-active-mode";
 import {
@@ -41,6 +43,7 @@ import {
   type ReviewItem,
 } from "@/app/actions/reviews";
 import { FavoriteButton } from "@/components/favorite-button";
+import { UserSafetyActions } from "@/components/user-safety-actions";
 import { ReviewsList } from "@/components/reviews-list";
 import { ArrowLeft, Loader2, Pencil, Send, Star, Trash2 } from "lucide-react";
 
@@ -48,6 +51,7 @@ export default function ProjectDetailPage() {
   const params = useParams();
   const router = useRouter();
   const projectId = typeof params.id === "string" ? params.id : "";
+  const { skills } = useTaxonomy();
 
   const [project, setProject] = useState<ProjectDetail | null>(null);
   const [meId, setMeId] = useState<string | null>(null);
@@ -265,6 +269,13 @@ export default function ProjectDetailPage() {
                   Edit
                 </Link>
               )}
+              {!isOwner && meId && (
+                <UserSafetyActions
+                  targetId={projectId}
+                  targetType="project"
+                  targetLabel={project.title}
+                />
+              )}
               <StatusBadge status={projectStatusForUi(project.status)} />
             </div>
           </div>
@@ -293,7 +304,7 @@ export default function ProjectDetailPage() {
                 key={t}
                 className="px-3 py-1 rounded-lg bg-white/5 border border-border text-xs text-muted-foreground"
               >
-                {t}
+                {skillLabel(t, skills)}
               </span>
             ))}
           </div>
