@@ -139,6 +139,9 @@ model Proposal {
   status          ResponseStatus @default(PENDING)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+
+  // Один фрилансер — один отклик на проект (защита на уровне БД)
+  @@unique([projectId, freelancerId])
 }
 
 // ─── READY-MADE SOLUTIONS ─────────────────────────────────────────────────────

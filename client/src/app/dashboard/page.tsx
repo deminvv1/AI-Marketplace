@@ -1,9 +1,15 @@
 "use client";
 
-import Link from "next/link"; // Роутинг Next.js вместо TanStack
+/** Дашборд заказчика: имя из getMe(), проекты из GET /api/projects/mine */
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { WelcomeModal } from "@/components/welcome-modal";
-import { PROJECTS, FREELANCERS, flag } from "@/lib/mock-data";
+import { FREELANCERS, flag } from "@/lib/mock-data";
+import { getMe } from "@/app/actions/me";
+import { getMyProjects, type ProjectListItem } from "@/app/actions/projects";
+import { projectStatusForUi } from "@/lib/projects";
 import {
   ClipboardList,
   MessagesSquare,
@@ -35,14 +41,36 @@ const stats = [
 ] as const;
 
 export default function DashboardPage() {
+  const [displayName, setDisplayName] = useState("there");
+  const [myProjects, setMyProjects] = useState<ProjectListItem[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      const me = await getMe();
+      if (me?.profile?.firstName) {
+        setDisplayName(me.profile.firstName);
+      } else if (me?.username) {
+        setDisplayName(me.username);
+      }
+
+      const mine = await getMyProjects();
+      if (Array.isArray(mine)) setMyProjects(mine);
+    })();
+  }, []);
+
+  const activeCount = myProjects.filter((p) =>
+    ["OPEN", "IN_PROGRESS"].includes(p.status),
+  ).length;
+
   return (
     <AppShell title="Dashboard">
       <WelcomeModal />
       <div className="space-y-8">
-        {/* Шапка дашборда */}
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">Welcome back, Alex</h2>
+            <h2 className="text-3xl font-bold tracking-tight">
+              Welcome back, {displayName}
+            </h2>
             <p className="text-sm text-muted-foreground mt-1">
               Wednesday · May 27, 2026 · 3 active conversations
             </p>
@@ -57,7 +85,7 @@ export default function DashboardPage() {
 
         {/* Сетка со статистикой */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map(({ label, value, icon: Icon, color, delta }) => (
+          {stats.map(({ label, value, icon: Icon, color, delta }, idx) => (
             <div key={label} className="glass glass-hover rounded-2xl p-5">
               <div className="flex items-start justify-between">
                 <div
@@ -71,7 +99,9 @@ export default function DashboardPage() {
                   {delta}
                 </span>
               </div>
-              <div className="mt-5 text-3xl font-bold tracking-tight">{value}</div>
+              <div className="mt-5 text-3xl font-bold tracking-tight">
+                {idx === 0 ? String(activeCount || value) : value}
+              </div>
               <div className="text-sm text-muted-foreground">{label}</div>
             </div>
           ))}
@@ -88,28 +118,44 @@ export default function DashboardPage() {
               </Link>
             </div>
             <div className="space-y-3">
-              {PROJECTS.slice(0, 3).map((o) => (
-                <div
-                  key={o.id}
-                  className="p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <div className="font-medium truncate">{o.title}</div>
-                      <div className="flex items-center gap-2 mt-1 text-xs">
-                        <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30">
-                          {o.industry}
-                        </span>
-                        <span className="text-muted-foreground">{o.budget}</span>
-                        <span className="text-muted-foreground">
-                          · {flag(o.country)} {o.country}
-                        </span>
+              {myProjects.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No projects yet.{" "}
+                  <Link href="/projects/new" className="text-primary hover:underline">
+                    Post your first project
+                  </Link>
+                  .
+                </p>
+              ) : (
+                myProjects.slice(0, 3).map((o) => (
+                  <div
+                    key={o.id}
+                    className="p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <div className="font-medium truncate">{o.title}</div>
+                        <div className="flex items-center gap-2 mt-1 text-xs">
+                          {o.industry && (
+                            <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary border border-primary/30">
+                              {o.industry}
+                            </span>
+                          )}
+                          <span className="text-muted-foreground">
+                            {o.budget || "Budget TBD"}
+                          </span>
+                          {o.country && (
+                            <span className="text-muted-foreground">
+                              · {flag(o.country)} {o.country}
+                            </span>
+                          )}
+                        </div>
                       </div>
+                      <StatusBadge status={projectStatusForUi(o.status)} />
                     </div>
-                    <StatusBadge status={o.status} />
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 

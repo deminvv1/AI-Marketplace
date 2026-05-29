@@ -5,5 +5,6 @@ import { ProfileController } from './profile.controller';
 @Module({
   providers: [ProfileService],
   controllers: [ProfileController],
+  exports: [ProfileService],
 })
 export class ProfileModule {}

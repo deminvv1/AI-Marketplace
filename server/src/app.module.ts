@@ -5,6 +5,8 @@ import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { SettingsModule } from './settings/settings.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { ProjectsModule } from './projects/projects.module';
+import { FreelancersModule } from './freelancers/freelancers.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { OnboardingModule } from './onboarding/onboarding.module';
     ProfileModule,
     SettingsModule,
     OnboardingModule,
+    ProjectsModule,
+    FreelancersModule,
   ],
 })
 export class AppModule {}
