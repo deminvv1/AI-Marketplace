@@ -29,7 +29,7 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **Notification** | Уведомления | **Влад** | не начато |
 | **Project** | Проект на бирже | **Антон** | CRUD: create, read, complete, **delete**, фильтры |
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
-| **Solution** | Готовое AI-решение | **Антон** | только mock UI |
+| **Solution** | Готовое AI-решение | **Антон** | CRUD API + каталог, new, detail |
 | **ForumPost** / **ForumComment** | Форум | **Антон** | только mock UI |
 | **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
 | **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
@@ -106,13 +106,16 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 ---
 
-### 🔜 Сущность 3: **Solution** ← СЕЙЧАС
+### ✅ Сущность 3: **Solution** (сделано)
 
-`server/src/solutions/`, `/solutions` без mock.
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/solutions/` — CRUD + фильтры |
+| Фронт | `/solutions`, `/solutions/new`, `/solutions/[id]` |
 
 ---
 
-### Сущность 4: **Forum**
+### 🔜 Сущность 4: **Forum** ← СЕЙЧАС
 
 `server/src/forum/`, `/forum` без mock.
 

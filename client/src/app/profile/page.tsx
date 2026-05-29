@@ -396,13 +396,21 @@ export default function ProfilePage() {
           )}
 
           {activeTab === "offers" && (
-            <div className="glass rounded-2xl p-10 text-center space-y-3">
+            <div className="glass rounded-2xl p-10 text-center space-y-4">
               <p className="text-muted-foreground text-sm">
-                Ready-made AI solutions live in the Solutions section.
+                Publish and manage your ready-made AI solutions.
               </p>
-              <Link href="/solutions" className="text-primary text-sm hover:underline">
-                Go to Solutions →
-              </Link>
+              <div className="flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/solutions/new"
+                  className="h-10 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium"
+                >
+                  Publish solution
+                </Link>
+                <Link href="/solutions" className="h-10 px-5 rounded-xl border border-border text-sm">
+                  Browse catalog
+                </Link>
+              </div>
             </div>
           )}
 
