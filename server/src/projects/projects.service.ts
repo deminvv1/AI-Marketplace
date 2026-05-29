@@ -1,11 +1,13 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { Role } from '@prisma/client';
+import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
 
 /**
  * Единый набор полей Project для списков и карточки.
@@ -69,11 +71,62 @@ export class ProjectsService {
     });
   }
 
-  /** Публичный каталог: только OPEN (ещё принимают отклики). */
-  findAll() {
+  /** Публичный каталог: только OPEN + опциональные фильтры из query. */
+  findAll(query: ListProjectsQueryDto = {}) {
+    const industry = query.industry?.trim();
+    const country = query.country?.trim();
+    const q = query.q?.trim();
+
+    const where: Prisma.ProjectWhereInput = {
+      status: 'OPEN',
+      ...(industry
+        ? { industry: { equals: industry, mode: 'insensitive' } }
+        : {}),
+      ...(country
+        ? { country: { contains: country, mode: 'insensitive' } }
+        : {}),
+      ...(q
+        ? {
+            OR: [
+              { title: { contains: q, mode: 'insensitive' } },
+              { shortDescription: { contains: q, mode: 'insensitive' } },
+              { description: { contains: q, mode: 'insensitive' } },
+              { industry: { contains: q, mode: 'insensitive' } },
+              { tags: { has: q } },
+            ],
+          }
+        : {}),
+    };
+
     return this.prisma.project.findMany({
-      where: { status: 'OPEN' },
+      where,
       orderBy: { createdAt: 'desc' },
+      select: projectListSelect,
+    });
+  }
+
+  /**
+   * Заказчик закрывает проект после работы: IN_PROGRESS → COMPLETED.
+   * COMPLETED не попадает в каталог (там только OPEN).
+   */
+  async complete(projectId: string, userId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { id: true, clientId: true, status: true },
+    });
+    if (!project) throw new NotFoundException('Project not found');
+    if (project.clientId !== userId) {
+      throw new ForbiddenException('Only the project owner can complete it');
+    }
+    if (project.status !== 'IN_PROGRESS') {
+      throw new BadRequestException(
+        'Only in-progress projects can be marked completed',
+      );
+    }
+
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data: { status: 'COMPLETED' },
       select: projectListSelect,
     });
   }

@@ -1,7 +1,17 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
 import { CreateProjectDto } from './dto/create-project.dto';
+import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
 import { ProjectsService } from './projects.service';
 
 /**
@@ -14,10 +24,10 @@ import { ProjectsService } from './projects.service';
 export class ProjectsController {
   constructor(private projects: ProjectsService) {}
 
-  /** GET /api/projects — публичный список OPEN-проектов. */
+  /** GET /api/projects?industry=&country=&q= — каталог OPEN с фильтрами. */
   @Get()
-  findAll() {
-    return this.projects.findAll();
+  findAll(@Query() query: ListProjectsQueryDto) {
+    return this.projects.findAll(query);
   }
 
   /** GET /api/projects/mine — проекты текущего пользователя (JWT). */
@@ -25,6 +35,16 @@ export class ProjectsController {
   @UseGuards(AuthGuard)
   findMine(@CurrentUser() user: { id: string }) {
     return this.projects.findMine(user.id);
+  }
+
+  /** PATCH /api/projects/:id/complete — заказчик завершает проект */
+  @Patch(':id/complete')
+  @UseGuards(AuthGuard)
+  complete(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string },
+  ) {
+    return this.projects.complete(id, user.id);
   }
 
   /** GET /api/projects/:id — карточка одного проекта. */

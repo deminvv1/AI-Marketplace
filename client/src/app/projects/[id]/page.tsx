@@ -12,7 +12,7 @@ import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/ui-bits";
 import { getMe } from "@/app/actions/me";
-import { getProject, type ProjectDetail } from "@/app/actions/projects";
+import { completeProject, getProject, type ProjectDetail } from "@/app/actions/projects";
 import {
   acceptProposal,
   createProposal,
@@ -59,6 +59,7 @@ export default function ProjectDetailPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [proposalActionId, setProposalActionId] = useState<string | null>(null);
+  const [completing, setCompleting] = useState(false);
 
   const loadProjectData = useCallback(async () => {
     const [projResult, me] = await Promise.all([getProject(projectId), getMe()]);
@@ -98,6 +99,20 @@ export default function ProjectDetailPage() {
     setProposalActionId(proposalId);
     const result = await acceptProposal(projectId, proposalId);
     setProposalActionId(null);
+    if ("error" in result && result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    setSubmitError(null);
+    await loadProjectData();
+    router.refresh();
+  }
+
+  async function handleCompleteProject() {
+    if (!projectId) return;
+    setCompleting(true);
+    const result = await completeProject(projectId);
+    setCompleting(false);
     if ("error" in result && result.error) {
       setSubmitError(result.error);
       return;
@@ -248,6 +263,30 @@ export default function ProjectDetailPage() {
         <aside className="space-y-4">
           {isOwner && submitError && (
             <p className="text-sm text-destructive glass rounded-xl p-3">{submitError}</p>
+          )}
+
+          {isOwner && project.status === "IN_PROGRESS" && (
+            <div className="glass rounded-2xl p-6 border border-success/30">
+              <h2 className="font-semibold text-sm">Work in progress</h2>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">
+                Mark as completed when the freelancer has delivered. The project will leave the
+                open catalog.
+              </p>
+              <button
+                type="button"
+                disabled={completing}
+                onClick={handleCompleteProject}
+                className="w-full h-10 rounded-xl bg-success/20 text-success border border-success/40 text-sm font-medium hover:bg-success/30 disabled:opacity-60"
+              >
+                {completing ? "Saving…" : "Mark project completed"}
+              </button>
+            </div>
+          )}
+
+          {isOwner && project.status === "COMPLETED" && (
+            <p className="text-sm text-muted-foreground glass rounded-2xl p-4">
+              This project is completed and no longer accepts proposals.
+            </p>
           )}
 
           {isOwner && (

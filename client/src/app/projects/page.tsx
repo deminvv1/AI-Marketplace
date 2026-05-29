@@ -1,14 +1,15 @@
 "use client";
 
 /**
- * Каталог проектов: GET /api/projects (только status=OPEN на бэке).
+ * Каталог: GET /api/projects?industry=&country=&q=
+ * На бэке только status=OPEN — завершённые (COMPLETED) не показываются.
  */
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { INDUSTRIES, flag } from "@/lib/mock-data";
-import { Search, ArrowRight, Loader2 } from "lucide-react";
+import { Search, ArrowRight, Loader2, X } from "lucide-react";
 import { StatusBadge } from "@/components/ui-bits";
 import { getProjects, type ProjectListItem } from "@/app/actions/projects";
 import {
@@ -22,11 +23,19 @@ export default function ProjectsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
+  const [industry, setIndustry] = useState<string | null>(null);
+  const [country, setCountry] = useState("");
 
   useEffect(() => {
     let cancelled = false;
-    (async () => {
-      const result = await getProjects();
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      setError(null);
+      const result = await getProjects({
+        industry: industry ?? undefined,
+        country: country.trim() || undefined,
+        q: query.trim() || undefined,
+      });
       if (cancelled) return;
       if ("error" in result && result.error) {
         setError(result.error);
@@ -35,21 +44,15 @@ export default function ProjectsPage() {
         setProjects(result);
       }
       setLoading(false);
-    })();
+    }, 300);
+
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
-  }, []);
+  }, [query, industry, country]);
 
-  const filtered = projects.filter((p) => {
-    const q = query.trim().toLowerCase();
-    if (!q) return true;
-    const hay = [p.title, p.shortDescription, p.description, p.industry, ...p.tags]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase();
-    return hay.includes(q);
-  });
+  const hasFilters = !!(industry || country.trim() || query.trim());
 
   return (
     <AppShell title="Projects">
@@ -59,7 +62,7 @@ export default function ProjectsPage() {
           <p className="text-sm text-muted-foreground mt-1">
             {loading
               ? "Loading…"
-              : `${filtered.length} open project${filtered.length === 1 ? "" : "s"}`}
+              : `${projects.length} open project${projects.length === 1 ? "" : "s"}`}
           </p>
         </div>
         <Link
@@ -70,15 +73,39 @@ export default function ProjectsPage() {
         </Link>
       </div>
 
-      <div className="relative mb-6">
+      <div className="relative mb-4">
         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search projects by keyword, industry, or specialist…"
+          placeholder="Search by keyword, industry, tags…"
           className="w-full h-11 pl-10 pr-3 rounded-xl glass border border-border text-sm focus:outline-none focus:border-primary focus:glow-primary transition-all"
         />
       </div>
+
+      <div className="mb-6">
+        <label className="text-xs text-muted-foreground">Country filter</label>
+        <input
+          value={country}
+          onChange={(e) => setCountry(e.target.value)}
+          placeholder="e.g. Germany"
+          className="mt-1 w-full max-w-xs h-9 px-3 rounded-lg glass border border-border text-sm"
+        />
+      </div>
+
+      {hasFilters && (
+        <button
+          type="button"
+          onClick={() => {
+            setIndustry(null);
+            setCountry("");
+            setQuery("");
+          }}
+          className="mb-4 text-xs text-primary inline-flex items-center gap-1 hover:underline"
+        >
+          <X className="size-3" /> Clear filters
+        </button>
+      )}
 
       <div className="grid grid-cols-12 gap-6">
         <aside className="col-span-12 md:col-span-3 glass rounded-2xl p-5 h-fit sticky top-24">
@@ -86,15 +113,23 @@ export default function ProjectsPage() {
             Industries
           </h3>
           <ul className="space-y-1">
-            {INDUSTRIES.map((i, idx) => (
+            <li>
+              <button
+                type="button"
+                onClick={() => setIndustry(null)}
+                className={`w-full px-3 py-2 rounded-lg text-sm text-left transition ${!industry ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5"}`}
+              >
+                All industries
+              </button>
+            </li>
+            {INDUSTRIES.map((i) => (
               <li key={i.name}>
                 <button
                   type="button"
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition ${idx === 0 ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"}`}
+                  onClick={() => setIndustry(i.name)}
+                  className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${industry === i.name ? "bg-primary/15 text-primary border border-primary/30" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"}`}
                 >
-                  <span className="flex items-center gap-2">
-                    {i.icon} {i.name}
-                  </span>
+                  {i.icon} {i.name}
                 </button>
               </li>
             ))}
@@ -112,21 +147,23 @@ export default function ProjectsPage() {
             <p className="text-sm text-destructive glass rounded-2xl p-6">{error}</p>
           )}
 
-          {!loading && !error && filtered.length === 0 && (
+          {!loading && !error && projects.length === 0 && (
             <p className="text-sm text-muted-foreground glass rounded-2xl p-6">
-              No open projects yet.{" "}
+              No projects match your filters.{" "}
               <Link href="/projects/new" className="text-primary hover:underline">
-                Post the first one
+                Post a project
               </Link>
-              .
             </p>
           )}
 
           <div className="grid sm:grid-cols-2 gap-4">
-            {filtered.map((o) => (
+            {projects.map((o) => (
               <article key={o.id} className="glass glass-hover rounded-2xl p-5 flex flex-col">
                 <div className="flex items-start justify-between gap-3">
-                  <Link href={`/projects/${o.id}`} className="font-semibold leading-snug hover:text-primary">
+                  <Link
+                    href={`/projects/${o.id}`}
+                    className="font-semibold leading-snug hover:text-primary"
+                  >
                     {o.title}
                   </Link>
                   <StatusBadge status={projectStatusForUi(o.status)} />

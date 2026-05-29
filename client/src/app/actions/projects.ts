@@ -53,12 +53,33 @@ export async function getProject(id: string) {
   }
 }
 
-/** GET /api/projects — каталог OPEN */
-export async function getProjects() {
+export type ProjectCatalogFilters = {
+  industry?: string;
+  country?: string;
+  q?: string;
+};
+
+/** GET /api/projects?industry=&country=&q= — каталог OPEN */
+export async function getProjects(filters?: ProjectCatalogFilters) {
   try {
-    return await api.get<ProjectListItem[]>("/projects");
+    const params = new URLSearchParams();
+    if (filters?.industry) params.set("industry", filters.industry);
+    if (filters?.country) params.set("country", filters.country);
+    if (filters?.q) params.set("q", filters.q);
+    const qs = params.toString();
+    return await api.get<ProjectListItem[]>(`/projects${qs ? `?${qs}` : ""}`);
   } catch (e: unknown) {
     const message = e instanceof Error ? e.message : "Failed to load projects";
+    return { error: message };
+  }
+}
+
+/** PATCH /api/projects/:id/complete — IN_PROGRESS → COMPLETED */
+export async function completeProject(projectId: string) {
+  try {
+    return await api.patch<ProjectListItem>(`/projects/${projectId}/complete`, {});
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to complete project";
     return { error: message };
   }
 }
