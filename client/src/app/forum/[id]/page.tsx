@@ -15,6 +15,8 @@ import {
   deleteForumPost,
   getForumComments,
   getForumPost,
+  getMyForumCommentLikes,
+  toggleForumCommentLike,
   toggleForumPostLike,
   type ForumCommentItem,
   type ForumPostDetail,
@@ -23,12 +25,32 @@ import { flag } from "@/lib/mock-data";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
 import { ArrowLeft, Loader2, ThumbsUp, Trash2 } from "lucide-react";
 
+function updateCommentTree(
+  items: ForumCommentItem[],
+  commentId: string,
+  likesCount: number,
+): ForumCommentItem[] {
+  return items.map((c) => {
+    if (c.id === commentId) return { ...c, likesCount };
+    if (c.replies?.length) {
+      return { ...c, replies: updateCommentTree(c.replies, commentId, likesCount) };
+    }
+    return c;
+  });
+}
+
 function CommentBlock({
   comment,
   onReply,
+  isLiked,
+  likeBusyId,
+  onLike,
 }: {
   comment: ForumCommentItem;
   onReply: (parentId: string) => void;
+  isLiked: (id: string) => boolean;
+  likeBusyId: string | null;
+  onLike: (commentId: string) => void;
 }) {
   return (
     <div className={comment.parentCommentId ? "ml-6 mt-2" : ""}>
@@ -45,19 +67,43 @@ function CommentBlock({
             {formatForumTime(comment.createdAt)}
           </div>
           <p className="text-sm mt-1 whitespace-pre-wrap">{comment.content}</p>
-          {!comment.parentCommentId && (
+          <div className="mt-2 flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => onReply(comment.id)}
-              className="text-xs text-primary mt-2 hover:underline"
+              disabled={likeBusyId === comment.id}
+              onClick={() => onLike(comment.id)}
+              className={`text-xs inline-flex items-center gap-1 ${
+                isLiked(comment.id)
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-primary"
+              }`}
             >
-              Reply
+              <ThumbsUp
+                className={`size-3 ${isLiked(comment.id) ? "fill-current" : ""}`}
+              />
+              {comment.likesCount}
             </button>
-          )}
+            {!comment.parentCommentId && (
+              <button
+                type="button"
+                onClick={() => onReply(comment.id)}
+                className="text-xs text-primary hover:underline"
+              >
+                Reply
+              </button>
+            )}
+          </div>
         </div>
       </div>
       {comment.replies?.map((r) => (
-        <CommentBlock key={r.id} comment={r} onReply={onReply} />
+        <CommentBlock
+          key={r.id}
+          comment={r}
+          onReply={onReply}
+          isLiked={isLiked}
+          likeBusyId={likeBusyId}
+          onLike={onLike}
+        />
       ))}
     </div>
   );
@@ -77,8 +123,10 @@ export default function ForumTopicPage() {
   const [replyToId, setReplyToId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [liked, setLiked] = useState(false);
-  const [likeBusy, setLikeBusy] = useState(false);
+  const [postLiked, setPostLiked] = useState(false);
+  const [postLikeBusy, setPostLikeBusy] = useState(false);
+  const [likedCommentIds, setLikedCommentIds] = useState<Set<string>>(new Set());
+  const [commentLikeBusyId, setCommentLikeBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const [p, c, me] = await Promise.all([
@@ -91,8 +139,12 @@ export default function ForumTopicPage() {
     if (Array.isArray(c)) setComments(c);
     setMeId(me?.id ?? null);
     if (me?.id) {
-      const status = await checkForumPostLiked(postId);
-      setLiked(!!status.liked);
+      const [postStatus, commentLikes] = await Promise.all([
+        checkForumPostLiked(postId),
+        getMyForumCommentLikes(postId),
+      ]);
+      setPostLiked(!!postStatus.liked);
+      setLikedCommentIds(new Set(commentLikes.commentIds ?? []));
     }
   }, [postId]);
 
@@ -124,18 +176,39 @@ export default function ForumTopicPage() {
     if (Array.isArray(c)) setComments(c);
   }
 
-  async function handleLike() {
-    setLikeBusy(true);
+  async function handlePostLike() {
+    setPostLikeBusy(true);
     const result = await toggleForumPostLike(postId);
-    setLikeBusy(false);
+    setPostLikeBusy(false);
     if ("error" in result && result.error) {
       setError(result.error);
       return;
     }
     if ("liked" in result) {
-      setLiked(result.liked);
+      setPostLiked(result.liked);
       setPost((prev) =>
         prev ? { ...prev, likesCount: result.likesCount } : prev,
+      );
+    }
+  }
+
+  async function handleCommentLike(commentId: string) {
+    setCommentLikeBusyId(commentId);
+    const result = await toggleForumCommentLike(postId, commentId);
+    setCommentLikeBusyId(null);
+    if ("error" in result && result.error) {
+      setError(result.error);
+      return;
+    }
+    if ("liked" in result) {
+      setLikedCommentIds((prev) => {
+        const next = new Set(prev);
+        if (result.liked) next.add(commentId);
+        else next.delete(commentId);
+        return next;
+      });
+      setComments((prev) =>
+        updateCommentTree(prev, commentId, result.likesCount),
       );
     }
   }
@@ -204,15 +277,15 @@ export default function ForumTopicPage() {
 
         <button
           type="button"
-          disabled={likeBusy}
-          onClick={handleLike}
+          disabled={postLikeBusy}
+          onClick={handlePostLike}
           className={`mt-4 h-9 px-4 rounded-lg border text-sm inline-flex items-center gap-2 transition disabled:opacity-60 ${
-            liked
+            postLiked
               ? "border-primary/50 bg-primary/15 text-primary"
               : "border-border hover:border-primary/40"
           }`}
         >
-          <ThumbsUp className={`size-4 ${liked ? "fill-current" : ""}`} />
+          <ThumbsUp className={`size-4 ${postLiked ? "fill-current" : ""}`} />
           {post.likesCount} {post.likesCount === 1 ? "like" : "likes"}
         </button>
 
@@ -240,6 +313,9 @@ export default function ForumTopicPage() {
               setReplyToId(id);
               setReply(`@${forumAuthorName(c.author)} `);
             }}
+            isLiked={(id) => likedCommentIds.has(id)}
+            likeBusyId={commentLikeBusyId}
+            onLike={handleCommentLike}
           />
         ))}
 

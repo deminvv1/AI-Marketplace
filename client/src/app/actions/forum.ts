@@ -114,6 +114,28 @@ export async function deleteForumPost(id: string) {
   }
 }
 
+export async function getMyForumCommentLikes(postId: string) {
+  try {
+    return await api.get<{ commentIds: string[] }>(
+      `/forum/posts/${postId}/comments/likes/me`,
+    );
+  } catch {
+    return { commentIds: [] as string[] };
+  }
+}
+
+export async function toggleForumCommentLike(postId: string, commentId: string) {
+  try {
+    return await api.post<{ liked: boolean; likesCount: number }>(
+      `/forum/posts/${postId}/comments/${commentId}/like`,
+      {},
+    );
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update like";
+    return { error: message };
+  }
+}
+
 export async function getForumComments(postId: string) {
   try {
     return await api.get<ForumCommentItem[]>(`/forum/posts/${postId}/comments`);

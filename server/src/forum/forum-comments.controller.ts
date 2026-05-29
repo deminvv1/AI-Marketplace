@@ -17,6 +17,25 @@ export class ForumCommentsController {
     return this.comments.listForPost(postId);
   }
 
+  /** GET /api/forum/posts/:postId/comments/likes/me */
+  @Get('likes/me')
+  @UseGuards(AuthGuard)
+  myLikes(
+    @Param('postId') postId: string,
+    @CurrentUser() user: { id: string },
+  ) {
+    return this.comments.listMyLikesForPost(postId, user.id);
+  }
+
+  @Post(':commentId/like')
+  @UseGuards(AuthGuard)
+  toggleLike(
+    @Param('commentId') commentId: string,
+    @CurrentUser() user: { id: string },
+  ) {
+    return this.comments.toggleLike(commentId, user.id);
+  }
+
   @Post()
   @UseGuards(AuthGuard)
   create(

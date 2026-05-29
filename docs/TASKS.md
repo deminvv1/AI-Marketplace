@@ -149,9 +149,13 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 | API | `POST /forum/posts/:id/like`, `GET .../liked` |
 | Фронт | кнопка на `/forum/[id]` |
 
+### ✅ Лайки на комментариях (сделано)
+
+| API | `POST .../comments/:commentId/like`, `GET .../comments/likes/me` |
+
 ### 🔜 Дальше (по желанию)
 
-- лайки на комментариях, Job alerts / SavedSearch (`docs/new.md`)
+- **Project alerts** (подписка на новые OPEN-проекты), общий `/search`
 
 ---
 

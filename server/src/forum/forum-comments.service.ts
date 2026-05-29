@@ -88,6 +88,68 @@ export class ForumCommentsService {
     });
   }
 
+  /** ID комментариев темы, которые лайкнул пользователь (для UI списка) */
+  async listMyLikesForPost(postId: string, userId: string) {
+    const post = await this.prisma.forumPost.findFirst({
+      where: { id: postId, isDeleted: false },
+      select: { id: true },
+    });
+    if (!post) throw new NotFoundException('Topic not found');
+
+    const likes = await this.prisma.forumCommentLike.findMany({
+      where: {
+        userId,
+        comment: { postId },
+      },
+      select: { commentId: true },
+    });
+    return { commentIds: likes.map((l) => l.commentId) };
+  }
+
+  async toggleLike(commentId: string, userId: string) {
+    const comment = await this.prisma.forumComment.findUnique({
+      where: { id: commentId },
+      select: { id: true, postId: true },
+    });
+    if (!comment) throw new NotFoundException('Comment not found');
+
+    const existing = await this.prisma.forumCommentLike.findUnique({
+      where: { userId_commentId: { userId, commentId } },
+    });
+
+    if (existing) {
+      await this.prisma.$transaction([
+        this.prisma.forumCommentLike.delete({
+          where: { userId_commentId: { userId, commentId } },
+        }),
+        this.prisma.forumComment.update({
+          where: { id: commentId },
+          data: { likesCount: { decrement: 1 } },
+        }),
+      ]);
+      const updated = await this.prisma.forumComment.findUnique({
+        where: { id: commentId },
+        select: { likesCount: true },
+      });
+      return { liked: false, likesCount: Math.max(0, updated?.likesCount ?? 0) };
+    }
+
+    await this.prisma.$transaction([
+      this.prisma.forumCommentLike.create({
+        data: { userId, commentId },
+      }),
+      this.prisma.forumComment.update({
+        where: { id: commentId },
+        data: { likesCount: { increment: 1 } },
+      }),
+    ]);
+    const updated = await this.prisma.forumComment.findUnique({
+      where: { id: commentId },
+      select: { likesCount: true },
+    });
+    return { liked: true, likesCount: updated?.likesCount ?? 1 };
+  }
+
   async remove(commentId: string, userId: string) {
     const comment = await this.prisma.forumComment.findUnique({
       where: { id: commentId },

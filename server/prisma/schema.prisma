@@ -30,6 +30,7 @@ model User {
   forumPosts          ForumPost[]
   forumPostLikes      ForumPostLike[]
   forumComments       ForumComment[]
+  forumCommentLikes   ForumCommentLike[]
   reviewsGiven        Review[]                  @relation("ReviewsGiven")
   reviewsReceived     Review[]                  @relation("ReviewsReceived")
   reports             Report[]
@@ -241,6 +242,19 @@ model ForumComment {
   likesCount      Int            @default(0)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  likes           ForumCommentLike[]
+}
+
+/// Лайк комментария — один на пользователя
+model ForumCommentLike {
+  userId    String       @db.Uuid
+  commentId String     @db.Uuid
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   ForumComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@id([userId, commentId])
+  @@index([commentId])
 }
 
 // ─── REVIEWS, REPORTS, NOTIFICATIONS ─────────────────────────────────────────
