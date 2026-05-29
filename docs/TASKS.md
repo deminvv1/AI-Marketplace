@@ -30,7 +30,7 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **Project** | Проект на бирже | **Антон** | CRUD: create, read, complete, **delete**, фильтры |
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
 | **Solution** | Готовое AI-решение | **Антон** | CRUD API + каталог, new, detail |
-| **ForumPost** / **ForumComment** | Форум | **Антон** | только mock UI |
+| **ForumPost** / **ForumComment** | Форум | **Антон** | API + /forum, new, thread |
 | **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
 | **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
 | **Review** / **Favorite** | Отзыв, избранное | **Антон** | не начато |
@@ -115,15 +115,16 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 ---
 
-### 🔜 Сущность 4: **Forum** ← СЕЙЧАС
+### ✅ Сущность 4: **Forum** (сделано)
 
-`server/src/forum/`, `/forum` без mock.
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/forum/` — темы + комментарии (ответы) |
+| Фронт | `/forum`, `/forum/new`, `/forum/[id]` |
 
 ---
 
-### Сущность 5: **Review** + **Favorite**
-
-После стабильных проектов и профилей.
+### 🔜 Сущность 5: **Review** + **Favorite** ← СЕЙЧАС
 
 ---
 
