@@ -101,3 +101,13 @@ export async function createProject(data: CreateProjectInput) {
     return { error: message };
   }
 }
+
+/** DELETE /api/projects/:id — только владелец; отклики удаляются каскадом */
+export async function deleteProject(projectId: string) {
+  try {
+    return await api.delete<{ success: boolean }>(`/projects/${projectId}`);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to delete project";
+    return { error: message };
+  }
+}

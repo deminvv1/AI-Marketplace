@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -45,6 +46,16 @@ export class ProjectsController {
     @CurrentUser() user: { id: string },
   ) {
     return this.projects.complete(id, user.id);
+  }
+
+  /** DELETE /api/projects/:id — владелец удаляет проект и все отклики */
+  @Delete(':id')
+  @UseGuards(AuthGuard)
+  remove(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string },
+  ) {
+    return this.projects.remove(id, user.id);
   }
 
   /** GET /api/projects/:id — карточка одного проекта. */

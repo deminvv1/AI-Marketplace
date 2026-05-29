@@ -12,7 +12,12 @@ import { useParams, useRouter } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/ui-bits";
 import { getMe } from "@/app/actions/me";
-import { completeProject, getProject, type ProjectDetail } from "@/app/actions/projects";
+import {
+  completeProject,
+  deleteProject,
+  getProject,
+  type ProjectDetail,
+} from "@/app/actions/projects";
 import {
   acceptProposal,
   createProposal,
@@ -30,7 +35,7 @@ import {
   freelancerDisplayName,
   projectStatusForUi,
 } from "@/lib/projects";
-import { ArrowLeft, Loader2, Send } from "lucide-react";
+import { ArrowLeft, Loader2, Send, Trash2 } from "lucide-react";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -60,6 +65,7 @@ export default function ProjectDetailPage() {
   const [submitting, setSubmitting] = useState(false);
   const [proposalActionId, setProposalActionId] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const loadProjectData = useCallback(async () => {
     const [projResult, me] = await Promise.all([getProject(projectId), getMe()]);
@@ -119,6 +125,26 @@ export default function ProjectDetailPage() {
     }
     setSubmitError(null);
     await loadProjectData();
+    router.refresh();
+  }
+
+  async function handleDeleteProject() {
+    if (!projectId) return;
+    const msg =
+      project?.status === "IN_PROGRESS"
+        ? "Delete this project? The assigned freelancer and all proposals will be removed."
+        : "Delete this project permanently? All proposals will be removed.";
+    if (!confirm(msg)) return;
+
+    setDeleting(true);
+    const result = await deleteProject(projectId);
+    setDeleting(false);
+
+    if ("error" in result && result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    router.push("/dashboard");
     router.refresh();
   }
 
@@ -429,6 +455,28 @@ export default function ProjectDetailPage() {
               Sign in as a freelancer to send a proposal. Users with role BOTH can switch
               mode in the header.
             </p>
+          )}
+
+          {isOwner && (
+            <div className="glass rounded-2xl p-6 border border-destructive/20">
+              <h2 className="font-semibold text-sm text-destructive">Danger zone</h2>
+              <p className="text-xs text-muted-foreground mt-1 mb-4">
+                Permanently remove this project and all proposals. Cannot be undone.
+              </p>
+              <button
+                type="button"
+                disabled={deleting}
+                onClick={handleDeleteProject}
+                className="w-full h-10 rounded-xl border border-destructive/50 text-destructive text-sm font-medium hover:bg-destructive/10 disabled:opacity-60 inline-flex items-center justify-center gap-2"
+              >
+                {deleting ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Trash2 className="size-4" />
+                )}
+                Delete project
+              </button>
+            </div>
           )}
         </aside>
       </div>

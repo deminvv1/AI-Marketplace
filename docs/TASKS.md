@@ -27,7 +27,7 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **User** | Пользователь, роль, email | **Влад** | почти готово |
 | **PrivacySettings** | Приватность | **Влад** | готово |
 | **Notification** | Уведомления | **Влад** | не начато |
-| **Project** | Проект на бирже | **Антон** | API + каталог, создание, complete, фильтры |
+| **Project** | Проект на бирже | **Антон** | CRUD: create, read, complete, **delete**, фильтры |
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
 | **Solution** | Готовое AI-решение | **Антон** | только mock UI |
 | **ForumPost** / **ForumComment** | Форум | **Антон** | только mock UI |

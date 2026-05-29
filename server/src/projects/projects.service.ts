@@ -156,4 +156,22 @@ export class ProjectsService {
     if (!project) throw new NotFoundException('Project not found');
     return project;
   }
+
+  /**
+   * Delete — только владелец (clientId).
+   * Proposal удаляются каскадом (onDelete: Cascade в schema).
+   */
+  async remove(projectId: string, userId: string) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { id: true, clientId: true },
+    });
+    if (!project) throw new NotFoundException('Project not found');
+    if (project.clientId !== userId) {
+      throw new ForbiddenException('Only the project owner can delete it');
+    }
+
+    await this.prisma.project.delete({ where: { id: projectId } });
+    return { success: true };
+  }
 }
