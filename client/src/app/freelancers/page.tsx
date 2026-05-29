@@ -1,16 +1,16 @@
 "use client"; // Обязательно, так как используются клиентские компоненты, табы на кнопках и градиенты inline-styles
 
 import { AppShell } from "@/components/app-shell";
-import { EXECUTORS, flag } from "@/lib/mock-data";
+import { FREELANCERS, flag } from "@/lib/mock-data";
 import { MessageCircle, Mic, UserPlus, Briefcase } from "lucide-react";
 import { Stars } from "@/components/ui-bits";
 
 // Берем нужного исполнителя из моков
-const E = EXECUTORS[1];
+const E = FREELANCERS[1];
 
-export default function ExecutorsPage() {
+export default function FreelancersPage() {
   return (
-    <AppShell title="Executor Profile">
+    <AppShell title="Freelancer Profile">
       {/* Шапка профиля */}
       <div className="rounded-3xl overflow-hidden glass">
         <div
@@ -68,7 +68,7 @@ export default function ExecutorsPage() {
         {/* Табы навигации */}
         <div className="px-6 border-t border-border">
           <nav className="flex gap-1 overflow-x-auto">
-            {["About", "Portfolio", "Ready Offers", "Completed Projects", "Reviews"].map((t, i) => (
+            {["About", "Portfolio", "Solutions", "Completed Projects", "Reviews"].map((t, i) => (
               <button
                 key={t}
                 className={`px-4 py-3 text-sm whitespace-nowrap border-b-2 transition ${i === 0 ? "border-primary text-foreground" : "border-transparent text-muted-foreground hover:text-foreground"}`}

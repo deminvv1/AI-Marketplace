@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { normalizeRole } from "@/lib/roles";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
-
-const VALID_ROLES = ["CUSTOMER", "EXECUTOR", "BOTH", "ADMIN"];
 
 async function apiPost(path: string, token: string, body: object) {
   return fetch(`${API_URL}${path}`, {
@@ -41,13 +40,11 @@ export async function GET(request: Request) {
     const token = session.access_token;
 
     const cookieStore = await cookies();
-    const pendingRole = cookieStore.get("pending_role")?.value;
-    const role = pendingRole && VALID_ROLES.includes(pendingRole) ? pendingRole : null;
-    if (role) cookieStore.delete("pending_role");
+    const pendingRole = normalizeRole(cookieStore.get("pending_role")?.value);
+    if (pendingRole) cookieStore.delete("pending_role");
 
-    // Create user in DB via NestJS if not exists, and get current state
     const initRes = await apiPost("/onboarding/init", token, {
-      role: role ?? "CUSTOMER",
+      role: pendingRole ?? "CLIENT",
       avatarUrl: session.user.user_metadata?.avatar_url ?? null,
     });
 
@@ -59,7 +56,7 @@ export async function GET(request: Request) {
 
     if (!dbUser.onboardingCompleted) {
       return NextResponse.redirect(
-        `${origin}/onboarding${role ? "?skip_role=1" : ""}`
+        `${origin}/onboarding${pendingRole ? "?skip_role=1" : ""}`
       );
     }
 

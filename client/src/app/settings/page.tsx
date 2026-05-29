@@ -12,9 +12,10 @@ import {
 } from "@/app/actions/settings";
 import { useActiveMode } from "@/lib/use-active-mode";
 import { createClient } from "@/lib/supabase/client";
+import { normalizeRole } from "@/lib/roles";
 
-type Role = "CUSTOMER" | "EXECUTOR" | "BOTH";
-const ROLES: Role[] = ["CUSTOMER", "EXECUTOR", "BOTH"];
+type Role = "CLIENT" | "FREELANCER" | "BOTH";
+const ROLES: Role[] = ["CLIENT", "FREELANCER", "BOTH"];
 
 type Settings = Awaited<ReturnType<typeof getSettings>>;
 type Tab = "account" | "privacy" | "danger";
@@ -105,11 +106,11 @@ export default function SettingsPage() {
 
   // Account form
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState<Role>("CUSTOMER");
+  const [role, setRole] = useState<Role>("CLIENT");
   const [accountSaving, setAccountSaving] = useState(false);
   const [accountMsg, setAccountMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
-  // Active mode (CUSTOMER/EXECUTOR toggle for BOTH role)
+  // Active mode (CLIENT/FREELANCER toggle for BOTH role)
   const { mode, setMode, mounted: modeMounted } = useActiveMode(data?.role);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -132,7 +133,7 @@ export default function SettingsPage() {
     getSettings().then((d) => {
       setData(d);
       setUsername(d.username ?? "");
-      setRole(d.role);
+      setRole((normalizeRole(d.role) ?? "CLIENT") as Role);
       setPrivacy({
         profileVisible: d.privacy?.profileVisible ?? true,
         onlineVisible: d.privacy?.onlineVisible ?? true,
@@ -146,7 +147,7 @@ export default function SettingsPage() {
   function cancelAccount() {
     if (!data) return;
     setUsername(data.username ?? "");
-    setRole(data.role);
+    setRole((normalizeRole(data.role) ?? "CLIENT") as Role);
     setAccountMsg(null);
   }
 
@@ -274,7 +275,7 @@ export default function SettingsPage() {
             {modeMounted && data.role === "BOTH" && (
               <Field icon={ToggleLeft} label="Active mode" hint="Which role you act as right now">
                 <div className="flex gap-2">
-                  {(["CUSTOMER", "EXECUTOR"] as const).map((m) => (
+                  {(["CLIENT", "FREELANCER"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => setMode(m)}

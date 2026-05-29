@@ -52,7 +52,7 @@ export default function WelcomePage({
       .then(({ data }) => setIsAuthed(!!data.user));
   }, []);
 
-  function handleRoleSelect(role: "CUSTOMER" | "EXECUTOR") {
+  function handleRoleSelect(role: "CLIENT" | "FREELANCER") {
     document.cookie = `pending_role=${role}; path=/; max-age=3600`;
     router.push("/register");
   }
@@ -123,37 +123,37 @@ export default function WelcomePage({
           ) : (
             <>
               <button
-                onClick={() => handleRoleSelect("CUSTOMER")}
+                onClick={() => handleRoleSelect("CLIENT")}
                 className="group glass glass-hover rounded-2xl p-8 text-left w-full"
               >
                 <div className="size-14 rounded-2xl bg-primary/15 border border-primary/40 grid place-items-center glow-primary">
                   <Briefcase className="size-7 text-primary" />
                 </div>
-                <h3 className="mt-6 text-2xl font-bold">I'm a Customer</h3>
+                <h3 className="mt-6 text-2xl font-bold">I'm a Client</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Post AI projects, browse ready offers, and hire specialists
+                  Post AI projects, browse solutions, and hire freelancers
                   from 62 countries.
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-primary text-sm font-medium">
-                  Continue as Customer{" "}
+                  Continue as Client{" "}
                   <ArrowRight className="size-4 group-hover:translate-x-1 transition" />
                 </span>
               </button>
 
               <button
-                onClick={() => handleRoleSelect("EXECUTOR")}
+                onClick={() => handleRoleSelect("FREELANCER")}
                 className="group glass glass-hover rounded-2xl p-8 text-left w-full"
               >
                 <div className="size-14 rounded-2xl bg-secondary/15 border border-secondary/40 grid place-items-center glow-secondary">
                   <Code2 className="size-7 text-secondary" />
                 </div>
-                <h3 className="mt-6 text-2xl font-bold">I'm an Executor</h3>
+                <h3 className="mt-6 text-2xl font-bold">I'm a Freelancer</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Offer your AI expertise, sell ready solutions, and find
                   projects worldwide.
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-secondary text-sm font-medium">
-                  Continue as Executor{" "}
+                  Continue as Freelancer{" "}
                   <ArrowRight className="size-4 group-hover:translate-x-1 transition" />
                 </span>
               </button>
@@ -174,17 +174,17 @@ export default function WelcomePage({
               },
               {
                 icon: ShoppingBag,
-                label: "Ready Offers",
-                desc: "Browse AI solutions for sale",
+                label: "Solutions",
+                desc: "Browse ready-made AI products",
               },
               {
                 icon: ClipboardList,
-                label: "Orders",
+                label: "Projects",
                 desc: "Post or find AI projects",
               },
               {
                 icon: Users,
-                label: "Executors",
+                label: "Freelancers",
                 desc: "Find AI specialists worldwide",
               },
             ].map(({ icon: Icon, label, desc }) => (

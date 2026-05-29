@@ -6,9 +6,9 @@ import { Check } from "lucide-react";
 
 const steps = ["Basic Info", "Details", "Budget & Deadline", "Review"];
 
-export default function PostOrderPage() {
+export default function PostProjectPage() {
   return (
-    <AppShell title="Post New Order">
+    <AppShell title="Post a project">
       <div className="max-w-4xl mx-auto">
         {/* Степпер (Шаги) */}
         <ol className="flex items-center gap-2 mb-8">

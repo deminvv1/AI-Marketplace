@@ -13,9 +13,9 @@ type Me = Awaited<ReturnType<typeof getMe>>;
 
 const NAV = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/orders", label: "Orders", icon: ClipboardList },
-  { to: "/executors", label: "Executors", icon: Users },
-  { to: "/offers", label: "Ready Offers", icon: ShoppingBag },
+  { to: "/projects", label: "Projects", icon: ClipboardList },
+  { to: "/freelancers", label: "Freelancers", icon: Users },
+  { to: "/solutions", label: "Solutions", icon: ShoppingBag },
   { to: "/forum", label: "Forum", icon: MessagesSquare },
   { to: "/messages", label: "Messages", icon: MessageCircle },
   { to: "/profile", label: "Profile", icon: User },
@@ -83,7 +83,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
           <div className="flex-1" />
           <div className="relative w-72 max-w-full hidden md:block">
             <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <input placeholder="Search orders, executors, forum…"
+            <input placeholder="Search projects, freelancers, forum…"
               className="w-full h-9 pl-9 pr-3 rounded-lg bg-white/5 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:glow-primary transition-all" />
           </div>
           <button className="relative size-9 grid place-items-center rounded-lg bg-white/5 border border-border hover:border-primary/50 transition">

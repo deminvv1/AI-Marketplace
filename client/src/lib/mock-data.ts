@@ -16,7 +16,7 @@ export const FLAGS: Record<string,string> = {
 };
 export const flag = (c: string) => FLAGS[c] ?? "🌐";
 
-export const ORDERS = [
+export const PROJECTS = [
   { id: 1, title: "Medical imaging classifier for radiology clinic", desc: "Need a CNN model trained on chest X-rays to detect early pneumonia signs with 95%+ accuracy. HIPAA compliance required.", industry: "Medicine", budget: "$3,500 – $7,000", deadline: "Aug 24, 2026", country: "Germany", date: "2h ago", status: "open" },
   { id: 2, title: "Generative AI artwork series for NFT drop", desc: "Looking for a Stable Diffusion specialist to create 1,000 unique stylized portraits in a custom aesthetic.", industry: "Art", budget: "$1,200 – $2,500", deadline: "Jul 10, 2026", country: "Japan", date: "5h ago", status: "in_progress" },
   { id: 3, title: "Algorithmic trading signal model (crypto)", desc: "Build a transformer-based model that predicts BTC/ETH short-term price movements from on-chain + sentiment data.", industry: "Finance", budget: "$5,000 – $12,000", deadline: "Sep 1, 2026", country: "Singapore", date: "1d ago", status: "open" },
@@ -25,7 +25,7 @@ export const ORDERS = [
   { id: 6, title: "Contract clause extraction & redlining tool", desc: "NLP model to extract key clauses from M&A contracts and flag deviations from a standard template.", industry: "Legal", budget: "$4,000 – $9,000", deadline: "Aug 30, 2026", country: "United Kingdom", date: "3d ago", status: "closed" },
 ];
 
-export const EXECUTORS = [
+export const FREELANCERS = [
   { name: "Yuki Tanaka", handle: "@yuki.ai", country: "Japan", rating: 4.9, reviews: 87, specialty: "Computer Vision", online: true },
   { name: "Anya Volkov", handle: "@anya.nlp", country: "Ukraine", rating: 4.8, reviews: 124, specialty: "NLP / LLM tuning", online: true },
   { name: "Marcus Chen", handle: "@marcus.ml", country: "Singapore", rating: 5.0, reviews: 56, specialty: "MLOps & Inference", online: false },
@@ -34,7 +34,7 @@ export const EXECUTORS = [
   { name: "Priya Sharma", handle: "@priya.data", country: "India", rating: 4.6, reviews: 98, specialty: "Data Engineering", online: true },
 ];
 
-export const OFFERS = [
+export const SOLUTIONS = [
   { title: "MediScan Pro — radiology triage SaaS", industry: "Medicine", format: "SaaS", price: "$499 / mo", author: "Yuki Tanaka", rating: 4.9 },
   { title: "BrandVoice LLM fine-tuning API", industry: "Marketing", format: "API", price: "$299", author: "Sofia Reyes", rating: 4.7 },
   { title: "Legal Clause Extractor v2", industry: "Legal", format: "Script", price: "$149", author: "Anya Volkov", rating: 4.8 },

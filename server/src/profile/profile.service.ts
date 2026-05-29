@@ -38,4 +38,34 @@ export class ProfileService {
     });
     return { success: true };
   }
+
+  /** Call when someone opens a public profile (e.g. /freelancers/:username). */
+  async recordProfileView(profileUserId: string, viewerId?: string | null) {
+    const profile = await this.prisma.profile.findUnique({
+      where: { userId: profileUserId },
+      select: { id: true },
+    });
+    if (!profile) return { viewCount: 0 };
+
+    if (viewerId && viewerId === profileUserId) {
+      const current = await this.prisma.profile.findUnique({
+        where: { id: profile.id },
+        select: { viewCount: true },
+      });
+      return { viewCount: current?.viewCount ?? 0 };
+    }
+
+    const updated = await this.prisma.profile.update({
+      where: { id: profile.id },
+      data: {
+        viewCount: { increment: 1 },
+        profileViews: {
+          create: { viewerId: viewerId ?? null },
+        },
+      },
+      select: { viewCount: true },
+    });
+
+    return { viewCount: updated.viewCount };
+  }
 }
