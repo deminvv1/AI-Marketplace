@@ -1,7 +1,20 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
+const LEGACY_ROUTES: Record<string, string> = {
+  "/orders": "/projects",
+  "/post-order": "/projects/new",
+  "/executors": "/freelancers",
+  "/offers": "/solutions",
+};
+
 export async function proxy(request: NextRequest) {
+  const pathname = request.nextUrl.pathname;
+  const legacy = LEGACY_ROUTES[pathname];
+  if (legacy) {
+    return NextResponse.redirect(new URL(legacy, request.url));
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -27,7 +40,6 @@ export async function proxy(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession();
   const user = session?.user ?? null;
-  const pathname = request.nextUrl.pathname;
 
   const isPublic =
     pathname === "/" ||

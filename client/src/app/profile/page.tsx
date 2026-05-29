@@ -14,7 +14,7 @@ type Tab = "about" | "portfolio" | "offers" | "completed" | "reviews";
 const TABS: { key: Tab; label: string }[] = [
   { key: "about", label: "About" },
   { key: "portfolio", label: "Portfolio" },
-  { key: "offers", label: "Ready Offers" },
+  { key: "offers", label: "Solutions" },
   { key: "completed", label: "Completed Projects" },
   { key: "reviews", label: "Reviews" },
 ];
@@ -63,8 +63,11 @@ export default function ProfilePage() {
     setError("");
     const result = await updateProfile(form);
     setSaving(false);
-    if (!result?.success) { setError("Failed to save."); return; }
-    setData((prev) =>
+    if (!result || !("success" in result) || !result.success) {
+      setError("error" in result && result.error ? result.error : "Failed to save.");
+      return;
+    }
+    setData((prev: ProfileData | null) =>
       prev ? { ...prev, profile: prev.profile ? { ...prev.profile, ...form } : null } : null
     );
     setEditing(false);
@@ -97,9 +100,9 @@ export default function ProfilePage() {
 
   const initials = displayName.slice(0, 2).toUpperCase();
   const memberYear = new Date(data.createdAt).getFullYear();
-  const specTags = (editing ? form.specialization : (data.profile?.specialization ?? ""))
-    .split(",").map((s) => s.trim()).filter(Boolean);
-  const industries = editing ? form.industries : (data.profile?.industries ?? []);
+  const specTags: string[] = (editing ? form.specialization : (data.profile?.specialization ?? ""))
+    .split(",").map((s: string) => s.trim()).filter(Boolean);
+  const industries: string[] = editing ? form.industries : (data.profile?.industries ?? []);
 
   return (
     <AppShell title="">

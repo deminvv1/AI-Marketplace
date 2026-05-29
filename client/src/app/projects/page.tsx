@@ -1,17 +1,17 @@
 "use client"; // Обязательно, так как используются интерактивные фильтры, поиск и генерация Math.random() на клиенте
 
 import { AppShell } from "@/components/app-shell";
-import { ORDERS, INDUSTRIES, flag } from "@/lib/mock-data";
+import { PROJECTS, INDUSTRIES, flag } from "@/lib/mock-data";
 import { Search, SlidersHorizontal, ArrowRight } from "lucide-react";
 import { StatusBadge } from "@/components/ui-bits";
 
-export default function OrdersPage() {
+export default function ProjectsPage() {
   return (
-    <AppShell title="Orders">
+    <AppShell title="Projects">
       {/* Заголовок и быстрые фильтры */}
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Browse AI Orders</h2>
+          <h2 className="text-3xl font-bold tracking-tight">Browse AI Projects</h2>
           <p className="text-sm text-muted-foreground mt-1">
             3,291 open projects across 62 countries
           </p>
@@ -32,7 +32,7 @@ export default function OrdersPage() {
       <div className="relative mb-6">
         <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
         <input
-          placeholder="Search orders by keyword, industry, or specialist…"
+          placeholder="Search projects by keyword, industry, or specialist…"
           className="w-full h-11 pl-10 pr-3 rounded-xl glass border border-border text-sm focus:outline-none focus:border-primary focus:glow-primary transition-all"
         />
       </div>
@@ -62,7 +62,7 @@ export default function OrdersPage() {
 
         {/* Сетка карточек заказов */}
         <div className="col-span-12 md:col-span-9 grid sm:grid-cols-2 gap-4">
-          {ORDERS.map((o) => (
+          {PROJECTS.map((o) => (
             <article key={o.id} className="glass glass-hover rounded-2xl p-5 flex flex-col">
               <div className="flex items-start justify-between gap-3">
                 <h4 className="font-semibold leading-snug">{o.title}</h4>
@@ -88,7 +88,7 @@ export default function OrdersPage() {
               <div className="mt-4 flex items-center justify-between">
                 <span className="text-xs text-muted-foreground">Posted {o.date}</span>
                 <button className="h-8 px-3 rounded-lg border border-primary/50 text-primary text-xs font-medium hover:bg-primary/15 transition inline-flex items-center gap-1">
-                  Respond <ArrowRight className="size-3" />
+                  Send proposal <ArrowRight className="size-3" />
                 </button>
               </div>
             </article>

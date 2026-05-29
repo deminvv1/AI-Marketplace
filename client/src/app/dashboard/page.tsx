@@ -3,7 +3,7 @@
 import Link from "next/link"; // Роутинг Next.js вместо TanStack
 import { AppShell } from "@/components/app-shell";
 import { WelcomeModal } from "@/components/welcome-modal";
-import { ORDERS, EXECUTORS, flag } from "@/lib/mock-data";
+import { PROJECTS, FREELANCERS, flag } from "@/lib/mock-data";
 import {
   ClipboardList,
   MessagesSquare,
@@ -17,7 +17,7 @@ import { StatusBadge } from "@/components/ui-bits";
 
 const stats = [
   {
-    label: "Active Orders",
+    label: "Active Projects",
     value: "3",
     icon: ClipboardList,
     color: "primary",
@@ -30,7 +30,7 @@ const stats = [
     color: "secondary",
     delta: "+4 today",
   },
-  { label: "Saved Executors", value: "7", icon: Bookmark, color: "accent", delta: "2 online" },
+  { label: "Saved Freelancers", value: "7", icon: Bookmark, color: "accent", delta: "2 online" },
   { label: "Unread Messages", value: "5", icon: Inbox, color: "primary", delta: "View inbox" },
 ] as const;
 
@@ -48,10 +48,10 @@ export default function DashboardPage() {
             </p>
           </div>
           <Link
-            href="/post-order"
+            href="/projects/new"
             className="h-10 px-5 inline-flex items-center gap-2 rounded-lg bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition"
           >
-            Post new order <ArrowUpRight className="size-4" />
+            Post a project <ArrowUpRight className="size-4" />
           </Link>
         </div>
 
@@ -82,13 +82,13 @@ export default function DashboardPage() {
           {/* Недавние заказы */}
           <div className="lg:col-span-2 glass rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">My Recent Orders</h3>
-              <Link href="/orders" className="text-xs text-primary hover:underline">
+              <h3 className="font-semibold">My Recent Projects</h3>
+              <Link href="/projects" className="text-xs text-primary hover:underline">
                 View all
               </Link>
             </div>
             <div className="space-y-3">
-              {ORDERS.slice(0, 3).map((o) => (
+              {PROJECTS.slice(0, 3).map((o) => (
                 <div
                   key={o.id}
                   className="p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
@@ -116,13 +116,13 @@ export default function DashboardPage() {
           {/* Рекомендованные исполнители */}
           <div className="glass rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Recommended Executors</h3>
-              <Link href="/executors" className="text-xs text-primary hover:underline">
+              <h3 className="font-semibold">Recommended Freelancers</h3>
+              <Link href="/freelancers" className="text-xs text-primary hover:underline">
                 View all
               </Link>
             </div>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-              {EXECUTORS.map((e) => (
+              {FREELANCERS.map((e) => (
                 <div
                   key={e.handle}
                   className="p-3 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition flex items-center gap-3"

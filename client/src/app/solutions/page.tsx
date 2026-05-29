@@ -1,7 +1,7 @@
 "use client";
 
 import { AppShell } from "@/components/app-shell";
-import { OFFERS } from "@/lib/mock-data";
+import { SOLUTIONS } from "@/lib/mock-data";
 import { Stars } from "@/components/ui-bits";
 
 const gradients = [
@@ -13,13 +13,13 @@ const gradients = [
   "linear-gradient(135deg,#831843,#6366f1)",
 ];
 
-export default function OffersPage() {
+export default function SolutionsPage() {
   return (
-    <AppShell title="Ready AI Offers">
+    <AppShell title="Solutions">
       {/* Шапка и фильтры */}
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Ready AI Offers</h2>
+          <h2 className="text-3xl font-bold tracking-tight">AI Solutions</h2>
           <p className="text-sm text-muted-foreground mt-1">
             Plug-and-play solutions from vetted specialists
           </p>
@@ -38,7 +38,7 @@ export default function OffersPage() {
 
       {/* Сетка готовых предложений */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        {OFFERS.map((o, i) => (
+        {SOLUTIONS.map((o, i) => (
           <article
             key={o.title}
             className="glass glass-hover rounded-2xl overflow-hidden flex flex-col"
