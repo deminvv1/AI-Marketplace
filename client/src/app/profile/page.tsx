@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { getMyProfile, updateProfile, type MyProfile } from "@/app/actions/profile";
+import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
 import { PortfolioTab } from "@/app/profile/portfolio-tab";
+import { ReviewsList } from "@/components/reviews-list";
 import {
   Edit2, Save, X, Plus, Star, CheckCircle2,
   MessageCircle, Loader2, Globe, CalendarDays, Briefcase, Eye,
@@ -44,6 +46,24 @@ export default function ProfilePage() {
   });
   const [industryInput, setIndustryInput] = useState("");
   const [activeTab, setActiveTab] = useState<Tab>("about");
+  const [myReviews, setMyReviews] = useState<ReviewItem[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
+
+  useEffect(() => {
+    if (activeTab !== "reviews" || !data?.id) return;
+    let cancelled = false;
+    setReviewsLoading(true);
+    (async () => {
+      const res = await getReviewsForUser(data.id);
+      if (!cancelled) {
+        if (Array.isArray(res)) setMyReviews(res);
+        setReviewsLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab, data?.id]);
 
   const reload = useCallback(async () => {
     const d = await getMyProfile();
@@ -426,10 +446,18 @@ export default function ProfilePage() {
           )}
 
           {activeTab === "reviews" && (
-            <div className="glass rounded-2xl p-10 text-center">
-              <p className="text-muted-foreground text-sm">
-                Reviews will be available after the Review entity is implemented.
-              </p>
+            <div className="glass rounded-2xl p-6">
+              <h2 className="font-semibold mb-4">Reviews about you</h2>
+              {reviewsLoading ? (
+                <div className="flex justify-center py-8">
+                  <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : (
+                <ReviewsList
+                  reviews={myReviews}
+                  emptyMessage="No reviews yet. Reviews appear after clients rate completed projects."
+                />
+              )}
             </div>
           )}
         </div>

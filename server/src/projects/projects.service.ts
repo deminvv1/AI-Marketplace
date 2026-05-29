@@ -8,6 +8,7 @@ import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 /**
  * Единый набор полей Project для списков и карточки.
@@ -68,6 +69,57 @@ export class ProjectsService {
         clientId: userId,
       },
       select: projectListSelect,
+    });
+  }
+
+  /**
+   * Редактирование полей проекта — только владелец, только OPEN
+   * (после accept меняется status / freelancerId).
+   */
+  async update(projectId: string, userId: string, dto: UpdateProjectDto) {
+    const project = await this.prisma.project.findUnique({
+      where: { id: projectId },
+      select: { id: true, clientId: true, status: true },
+    });
+    if (!project) throw new NotFoundException('Project not found');
+    if (project.clientId !== userId) {
+      throw new ForbiddenException('Only the project owner can edit it');
+    }
+    if (project.status !== 'OPEN') {
+      throw new BadRequestException(
+        'Only open projects can be edited. Complete or cancel work first.',
+      );
+    }
+
+    const data: Prisma.ProjectUpdateInput = {};
+    if (dto.title !== undefined) data.title = dto.title.trim();
+    if (dto.description !== undefined) data.description = dto.description.trim();
+    if (dto.shortDescription !== undefined) {
+      data.shortDescription = dto.shortDescription.trim() || null;
+    }
+    if (dto.industry !== undefined) data.industry = dto.industry.trim() || null;
+    if (dto.tags !== undefined) data.tags = dto.tags;
+    if (dto.budget !== undefined) data.budget = dto.budget.trim() || null;
+    if (dto.deadline !== undefined) {
+      data.deadline = dto.deadline ? new Date(dto.deadline) : null;
+    }
+    if (dto.country !== undefined) data.country = dto.country.trim() || null;
+    if (dto.language !== undefined) data.language = dto.language.trim() || null;
+    if (dto.workFormat !== undefined) {
+      data.workFormat = dto.workFormat.trim() || null;
+    }
+
+    return this.prisma.project.update({
+      where: { id: projectId },
+      data,
+      select: {
+        ...projectListSelect,
+        updatedAt: true,
+        freelancerId: true,
+        freelancer: {
+          select: { id: true, username: true, avatarUrl: true },
+        },
+      },
     });
   }
 

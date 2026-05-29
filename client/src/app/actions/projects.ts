@@ -74,6 +74,19 @@ export async function getProjects(filters?: ProjectCatalogFilters) {
   }
 }
 
+/** PATCH /api/projects/:id — только OPEN, только владелец */
+export async function updateProject(
+  projectId: string,
+  data: Partial<CreateProjectInput>,
+) {
+  try {
+    return await api.patch<ProjectDetail>(`/projects/${projectId}`, data);
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Failed to update project";
+    return { error: message };
+  }
+}
+
 /** PATCH /api/projects/:id/complete — IN_PROGRESS → COMPLETED */
 export async function completeProject(projectId: string) {
   try {

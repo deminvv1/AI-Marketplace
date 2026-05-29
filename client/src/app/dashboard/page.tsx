@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { WelcomeModal } from "@/components/welcome-modal";
-import { FREELANCERS, flag } from "@/lib/mock-data";
+import { flag } from "@/lib/mock-data";
 import { getMe } from "@/app/actions/me";
+import { getFavorites, type FavoriteFreelancer } from "@/app/actions/favorites";
 import { getMyProjects, type ProjectListItem } from "@/app/actions/projects";
+import { freelancerDisplayName } from "@/lib/projects";
 import { projectStatusForUi } from "@/lib/projects";
 import {
   ClipboardList,
@@ -36,13 +38,14 @@ const stats = [
     color: "secondary",
     delta: "+4 today",
   },
-  { label: "Saved Freelancers", value: "7", icon: Bookmark, color: "accent", delta: "2 online" },
+  { label: "Saved Freelancers", value: "0", icon: Bookmark, color: "accent", delta: "From favorites" },
   { label: "Unread Messages", value: "5", icon: Inbox, color: "primary", delta: "View inbox" },
 ] as const;
 
 export default function DashboardPage() {
   const [displayName, setDisplayName] = useState("there");
   const [myProjects, setMyProjects] = useState<ProjectListItem[]>([]);
+  const [savedFreelancers, setSavedFreelancers] = useState<FavoriteFreelancer[]>([]);
 
   useEffect(() => {
     (async () => {
@@ -53,13 +56,21 @@ export default function DashboardPage() {
         setDisplayName(me.username);
       }
 
-      const mine = await getMyProjects();
+      const [mine, favs] = await Promise.all([
+        getMyProjects(),
+        getFavorites("freelancer"),
+      ]);
       if (Array.isArray(mine)) setMyProjects(mine);
+      if (Array.isArray(favs)) setSavedFreelancers(favs);
     })();
   }, []);
 
   const activeCount = myProjects.filter((p) =>
     ["OPEN", "IN_PROGRESS"].includes(p.status),
+  ).length;
+
+  const savedOnline = savedFreelancers.filter(
+    (f) => f.freelancer?.profile?.onlineStatus,
   ).length;
 
   return (
@@ -96,11 +107,17 @@ export default function DashboardPage() {
                   />
                 </div>
                 <span className="text-[10px] uppercase tracking-widest text-muted-foreground">
-                  {delta}
+                  {idx === 2 && savedFreelancers.length > 0
+                    ? `${savedOnline} online`
+                    : delta}
                 </span>
               </div>
               <div className="mt-5 text-3xl font-bold tracking-tight">
-                {idx === 0 ? String(activeCount || value) : value}
+                {idx === 0
+                  ? String(activeCount || value)
+                  : idx === 2
+                    ? String(savedFreelancers.length)
+                    : value}
               </div>
               <div className="text-sm text-muted-foreground">{label}</div>
             </div>
@@ -159,43 +176,75 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Рекомендованные исполнители */}
+          {/* Сохранённые фрилансеры */}
           <div className="glass rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold">Recommended Freelancers</h3>
+              <h3 className="font-semibold">Saved Freelancers</h3>
               <Link href="/freelancers" className="text-xs text-primary hover:underline">
-                View all
+                Browse catalog
               </Link>
             </div>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
-              {FREELANCERS.map((e) => (
-                <div
-                  key={e.handle}
-                  className="p-3 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition flex items-center gap-3"
-                >
-                  <div className="relative">
-                    <div className="size-10 rounded-full bg-gradient-primary grid place-items-center text-sm font-semibold">
-                      {e.name[0]}
+              {savedFreelancers.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Save freelancers from their profile page to see them here.
+                </p>
+              ) : (
+                savedFreelancers.map((f) => {
+                  const u = f.freelancer;
+                  if (!u) return null;
+                  const name = freelancerDisplayName({
+                    username: u.username,
+                    profile: u.profile,
+                  });
+                  const initial = name[0]?.toUpperCase() ?? "?";
+                  const profileHref = u.username
+                    ? `/freelancers/${u.username}`
+                    : "/freelancers";
+                  return (
+                    <div
+                      key={f.id}
+                      className="p-3 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition flex items-center gap-3"
+                    >
+                      <div className="relative">
+                        {u.avatarUrl ? (
+                          <img
+                            src={u.avatarUrl}
+                            alt=""
+                            className="size-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="size-10 rounded-full bg-gradient-primary grid place-items-center text-sm font-semibold">
+                            {initial}
+                          </div>
+                        )}
+                        {u.profile?.onlineStatus && (
+                          <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-card" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          href={profileHref}
+                          className="text-sm font-medium truncate block hover:text-primary"
+                        >
+                          {name}
+                        </Link>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Star className="size-3 fill-warning text-warning" />{" "}
+                          {u.profile?.rating?.toFixed(1) ?? "—"} ·{" "}
+                          {u.profile?.specialization ?? "Freelancer"}
+                        </div>
+                      </div>
+                      <Link
+                        href="/messages"
+                        className="size-8 grid place-items-center rounded-lg bg-primary/15 text-primary hover:bg-primary/25 transition"
+                      >
+                        <MessageCircle className="size-4" />
+                      </Link>
                     </div>
-                    {e.online && (
-                      <span className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-card" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{e.name}</div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Star className="size-3 fill-warning text-warning" /> {e.rating} ·{" "}
-                      {e.specialty}
-                    </div>
-                  </div>
-                  <Link
-                    href="/messages"
-                    className="size-8 grid place-items-center rounded-lg bg-primary/15 text-primary hover:bg-primary/25 transition"
-                  >
-                    <MessageCircle className="size-4" />
-                  </Link>
-                </div>
-              ))}
+                  );
+                })
+              )}
             </div>
           </div>
         </div>

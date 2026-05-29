@@ -8,6 +8,9 @@ import { OnboardingModule } from './onboarding/onboarding.module';
 import { ProjectsModule } from './projects/projects.module';
 import { FreelancersModule } from './freelancers/freelancers.module';
 import { SolutionsModule } from './solutions/solutions.module';
+import { ForumModule } from './forum/forum.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { FavoritesModule } from './favorites/favorites.module';
 
 @Module({
   imports: [
@@ -20,6 +23,9 @@ import { SolutionsModule } from './solutions/solutions.module';
     ProjectsModule,
     FreelancersModule,
     SolutionsModule,
+    ForumModule,
+    ReviewsModule,
+    FavoritesModule,
   ],
 })
 export class AppModule {}

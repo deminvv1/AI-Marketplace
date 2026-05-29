@@ -17,6 +17,9 @@ import {
 import { flag } from "@/lib/mock-data";
 import { freelancerDisplayName } from "@/lib/projects";
 import { Stars } from "@/components/ui-bits";
+import { FavoriteButton } from "@/components/favorite-button";
+import { ReviewsList } from "@/components/reviews-list";
+import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
 import { ArrowLeft, Loader2, MessageCircle, Eye } from "lucide-react";
 
 export default function FreelancerProfilePage() {
@@ -24,6 +27,7 @@ export default function FreelancerProfilePage() {
   const username = typeof params.username === "string" ? params.username : "";
 
   const [profile, setProfile] = useState<FreelancerPublicProfile | null>(null);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +36,12 @@ export default function FreelancerProfilePage() {
     (async () => {
       const result = await getFreelancerByUsername(username);
       if ("error" in result && result.error) setError(result.error);
-      else if (result && "id" in result) setProfile(result as FreelancerPublicProfile);
+      else if (result && "id" in result) {
+        const p = result as FreelancerPublicProfile;
+        setProfile(p);
+        const rev = await getReviewsForUser(p.id);
+        if (Array.isArray(rev)) setReviews(rev);
+      }
       setLoading(false);
     })();
   }, [username]);
@@ -124,13 +133,16 @@ export default function FreelancerProfilePage() {
               )}
             </div>
           </div>
-          <Link
-            href="/messages"
-            className="h-10 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary inline-flex items-center gap-2"
-          >
-            <MessageCircle className="size-4" />
-            Write
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <FavoriteButton targetId={profile.id} targetType="freelancer" />
+            <Link
+              href="/messages"
+              className="h-10 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary inline-flex items-center gap-2"
+            >
+              <MessageCircle className="size-4" />
+              Write
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -170,6 +182,11 @@ export default function FreelancerProfilePage() {
               <p className="text-sm text-muted-foreground whitespace-pre-wrap">{p.experience}</p>
             </section>
           )}
+
+          <section className="glass rounded-2xl p-6">
+            <h2 className="font-semibold mb-4">Reviews</h2>
+            <ReviewsList reviews={reviews} />
+          </section>
 
           {p?.portfolioItems && p.portfolioItems.length > 0 && (
             <section className="glass rounded-2xl p-6">

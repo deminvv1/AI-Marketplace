@@ -35,7 +35,14 @@ import {
   freelancerDisplayName,
   projectStatusForUi,
 } from "@/lib/projects";
-import { ArrowLeft, Loader2, Send, Trash2 } from "lucide-react";
+import {
+  createReview,
+  getReviewForProject,
+  type ReviewItem,
+} from "@/app/actions/reviews";
+import { FavoriteButton } from "@/components/favorite-button";
+import { ReviewsList } from "@/components/reviews-list";
+import { ArrowLeft, Loader2, Pencil, Send, Star, Trash2 } from "lucide-react";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -66,6 +73,10 @@ export default function ProjectDetailPage() {
   const [proposalActionId, setProposalActionId] = useState<string | null>(null);
   const [completing, setCompleting] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [projectReview, setProjectReview] = useState<ReviewItem | null>(null);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
 
   const loadProjectData = useCallback(async () => {
     const [projResult, me] = await Promise.all([getProject(projectId), getMe()]);
@@ -89,6 +100,10 @@ export default function ProjectDetailPage() {
     if (me?.id && proj.client.id === me.id) {
       const list = await getProjectProposals(projectId);
       if (Array.isArray(list)) setProposals(list);
+      if (proj.status === "COMPLETED") {
+        const rev = await getReviewForProject(projectId);
+        if (rev && !("error" in rev)) setProjectReview(rev as ReviewItem | null);
+      }
     } else if (role === "FREELANCER" || role === "BOTH") {
       const mine = await getMyProposalOnProject(projectId);
       if (mine && !("error" in mine)) setMyProposal(mine as ProposalItem | null);
@@ -159,6 +174,27 @@ export default function ProjectDetailPage() {
     await loadProjectData();
   }
 
+  async function handleReviewSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!project?.freelancerId) return;
+    setReviewSubmitting(true);
+    const result = await createReview({
+      toUserId: project.freelancerId,
+      rating: reviewRating,
+      text: reviewText || undefined,
+      projectId,
+    });
+    setReviewSubmitting(false);
+    if ("error" in result && result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    if ("id" in result) {
+      setProjectReview(result);
+      setSubmitError(null);
+    }
+  }
+
   async function handleProposalSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!projectId) return;
@@ -219,7 +255,18 @@ export default function ProjectDetailPage() {
         <div className="lg:col-span-2 space-y-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
-            <StatusBadge status={projectStatusForUi(project.status)} />
+            <div className="flex flex-wrap items-center gap-2">
+              {isOwner && project.status === "OPEN" && (
+                <Link
+                  href={`/projects/${projectId}/edit`}
+                  className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-2 hover:border-primary/40"
+                >
+                  <Pencil className="size-4" />
+                  Edit
+                </Link>
+              )}
+              <StatusBadge status={projectStatusForUi(project.status)} />
+            </div>
           </div>
 
           {project.shortDescription && (
@@ -310,9 +357,69 @@ export default function ProjectDetailPage() {
           )}
 
           {isOwner && project.status === "COMPLETED" && (
-            <p className="text-sm text-muted-foreground glass rounded-2xl p-4">
-              This project is completed and no longer accepts proposals.
-            </p>
+            <div className="glass rounded-2xl p-6 space-y-4">
+              <h2 className="font-semibold text-sm">Project completed</h2>
+              {projectReview ? (
+                <div>
+                  <p className="text-xs text-muted-foreground mb-2">Your review</p>
+                  <ReviewsList reviews={[projectReview]} />
+                </div>
+              ) : project.freelancerId ? (
+                <form onSubmit={handleReviewSubmit} className="space-y-3">
+                  <p className="text-xs text-muted-foreground">
+                    Rate the freelancer for this project (one review per project).
+                  </p>
+                  <div>
+                    <label className="text-sm font-medium">Rating</label>
+                    <div className="mt-2 flex gap-1">
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          onClick={() => setReviewRating(n)}
+                          className="p-1"
+                        >
+                          <Star
+                            className={`size-6 ${
+                              n <= reviewRating
+                                ? "fill-warning text-warning"
+                                : "text-muted-foreground"
+                            }`}
+                          />
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Comment (optional)</label>
+                    <textarea
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      rows={3}
+                      className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+                      placeholder="How was the collaboration?"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    disabled={reviewSubmitting}
+                    className="w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium disabled:opacity-60"
+                  >
+                    {reviewSubmitting ? "Submitting…" : "Submit review"}
+                  </button>
+                </form>
+              ) : (
+                <p className="text-xs text-muted-foreground">
+                  No freelancer was assigned to this project.
+                </p>
+              )}
+            </div>
+          )}
+
+          {!isOwner && (
+            <div className="flex justify-end">
+              <FavoriteButton targetId={projectId} targetType="project" />
+            </div>
           )}
 
           {isOwner && (

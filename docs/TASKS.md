@@ -27,13 +27,13 @@ URL: `/projects`, `/projects/new`, `/freelancers`, `/solutions` (старые `/
 | **User** | Пользователь, роль, email | **Влад** | почти готово |
 | **PrivacySettings** | Приватность | **Влад** | готово |
 | **Notification** | Уведомления | **Влад** | не начато |
-| **Project** | Проект на бирже | **Антон** | CRUD: create, read, complete, **delete**, фильтры |
+| **Project** | Проект на бирже | **Антон** | CRUD: create, read, **update** (OPEN), complete, delete, фильтры |
 | **Proposal** | Отклик | **Антон** | отклик, accept/reject, hire |
 | **Solution** | Готовое AI-решение | **Антон** | CRUD API + каталог, new, detail |
 | **ForumPost** / **ForumComment** | Форум | **Антон** | API + /forum, new, thread |
 | **Profile** / **PortfolioItem** | Профиль, портфолио | **Антон** | PATCH profile + CRUD `/profile/portfolio`, вкладка Portfolio |
 | **ProfileView** | Просмотры визитки | **Антон** | при GET `/freelancers/:username` |
-| **Review** / **Favorite** | Отзыв, избранное | **Антон** | не начато |
+| **Review** / **Favorite** | Отзыв, избранное | **Антон** | API + UI (отзыв после COMPLETED, Save на визитке) |
 | **Conversation** / **Message** | Чат | **Влад** | только mock UI |
 | **Report** / **BlockedUser** | Жалоба, блок | **Влад** | модель есть, API нет |
 
@@ -65,7 +65,7 @@ cd server && npx prisma migrate deploy && npx prisma generate
 
 ```
 Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Review / Favorite
-      [готово]              [СЕЙЧАС]
+      [готово]                                              [готово]
 ```
 
 ---
@@ -77,7 +77,7 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 | Бэк | `server/src/projects/` |
 | Actions | `client/src/app/actions/projects.ts`, `proposals.ts` |
 | Фронт | `/projects`, `/projects/new`, `/projects/[id]`, dashboard |
-| API | accept/reject, `PATCH .../complete` → COMPLETED |
+| API | accept/reject, `PATCH .../:id` (OPEN), `PATCH .../complete` → COMPLETED |
 | Каталог | `GET /projects?industry=&country=&q=` (только **OPEN**) |
 
 **Владу для проверки:** роль CLIENT/BOTH — создать проект; FREELANCER/BOTH — отклик; CLIENT — Accept → IN_PROGRESS → Complete.
@@ -124,7 +124,26 @@ Project + Proposal  →  Profile + Portfolio  →  Solution  →  Forum  →  Re
 
 ---
 
-### 🔜 Сущность 5: **Review** + **Favorite** ← СЕЙЧАС
+### ✅ Сущность 5: **Review** + **Favorite** (сделано)
+
+| Слой | Где |
+|------|-----|
+| Бэк | `server/src/reviews/`, `server/src/favorites/` |
+| Actions | `client/src/app/actions/reviews.ts`, `favorites.ts` |
+| Фронт | отзыв на `/projects/[id]` (COMPLETED), Reviews на визитке и `/profile`, Save + dashboard |
+
+**Правила:** отзыв по проекту — только CLIENT, один раз; избранное: `freelancer` \| `project` \| `solution`.
+
+### ✅ Редактирование проекта (сделано)
+
+| Слой | Где |
+|------|-----|
+| API | `PATCH /api/projects/:id` — владелец, только **OPEN** |
+| Фронт | `/projects/[id]/edit`, кнопка Edit на карточке |
+
+### 🔜 Дальше (по желанию)
+
+- лайки на форуме, Job alerts / SavedSearch (`docs/new.md`)
 
 ---
 

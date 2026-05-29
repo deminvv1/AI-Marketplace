@@ -13,6 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { ListProjectsQueryDto } from './dto/list-projects-query.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 import { ProjectsService } from './projects.service';
 
 /**
@@ -46,6 +47,17 @@ export class ProjectsController {
     @CurrentUser() user: { id: string },
   ) {
     return this.projects.complete(id, user.id);
+  }
+
+  /** PATCH /api/projects/:id — правка полей (только OPEN, владелец) */
+  @Patch(':id')
+  @UseGuards(AuthGuard)
+  update(
+    @Param('id') id: string,
+    @CurrentUser() user: { id: string },
+    @Body() dto: UpdateProjectDto,
+  ) {
+    return this.projects.update(id, user.id, dto);
   }
 
   /** DELETE /api/projects/:id — владелец удаляет проект и все отклики */
