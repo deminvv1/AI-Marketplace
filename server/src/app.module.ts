@@ -5,15 +5,43 @@ import { UsersModule } from './users/users.module';
 import { ProfileModule } from './profile/profile.module';
 import { SettingsModule } from './settings/settings.module';
 import { OnboardingModule } from './onboarding/onboarding.module';
+import { ProjectsModule } from './projects/projects.module';
+import { FreelancersModule } from './freelancers/freelancers.module';
+import { SolutionsModule } from './solutions/solutions.module';
+import { ForumModule } from './forum/forum.module';
+import { ReviewsModule } from './reviews/reviews.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { ProjectAlertsModule } from './project-alerts/project-alerts.module';
+import { ProposalsModule } from './proposals/proposals.module';
+import { SearchModule } from './search/search.module';
+import { MessagesModule } from './messages/messages.module';
+import { ReportsModule } from './reports/reports.module';
+import { BlocksModule } from './blocks/blocks.module';
+import { TaxonomyModule } from './taxonomy/taxonomy.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true, envFilePath: '.env' }),
     PrismaModule,
+    TaxonomyModule,
     UsersModule,
     ProfileModule,
     SettingsModule,
     OnboardingModule,
+    ProjectsModule,
+    FreelancersModule,
+    SolutionsModule,
+    ForumModule,
+    ReviewsModule,
+    FavoritesModule,
+    NotificationsModule,
+    ProjectAlertsModule,
+    ProposalsModule,
+    SearchModule,
+    MessagesModule,
+    ReportsModule,
+    BlocksModule,
   ],
 })
 export class AppModule {}

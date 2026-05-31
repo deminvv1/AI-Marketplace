@@ -14,7 +14,7 @@ export class OnboardingController {
       user.id,
       user.email,
       body.avatarUrl ?? user.user_metadata?.avatar_url ?? null,
-      (body.role as any) ?? 'CUSTOMER',
+      (body.role as any) ?? 'CLIENT',
     );
   }
 

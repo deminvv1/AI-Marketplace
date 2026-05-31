@@ -4,7 +4,8 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import { completeOnboarding } from "@/app/actions/onboarding";
-import { Role } from "@prisma/client";
+import { getMe } from "@/app/actions/me";
+import { normalizeRole, type AppRole } from "@/lib/roles";
 
 export default function OnboardingPage() {
   const [username, setUsername] = useState("");
@@ -16,12 +17,21 @@ export default function OnboardingPage() {
     if (!username.trim()) return;
     setError("");
     startTransition(async () => {
-      const result = await completeOnboarding({ role: Role.CUSTOMER, username });
-      if (result?.error) {
+      const me = await getMe();
+      const cookieMatch =
+        typeof document !== "undefined"
+          ? document.cookie.match(/pending_role=([^;]+)/)
+          : null;
+      const role: AppRole =
+        normalizeRole(me?.role) ??
+        normalizeRole(cookieMatch?.[1]) ??
+        "CLIENT";
+      const result = await completeOnboarding({ role, username });
+      if (result && "error" in result && result.error) {
         setError(result.error);
         return;
       }
-      if (result?.success) {
+      if (result && "success" in result && result.success) {
         localStorage.setItem("show_welcome", "1");
         router.push("/dashboard");
       }

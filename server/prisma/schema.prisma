@@ -6,13 +6,13 @@ datasource db {
   provider = "postgresql"
 }
 
-// ─── АККАУНТ ────────────────────────────────────────────────────────────────
+// ─── ACCOUNT ────────────────────────────────────────────────────────────────
 model User {
   id                  String                    @id @db.Uuid
   email               String                    @unique
   username            String?                   @unique
   avatarUrl           String?
-  role                Role                      @default(CUSTOMER)
+  role                Role                      @default(CLIENT)
   region              Region                    @default(GLOBAL)
   isBlocked           Boolean                   @default(false)
   onboardingCompleted Boolean                   @default(false)
@@ -21,24 +21,27 @@ model User {
 
   profile             Profile?
   privacy             PrivacySettings?
-  orders              Order[]                   @relation("OrderAuthor")
-  assignedOrders      Order[]                   @relation("OrderExecutor")
-  orderResponses      OrderResponse[]
-  offers              Offer[]
+  clientProjects      Project[]                 @relation("ProjectClient")
+  assignedProjects    Project[]                 @relation("ProjectFreelancer")
+  proposals           Proposal[]
+  solutions           Solution[]
   sentMessages        Message[]                 @relation("SentMessages")
   conversations       ConversationParticipant[]
   forumPosts          ForumPost[]
+  forumPostLikes      ForumPostLike[]
   forumComments       ForumComment[]
+  forumCommentLikes   ForumCommentLike[]
   reviewsGiven        Review[]                  @relation("ReviewsGiven")
   reviewsReceived     Review[]                  @relation("ReviewsReceived")
-  complaints          Complaint[]
+  reports             Report[]
   notifications       Notification[]
   favorites           Favorite[]
+  projectAlerts       ProjectAlert[]
   blockedUsers        BlockedUser[]             @relation("BlockedBy")
   blockedByUsers      BlockedUser[]             @relation("BlockedUser")
+  profileViewsMade    ProfileView[]             @relation("ProfileViewsByViewer")
 }
 
-// ─── НАСТРОЙКИ ПРИВАТНОСТИ ───────────────────────────────────────────────────
 model PrivacySettings {
   id              String  @id @default(uuid()) @db.Uuid
   userId          String  @unique              @db.Uuid
@@ -50,7 +53,7 @@ model PrivacySettings {
   lastSeenVisible Boolean @default(true)
 }
 
-// ─── ПРОФИЛЬ ────────────────────────────────────────────────────────────────
+// ─── PROFILE ──────────────────────────────────────────────────────────────────
 model Profile {
   id                     String          @id @default(uuid()) @db.Uuid
   userId                 String          @unique              @db.Uuid
@@ -71,9 +74,23 @@ model Profile {
   completedProjectsCount Int             @default(0)
   onlineStatus           Boolean         @default(false)
   lastSeenAt             DateTime?
+  viewCount              Int             @default(0)
   createdAt              DateTime        @default(now())
   updatedAt              DateTime        @updatedAt
   portfolioItems         PortfolioItem[]
+  profileViews           ProfileView[]
+}
+
+/// Who viewed a public profile (for stats + motivation to fill out profile).
+model ProfileView {
+  id        String   @id @default(uuid()) @db.Uuid
+  profileId String                         @db.Uuid
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  viewerId  String?                        @db.Uuid
+  viewer    User?    @relation("ProfileViewsByViewer", fields: [viewerId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+
+  @@index([profileId, createdAt])
 }
 
 model PortfolioItem {
@@ -88,8 +105,29 @@ model PortfolioItem {
   updatedAt DateTime @updatedAt
 }
 
-// ─── ЗАКАЗЫ ─────────────────────────────────────────────────────────────────
-model Order {
+// ─── TAXONOMY (industry + skills справочник) ─────────────────────────────────
+model Category {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique
+  slug      String   @unique
+  icon      String?
+  sortOrder Int      @default(0)
+  skills    Skill[]
+}
+
+model Skill {
+  id         String    @id @default(uuid()) @db.Uuid
+  name       String
+  slug       String    @unique
+  categoryId String?                        @db.Uuid
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  sortOrder  Int       @default(0)
+
+  @@index([categoryId])
+}
+
+// ─── PROJECTS (marketplace jobs) ──────────────────────────────────────────────
+model Project {
   id               String          @id @default(uuid()) @db.Uuid
   title            String
   shortDescription String?
@@ -101,52 +139,57 @@ model Order {
   country          String?
   language         String?
   workFormat       String?
-  status           OrderStatus     @default(OPEN)
-  authorId         String                          @db.Uuid
-  author           User            @relation("OrderAuthor", fields: [authorId], references: [id], onDelete: Cascade)
-  executorId       String?                         @db.Uuid
-  executor         User?           @relation("OrderExecutor", fields: [executorId], references: [id], onDelete: SetNull)
+  status           ProjectStatus   @default(OPEN)
+  clientId         String                          @db.Uuid
+  client           User            @relation("ProjectClient", fields: [clientId], references: [id], onDelete: Cascade)
+  freelancerId     String?                         @db.Uuid
+  freelancer       User?           @relation("ProjectFreelancer", fields: [freelancerId], references: [id], onDelete: SetNull)
   attachments      String[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
-  responses        OrderResponse[]
+  proposals        Proposal[]
   review           Review?
 }
 
-model OrderResponse {
-  id         String         @id @default(uuid()) @db.Uuid
-  orderId    String                               @db.Uuid
-  order      Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  executorId String                               @db.Uuid
-  executor   User           @relation(fields: [executorId], references: [id], onDelete: Cascade)
-  message    String?
-  status     ResponseStatus @default(PENDING)
-  createdAt  DateTime       @default(now())
-  updatedAt  DateTime       @updatedAt
+model Proposal {
+  id              String         @id @default(uuid()) @db.Uuid
+  projectId       String                               @db.Uuid
+  project         Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  freelancerId    String                               @db.Uuid
+  freelancer      User           @relation(fields: [freelancerId], references: [id], onDelete: Cascade)
+  coverLetter     String?
+  proposedBudget  String?
+  estimatedDays   Int?
+  status          ResponseStatus @default(PENDING)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  // Один фрилансер — один отклик на проект (защита на уровне БД)
+  @@unique([projectId, freelancerId])
 }
 
-// ─── ГОТОВЫЕ ПРЕДЛОЖЕНИЯ ─────────────────────────────────────────────────────
-model Offer {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String
-  industry    String?
-  description String
-  format      String?
-  price       String?
-  preview     String?
-  mediaUrls   String[]
-  tags        String[]
-  language    String?
-  country     String?
-  authorId    String                   @db.Uuid
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  viewsCount  Int      @default(0)
-  isPublished Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// ─── READY-MADE SOLUTIONS ─────────────────────────────────────────────────────
+model Solution {
+  id           String   @id @default(uuid()) @db.Uuid
+  title        String
+  industry     String?
+  description  String
+  format       String?
+  price        String?
+  preview      String?
+  mediaUrls    String[]
+  tags         String[]
+  language     String?
+  country      String?
+  freelancerId String                   @db.Uuid
+  freelancer   User     @relation(fields: [freelancerId], references: [id], onDelete: Cascade)
+  viewsCount   Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
-// ─── СООБЩЕНИЯ ───────────────────────────────────────────────────────────────
+// ─── MESSAGES ─────────────────────────────────────────────────────────────────
 model Conversation {
   id            String                    @id @default(uuid()) @db.Uuid
   participants  ConversationParticipant[]
@@ -177,7 +220,7 @@ model Message {
   createdAt      DateTime     @default(now())
 }
 
-// ─── ФОРУМ ───────────────────────────────────────────────────────────────────
+// ─── FORUM ────────────────────────────────────────────────────────────────────
 model ForumPost {
   id         String         @id @default(uuid()) @db.Uuid
   title      String
@@ -193,6 +236,19 @@ model ForumPost {
   createdAt  DateTime       @default(now())
   updatedAt  DateTime       @updatedAt
   comments   ForumComment[]
+  likes      ForumPostLike[]
+}
+
+/// Кто лайкнул тему — один лайк на пользователя, счётчик в ForumPost.likesCount
+model ForumPostLike {
+  userId    String    @db.Uuid
+  postId    String    @db.Uuid
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post      ForumPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
+
+  @@id([userId, postId])
+  @@index([postId])
 }
 
 model ForumComment {
@@ -208,9 +264,22 @@ model ForumComment {
   likesCount      Int            @default(0)
   createdAt       DateTime       @default(now())
   updatedAt       DateTime       @updatedAt
+  likes           ForumCommentLike[]
 }
 
-// ─── ОТЗЫВЫ, ЖАЛОБЫ, УВЕДОМЛЕНИЯ ────────────────────────────────────────────
+/// Лайк комментария — один на пользователя
+model ForumCommentLike {
+  userId    String       @db.Uuid
+  commentId String     @db.Uuid
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comment   ForumComment @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+
+  @@id([userId, commentId])
+  @@index([commentId])
+}
+
+// ─── REVIEWS, REPORTS, NOTIFICATIONS ─────────────────────────────────────────
 model Review {
   id         String   @id @default(uuid()) @db.Uuid
   rating     Int
@@ -219,19 +288,19 @@ model Review {
   fromUser   User     @relation("ReviewsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
   toUserId   String                   @db.Uuid
   toUser     User     @relation("ReviewsReceived", fields: [toUserId], references: [id], onDelete: Cascade)
-  orderId    String?  @unique         @db.Uuid
-  order      Order?   @relation(fields: [orderId], references: [id], onDelete: SetNull)
+  projectId  String?  @unique         @db.Uuid
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
   createdAt  DateTime @default(now())
 }
 
-model Complaint {
+model Report {
   id          String    @id @default(uuid()) @db.Uuid
   type        String
   targetId    String
   targetType  String
   description String?
-  authorId    String                     @db.Uuid
-  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reporterId  String                     @db.Uuid
+  reporter    User      @relation(fields: [reporterId], references: [id], onDelete: Cascade)
   status      String    @default("pending")
   resolvedAt  DateTime?
   resolvedBy  String?
@@ -248,9 +317,29 @@ model Notification {
   isRead    Boolean  @default(false)
   link      String?
   createdAt DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
 }
 
-// ─── ИЗБРАННОЕ И БЛОКИРОВКИ ──────────────────────────────────────────────────
+/// Подписка фрилансера на новые OPEN-проекты (Project alerts, бывш. Job alerts)
+model ProjectAlert {
+  id            String   @id @default(uuid()) @db.Uuid
+  userId        String                         @db.Uuid
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label         String?
+  industry      String?
+  country       String?
+  q             String?
+  tags          String[] @default([])
+  notifyByEmail Boolean  @default(true)
+  isActive      Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([userId, isActive])
+}
+
+// ─── FAVORITES & BLOCKS ───────────────────────────────────────────────────────
 model Favorite {
   id         String   @id @default(uuid()) @db.Uuid
   userId     String                         @db.Uuid
@@ -273,10 +362,10 @@ model BlockedUser {
   @@unique([blockedById, blockedId])
 }
 
-// ─── ENUMS ───────────────────────────────────────────────────────────────────
+// ─── ENUMS ────────────────────────────────────────────────────────────────────
 enum Role {
-  CUSTOMER
-  EXECUTOR
+  CLIENT
+  FREELANCER
   BOTH
   ADMIN
 }
@@ -286,7 +375,7 @@ enum Region {
   RU
 }
 
-enum OrderStatus {
+enum ProjectStatus {
   OPEN
   IN_PROGRESS
   COMPLETED

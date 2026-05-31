@@ -27,16 +27,28 @@
 
 | Слой | Технология |
 |------|-----------|
-| Frontend | Next.js 14+ (App Router), TypeScript, Tailwind CSS, shadcn/ui |
-| Backend | Next.js API Routes / Server Actions |
-| База данных | PostgreSQL |
-| ORM | Prisma |
+| **Frontend** | **Next.js 16** (App Router), TypeScript, Tailwind CSS, shadcn/ui — папка `client/` |
+| **Backend API** | **NestJS 10** — папка `server/`, префикс маршрутов `/api`, порт `4000` |
+| Связь UI ↔ API | Next.js **Server Actions** (`client/src/app/actions/`) → `client/src/lib/api.ts` → NestJS |
+| База данных | PostgreSQL (Supabase) |
+| ORM | Prisma (только в `server/`) |
 | Auth | Supabase Auth (OTP email + OAuth: Google, Apple, Facebook, Telegram) |
 | Realtime | Supabase Realtime (postgres_changes) |
 | Storage | Supabase Storage (аватары, медиа, портфолио) |
 | i18n | next-intl / i18next |
 | Auto-translation | Google Translate API / DeepL API |
-| Деплой | Vercel + Supabase cloud |
+| Деплой | Vercel (`client`) + хостинг Nest (`server`) + Supabase cloud |
+
+### Структура репозитория (monorepo)
+
+```
+AI-Marketplace/
+├── client/     # Next.js — UI, страницы, Server Actions
+├── server/     # NestJS — REST API, Prisma, бизнес-логика
+└── ТЗ_AI_Marketplace.md
+```
+
+**Важно:** бизнес-логика и работа с БД — в NestJS. Next.js не дублирует API Routes для доменных сущностей (заказы, форум и т.д.).
 
 ---
 

@@ -10,11 +10,14 @@ import { AppShell } from "@/components/app-shell";
 import {
   getSettings, updateAccount, updatePrivacy, deleteAccount,
 } from "@/app/actions/settings";
+import { getBlockedUsers, unblockUser, type BlockedUserRow } from "@/app/actions/blocks";
+import { messageUserName } from "@/lib/messages";
 import { useActiveMode } from "@/lib/use-active-mode";
 import { createClient } from "@/lib/supabase/client";
+import { normalizeRole } from "@/lib/roles";
 
-type Role = "CUSTOMER" | "EXECUTOR" | "BOTH";
-const ROLES: Role[] = ["CUSTOMER", "EXECUTOR", "BOTH"];
+type Role = "CLIENT" | "FREELANCER" | "BOTH";
+const ROLES: Role[] = ["CLIENT", "FREELANCER", "BOTH"];
 
 type Settings = Awaited<ReturnType<typeof getSettings>>;
 type Tab = "account" | "privacy" | "danger";
@@ -105,11 +108,11 @@ export default function SettingsPage() {
 
   // Account form
   const [username, setUsername] = useState("");
-  const [role, setRole] = useState<Role>("CUSTOMER");
+  const [role, setRole] = useState<Role>("CLIENT");
   const [accountSaving, setAccountSaving] = useState(false);
   const [accountMsg, setAccountMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
-  // Active mode (CUSTOMER/EXECUTOR toggle for BOTH role)
+  // Active mode (CLIENT/FREELANCER toggle for BOTH role)
   const { mode, setMode, mounted: modeMounted } = useActiveMode(data?.role);
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -123,16 +126,33 @@ export default function SettingsPage() {
   });
   const [privacySaving, setPrivacySaving] = useState(false);
   const [privacyMsg, setPrivacyMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const [blocked, setBlocked] = useState<BlockedUserRow[]>([]);
+  const [blockedLoading, setBlockedLoading] = useState(false);
+  const [unblockBusyId, setUnblockBusyId] = useState<string | null>(null);
 
   // Delete account
   const [deleteInput, setDeleteInput] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
+    if (activeTab !== "privacy") return;
+    let cancelled = false;
+    setBlockedLoading(true);
+    getBlockedUsers().then((res) => {
+      if (cancelled) return;
+      if (Array.isArray(res)) setBlocked(res);
+      setBlockedLoading(false);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [activeTab]);
+
+  useEffect(() => {
     getSettings().then((d) => {
       setData(d);
       setUsername(d.username ?? "");
-      setRole(d.role);
+      setRole((normalizeRole(d.role) ?? "CLIENT") as Role);
       setPrivacy({
         profileVisible: d.privacy?.profileVisible ?? true,
         onlineVisible: d.privacy?.onlineVisible ?? true,
@@ -146,7 +166,7 @@ export default function SettingsPage() {
   function cancelAccount() {
     if (!data) return;
     setUsername(data.username ?? "");
-    setRole(data.role);
+    setRole((normalizeRole(data.role) ?? "CLIENT") as Role);
     setAccountMsg(null);
   }
 
@@ -275,7 +295,7 @@ export default function SettingsPage() {
             {modeMounted && data.role === "BOTH" && (
               <Field icon={ToggleLeft} label="Active mode" hint="Which role you act as right now">
                 <div className="flex gap-2">
-                  {(["CUSTOMER", "EXECUTOR"] as const).map((m) => (
+                  {(["CLIENT", "FREELANCER"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => setMode(m)}
@@ -369,6 +389,46 @@ export default function SettingsPage() {
               >
                 Cancel
               </button>
+            </div>
+
+            <div className="border-t border-border/60 pt-5 space-y-3">
+              <p className="text-sm font-medium">Blocked users</p>
+              <p className="text-xs text-muted-foreground">
+                Blocked users cannot start or continue conversations with you.
+              </p>
+              {blockedLoading ? (
+                <Loader2 className="size-5 animate-spin text-muted-foreground" />
+              ) : blocked.length === 0 ? (
+                <p className="text-xs text-muted-foreground">No blocked users.</p>
+              ) : (
+                <ul className="space-y-2">
+                  {blocked.map((row) => (
+                    <li
+                      key={row.id}
+                      className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white/5 border border-border text-sm"
+                    >
+                      <span>{messageUserName(row.blocked)}</span>
+                      <button
+                        type="button"
+                        disabled={unblockBusyId === row.blockedId}
+                        onClick={async () => {
+                          setUnblockBusyId(row.blockedId);
+                          const res = await unblockUser(row.blockedId);
+                          setUnblockBusyId(null);
+                          if (!("error" in res && res.error)) {
+                            setBlocked((prev) =>
+                              prev.filter((b) => b.blockedId !== row.blockedId),
+                            );
+                          }
+                        }}
+                        className="text-xs text-primary hover:underline disabled:opacity-50"
+                      >
+                        Unblock
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           </Section>
         )}

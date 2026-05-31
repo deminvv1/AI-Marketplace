@@ -1,5 +1,9 @@
 import { createClient } from "@/lib/supabase/client";
 
+/**
+ * Единая точка HTTP к NestJS API.
+ * Подставляет Supabase access_token в Authorization — см. AuthGuard на сервере.
+ */
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
 
 async function getToken(): Promise<string | null> {
@@ -51,6 +55,5 @@ export const api = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body: unknown) => request<T>("POST", path, body),
   patch: <T>(path: string, body: unknown) => request<T>("PATCH", path, body),
-  delete: <T>(path: string) => request<T>("DELETE", path),
-  upload: <T>(path: string, formData: FormData) => upload<T>(path, formData),
+  delete: <T>(path: string, body?: unknown) => request<T>("DELETE", path, body),
 };

@@ -1,26 +1,31 @@
 import { useState, useEffect } from "react";
 
-export type ActiveMode = "CUSTOMER" | "EXECUTOR";
+import { normalizeRole, type AppRole } from "@/lib/roles";
+
+export type ActiveMode = "CLIENT" | "FREELANCER";
 
 export function useActiveMode(userRole?: string) {
-  const [mode, setModeState] = useState<ActiveMode>("CUSTOMER");
+  const [mode, setModeState] = useState<ActiveMode>("CLIENT");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem("activeMode") as ActiveMode | null;
-    // If user only has one role, lock mode to that role
-    if (userRole === "CUSTOMER") {
-      setModeState("CUSTOMER");
+    const role = normalizeRole(userRole) as AppRole | null;
+    if (role === "CLIENT") {
+      setModeState("CLIENT");
       return;
     }
-    if (userRole === "EXECUTOR") {
-      setModeState("EXECUTOR");
+    if (role === "FREELANCER") {
+      setModeState("FREELANCER");
       return;
     }
-    // BOTH — use saved preference or default to CUSTOMER
-    if (saved === "CUSTOMER" || saved === "EXECUTOR") {
+    if (saved === "CLIENT" || saved === "FREELANCER") {
       setModeState(saved);
+    } else if (saved === "CUSTOMER") {
+      setModeState("CLIENT");
+    } else if (saved === "EXECUTOR") {
+      setModeState("FREELANCER");
     }
   }, [userRole]);
 
