@@ -9,6 +9,9 @@ import {
 import { ReactNode, useEffect, useState } from "react";
 import { getMe } from "@/app/actions/me";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { createClient } from "@/lib/supabase/client";
+import { getSocket } from "@/lib/socket";
+import { usePresence } from "@/lib/use-presence";
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
@@ -37,6 +40,19 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
     const refresh = () => getMe().then(setMe);
     window.addEventListener("user-updated", refresh);
     return () => window.removeEventListener("user-updated", refresh);
+  }, []);
+
+  usePresence();
+
+  // Global WebSocket connection — connects once, stays alive across navigations
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      getSocket(session.access_token);
+    })();
+    // No cleanup here — socket must stay alive between page navigations
   }, []);
 
   const displayName =

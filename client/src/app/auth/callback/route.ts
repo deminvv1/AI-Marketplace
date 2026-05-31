@@ -41,11 +41,16 @@ export async function GET(request: Request) {
 
     const cookieStore = await cookies();
     const pendingRole = normalizeRole(cookieStore.get("pending_role")?.value);
+    const pendingCountry = cookieStore.get("pending_country")?.value
+      ? decodeURIComponent(cookieStore.get("pending_country")!.value)
+      : null;
     if (pendingRole) cookieStore.delete("pending_role");
+    if (pendingCountry) cookieStore.delete("pending_country");
 
     const initRes = await apiPost("/onboarding/init", token, {
       role: pendingRole ?? "CLIENT",
       avatarUrl: session.user.user_metadata?.avatar_url ?? null,
+      country: pendingCountry ?? null,
     });
 
     if (!initRes.ok) {

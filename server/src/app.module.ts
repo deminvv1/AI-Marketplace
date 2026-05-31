@@ -19,6 +19,7 @@ import { MessagesModule } from './messages/messages.module';
 import { ReportsModule } from './reports/reports.module';
 import { BlocksModule } from './blocks/blocks.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
+import { ChatModule } from './chat/chat.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { TaxonomyModule } from './taxonomy/taxonomy.module';
     MessagesModule,
     ReportsModule,
     BlocksModule,
+    ChatModule,
   ],
 })
 export class AppModule {}

@@ -9,12 +9,13 @@ export class OnboardingController {
   constructor(private onboarding: OnboardingService) {}
 
   @Post('init')
-  init(@CurrentUser() user: any, @Body() body: { role?: string; avatarUrl?: string }) {
+  init(@CurrentUser() user: any, @Body() body: { role?: string; avatarUrl?: string; country?: string }) {
     return this.onboarding.createIfNotExists(
       user.id,
       user.email,
       body.avatarUrl ?? user.user_metadata?.avatar_url ?? null,
       (body.role as any) ?? 'CLIENT',
+      body.country ?? null,
     );
   }
 

@@ -26,7 +26,7 @@ export class OnboardingService {
     return { success: true };
   }
 
-  async createIfNotExists(userId: string, email: string, avatarUrl: string | null, role: Role) {
+  async createIfNotExists(userId: string, email: string, avatarUrl: string | null, role: Role, country?: string | null) {
     const exists = await this.prisma.user.findUnique({ where: { id: userId } });
     if (exists) return exists;
 
@@ -36,7 +36,7 @@ export class OnboardingService {
         email,
         avatarUrl,
         role,
-        profile: { create: {} },
+        profile: { create: { country: country ?? null } },
         privacy: { create: {} },
       },
     });

@@ -47,6 +47,14 @@ export class UsersService {
     });
   }
 
+  async setOnlineStatus(userId: string, online: boolean) {
+    await this.prisma.profile.update({
+      where: { userId },
+      data: { onlineStatus: online, lastSeenAt: new Date() },
+    });
+    return { ok: true };
+  }
+
   async uploadAvatar(userId: string, file: UploadedFile) {
     const webp = await sharp(file.buffer)
       .resize(256, 256, { fit: 'cover', position: 'centre' })

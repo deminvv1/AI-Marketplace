@@ -216,6 +216,8 @@ export default function SettingsPage() {
 
   async function handleLogout() {
     setLoggingOut(true);
+    const { disconnectSocket } = await import("@/lib/socket");
+    disconnectSocket();
     const supabase = createClient();
     await supabase.auth.signOut();
     router.push("/register?signed-out=1");

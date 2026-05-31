@@ -47,4 +47,5 @@ export class UsersController {
   deleteAvatar(@CurrentUser() user: any) {
     return this.users.deleteAvatar(user.id);
   }
+
 }

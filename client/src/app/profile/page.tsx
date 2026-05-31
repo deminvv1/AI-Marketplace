@@ -16,6 +16,8 @@ import { getTaxonomy, type TaxonomyCategory } from "@/app/actions/taxonomy";
 import { CategoryMultiPicker } from "@/components/category-picker";
 import { PortfolioTab } from "@/app/profile/portfolio-tab";
 import { ReviewsList } from "@/components/reviews-list";
+import { uploadAvatar, deleteAvatar } from "@/app/actions/settings";
+import { AvatarUploadModal } from "@/components/avatar-upload-modal";
 import {
   Edit2, Save, X, Plus, Star, CheckCircle2,
   MessageCircle, Loader2, Globe, CalendarDays, Briefcase, Eye,
@@ -119,6 +121,26 @@ export default function ProfilePage() {
   const [completed, setCompleted] = useState<CompletedProjectsMine | null>(null);
   const [completedLoading, setCompletedLoading] = useState(false);
   const [completedError, setCompletedError] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+
+  async function handleAvatarUpload(file: File) {
+    setAvatarUploading(true);
+    const result = await uploadAvatar(file);
+    setAvatarUploading(false);
+    if (!("error" in result)) {
+      setData((prev: any) => prev ? { ...prev, avatarUrl: result.avatarUrl } : null);
+      window.dispatchEvent(new Event("user-updated"));
+    }
+  }
+
+  async function handleDeleteAvatar() {
+    setAvatarUploading(true);
+    await deleteAvatar();
+    setAvatarUploading(false);
+    setData((prev: any) => prev ? { ...prev, avatarUrl: null } : null);
+    window.dispatchEvent(new Event("user-updated"));
+  }
 
   useEffect(() => {
     if (activeTab !== "reviews" || !data?.id) return;
