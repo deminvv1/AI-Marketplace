@@ -16,6 +16,8 @@ import { getTaxonomy, type TaxonomyCategory } from "@/app/actions/taxonomy";
 import { CategoryMultiPicker } from "@/components/category-picker";
 import { PortfolioTab } from "@/app/profile/portfolio-tab";
 import { ReviewsList } from "@/components/reviews-list";
+import { uploadAvatar, deleteAvatar } from "@/app/actions/settings";
+import { AvatarUploadModal } from "@/components/avatar-upload-modal";
 import {
   Edit2, Save, X, Plus, Star, CheckCircle2,
   MessageCircle, Loader2, Globe, CalendarDays, Briefcase, Eye,
@@ -119,6 +121,26 @@ export default function ProfilePage() {
   const [completed, setCompleted] = useState<CompletedProjectsMine | null>(null);
   const [completedLoading, setCompletedLoading] = useState(false);
   const [completedError, setCompletedError] = useState<string | null>(null);
+  const [avatarUploading, setAvatarUploading] = useState(false);
+  const [avatarModalOpen, setAvatarModalOpen] = useState(false);
+
+  async function handleAvatarUpload(file: File) {
+    setAvatarUploading(true);
+    const result = await uploadAvatar(file);
+    setAvatarUploading(false);
+    if (!("error" in result)) {
+      setData((prev: any) => prev ? { ...prev, avatarUrl: result.avatarUrl } : null);
+      window.dispatchEvent(new Event("user-updated"));
+    }
+  }
+
+  async function handleDeleteAvatar() {
+    setAvatarUploading(true);
+    await deleteAvatar();
+    setAvatarUploading(false);
+    setData((prev: any) => prev ? { ...prev, avatarUrl: null } : null);
+    window.dispatchEvent(new Event("user-updated"));
+  }
 
   useEffect(() => {
     if (activeTab !== "reviews" || !data?.id) return;
@@ -218,6 +240,12 @@ export default function ProfilePage() {
 
   return (
     <AppShell title="">
+      {avatarModalOpen && (
+        <AvatarUploadModal
+          onClose={() => setAvatarModalOpen(false)}
+          onUpload={handleAvatarUpload}
+        />
+      )}
       {/* ── Break out of AppShell padding ── */}
       <div className="-mx-8 -mt-8">
 
@@ -232,8 +260,34 @@ export default function ProfilePage() {
           <div className="flex items-end gap-5 -mt-12">
 
             {/* Avatar */}
-            <div className="size-24 rounded-2xl bg-gradient-primary border-[3px] border-background grid place-items-center text-2xl font-bold text-white flex-shrink-0 glow-primary select-none z-10">
-              {initials}
+            <div className="relative flex-shrink-0 z-10">
+              <div className="size-24 rounded-2xl bg-gradient-primary border-[3px] border-background overflow-hidden grid place-items-center text-2xl font-bold text-white glow-primary select-none">
+                {data.avatarUrl
+                  ? <img src={data.avatarUrl} alt="avatar" className="size-full object-cover" />
+                  : initials
+                }
+                {avatarUploading && (
+                  <div className="absolute inset-0 rounded-2xl bg-black/50 grid place-items-center">
+                    <Loader2 className="size-6 text-white animate-spin" />
+                  </div>
+                )}
+              </div>
+              <button
+                onClick={() => setAvatarModalOpen(true)}
+                disabled={avatarUploading}
+                className="absolute -bottom-1.5 -right-1.5 size-7 rounded-full bg-primary border-2 border-background grid place-items-center hover:opacity-80 transition disabled:opacity-50"
+              >
+                <Plus className="size-3.5 text-white" />
+              </button>
+              {data.avatarUrl && (
+                <button
+                  onClick={handleDeleteAvatar}
+                  disabled={avatarUploading}
+                  className="absolute -top-1.5 -right-1.5 size-6 rounded-full bg-destructive border-2 border-background grid place-items-center hover:opacity-80 transition disabled:opacity-50"
+                >
+                  <X className="size-3 text-white" />
+                </button>
+              )}
             </div>
 
             <div className="flex-1 min-w-0 pb-1">
@@ -405,7 +459,7 @@ export default function ProfilePage() {
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {specTags.length > 0 ? (
-                        specTags.map((tag) => (
+                        specTags.map((tag: string) => (
                           <span key={tag} className="text-xs px-3 py-1 rounded-full bg-white/5 border border-border">
                             {tag}
                           </span>
@@ -423,7 +477,7 @@ export default function ProfilePage() {
                     Industries
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {industries.map((tag) => (
+                    {industries.map((tag: string) => (
                       <span
                         key={tag}
                         className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-white/5 border border-border"

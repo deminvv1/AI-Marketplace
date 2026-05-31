@@ -2,7 +2,7 @@
 
 import { Suspense, useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Mail, ArrowRight, Sparkles, CheckCircle2, Loader2, LogIn } from "lucide-react";
+import { Mail, ArrowRight, Sparkles, CheckCircle2, Loader2, LogIn, LogOut } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { checkEmail } from "@/app/actions/check-email";
 
@@ -16,12 +16,18 @@ function RegisterForm() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [signedOut, setSignedOut] = useState(false);
   const [existingAccount, setExistingAccount] = useState(false);
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const e = searchParams.get("error");
     if (e) setError(AUTH_ERRORS[e] ?? "Something went wrong. Please try again.");
+    if (searchParams.get("signed-out") === "1") {
+      setSignedOut(true);
+      const t = setTimeout(() => setSignedOut(false), 10000);
+      return () => clearTimeout(t);
+    }
   }, [searchParams]);
 
   async function handleEmailBlur() {
@@ -76,6 +82,13 @@ function RegisterForm() {
           </div>
           <span className="font-bold tracking-tight">AI Marketplace</span>
         </div>
+
+        {signedOut && (
+          <div className="mb-6 flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 border border-green-500/30 text-green-400">
+            <LogOut className="size-4 shrink-0" />
+            <p className="text-sm">You've been signed out successfully.</p>
+          </div>
+        )}
 
         {step === "sent" ? (
           <div className="flex flex-col items-center text-center py-4">

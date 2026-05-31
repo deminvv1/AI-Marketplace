@@ -6,6 +6,7 @@ export async function getMe() {
     return await api.get<{
       id: string;
       username: string | null;
+      avatarUrl: string | null;
       role: string;
       profile: { firstName: string | null; lastName: string | null; country: string | null } | null;
     }>("/users/me");

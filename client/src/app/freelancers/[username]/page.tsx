@@ -85,40 +85,47 @@ export default function FreelancerProfilePage() {
       </Link>
 
       <div className="rounded-3xl overflow-hidden glass">
+        {/* Banner */}
         <div
-          className="h-40 relative"
+          className="h-36 relative"
           style={{
             background:
               "linear-gradient(120deg, oklch(0.4 0.25 295) 0%, oklch(0.4 0.22 265) 50%, oklch(0.45 0.18 215) 100%)",
           }}
         />
-        <div className="p-6 pt-0 -mt-14 flex flex-wrap items-end gap-6">
-          <div className="relative">
+
+        {/* Avatar row — overlaps banner */}
+        <div className="px-6 -mt-14 flex items-end gap-4">
+          <div className="relative flex-shrink-0">
             {profile.avatarUrl ? (
               <img
                 src={profile.avatarUrl}
                 alt=""
-                className="size-28 rounded-2xl border-4 border-background object-cover"
+                className="size-24 rounded-2xl border-4 border-background object-cover"
               />
             ) : (
-              <div className="size-28 rounded-2xl bg-gradient-primary border-4 border-background grid place-items-center text-4xl font-bold glow-primary">
+              <div className="size-24 rounded-2xl bg-gradient-primary border-4 border-background grid place-items-center text-3xl font-bold glow-primary">
                 {initial}
               </div>
             )}
             {p?.onlineStatus && (
-              <span className="absolute bottom-2 right-2 size-4 rounded-full bg-success border-4 border-background" />
+              <span className="absolute bottom-2 right-2 size-3.5 rounded-full bg-green-500 border-2 border-background" />
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-3xl font-bold">{name}</h1>
+        </div>
+
+        {/* Name + actions row — always below banner */}
+        <div className="px-6 pt-3 pb-5 flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-bold">{name}</h1>
             {profile.username && (
-              <p className="text-muted-foreground">@{profile.username}</p>
+              <p className="text-sm text-muted-foreground mt-0.5">@{profile.username}</p>
             )}
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Stars value={p?.rating ?? 0} />
                 <span className="text-foreground font-medium">
-                  {p?.rating?.toFixed(1) ?? "0"}
+                  {p?.rating?.toFixed(1) ?? "0.0"}
                 </span>
                 · {p?.reviewsCount ?? 0} reviews
               </span>
@@ -134,8 +141,10 @@ export default function FreelancerProfilePage() {
               )}
             </div>
           </div>
-          <div className="flex flex-col gap-3 items-end">
-            <div className="flex flex-wrap gap-2 justify-end">
+
+          {/* Action buttons */}
+          <div className="flex flex-col items-end gap-2 flex-shrink-0">
+            <div className="flex items-center gap-2">
               <FavoriteButton targetId={profile.id} targetType="freelancer" />
               <Link
                 href={`/messages?with=${profile.id}`}
@@ -148,10 +157,7 @@ export default function FreelancerProfilePage() {
             <UserSafetyActions
               targetId={profile.id}
               targetType="user"
-              targetLabel={freelancerDisplayName({
-                username: profile.username,
-                profile: profile.profile,
-              })}
+              targetLabel={name}
             />
           </div>
         </div>

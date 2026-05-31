@@ -30,6 +30,24 @@ export async function updatePrivacy(data: {
   }
 }
 
+export async function deleteAvatar() {
+  try {
+    return await api.delete<{ success: boolean }>("/users/avatar");
+  } catch (e: any) {
+    return { error: e?.message || "Failed to delete." };
+  }
+}
+
+export async function uploadAvatar(file: File) {
+  try {
+    const form = new FormData();
+    form.append("avatar", file);
+    return await api.upload<{ avatarUrl: string }>("/users/avatar", form);
+  } catch (e: any) {
+    return { error: e?.message || "Upload failed." };
+  }
+}
+
 export async function deleteAccount() {
   try {
     await api.delete<{ success: boolean }>("/settings");

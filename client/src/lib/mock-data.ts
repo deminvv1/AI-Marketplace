@@ -3,7 +3,7 @@ export const COUNTRIES = [
   "Denmark","Egypt","Estonia","Finland","France","Germany","Greece","Hungary","Iceland","India",
   "Indonesia","Ireland","Israel","Italy","Japan","Kazakhstan","Kenya","Latvia","Lithuania","Luxembourg",
   "Malaysia","Mexico","Morocco","Netherlands","New Zealand","Nigeria","Norway","Pakistan","Peru","Philippines",
-  "Poland","Portugal","Qatar","Romania","Saudi Arabia","Serbia","Singapore","Slovakia","Slovenia","South Africa",
+  "Poland","Portugal","Qatar","Romania","Russia","Saudi Arabia","Serbia","Singapore","Slovakia","Slovenia","South Africa",
   "South Korea","Spain","Sweden","Switzerland","Thailand","Turkey","Ukraine","United Arab Emirates","United Kingdom","United States",
   "Uruguay","Vietnam"
 ];
@@ -12,7 +12,7 @@ export const FLAGS: Record<string,string> = {
   "United States":"🇺🇸","United Kingdom":"🇬🇧","Germany":"🇩🇪","France":"🇫🇷","Japan":"🇯🇵",
   "Spain":"🇪🇸","Italy":"🇮🇹","Canada":"🇨🇦","Brazil":"🇧🇷","Australia":"🇦🇺",
   "Netherlands":"🇳🇱","Sweden":"🇸🇪","Switzerland":"🇨🇭","Singapore":"🇸🇬","India":"🇮🇳",
-  "South Korea":"🇰🇷","Ukraine":"🇺🇦","Poland":"🇵🇱","Israel":"🇮🇱","Mexico":"🇲🇽",
+  "Russia":"🇷🇺","South Korea":"🇰🇷","Ukraine":"🇺🇦","Poland":"🇵🇱","Israel":"🇮🇱","Mexico":"🇲🇽",
 };
 export const flag = (c: string) => FLAGS[c] ?? "🌐";
 

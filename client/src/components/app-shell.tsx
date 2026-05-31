@@ -9,6 +9,9 @@ import {
 import { ReactNode, useEffect, useState } from "react";
 import { getMe } from "@/app/actions/me";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { createClient } from "@/lib/supabase/client";
+import { getSocket } from "@/lib/socket";
+import { usePresence } from "@/lib/use-presence";
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
@@ -34,6 +37,22 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
 
   useEffect(() => {
     getMe().then(setMe);
+    const refresh = () => getMe().then(setMe);
+    window.addEventListener("user-updated", refresh);
+    return () => window.removeEventListener("user-updated", refresh);
+  }, []);
+
+  usePresence();
+
+  // Global WebSocket connection — connects once, stays alive across navigations
+  useEffect(() => {
+    (async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+      getSocket(session.access_token);
+    })();
+    // No cleanup here — socket must stay alive between page navigations
   }, []);
 
   const displayName =
@@ -73,8 +92,11 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
         </nav>
         <div className="p-4 border-t border-border/60">
           <div className="glass rounded-xl p-3 flex items-center gap-3">
-            <div className="size-9 rounded-full bg-gradient-primary grid place-items-center text-sm font-semibold select-none">
-              {initials}
+            <div className="size-9 rounded-full bg-gradient-primary overflow-hidden grid place-items-center text-sm font-semibold select-none shrink-0">
+              {me?.avatarUrl
+                ? <img src={me.avatarUrl} alt="avatar" className="size-full object-cover" />
+                : initials
+              }
             </div>
             <div className="text-xs min-w-0">
               <div className="font-medium truncate">{displayName}</div>

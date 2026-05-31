@@ -15,6 +15,7 @@ import {
   type ConversationListItem,
 } from "@/app/actions/messages";
 import { formatMessageTime, messageUserName } from "@/lib/messages";
+import { useChatSocket } from "@/lib/use-chat-socket";
 import { Loader2, Send } from "lucide-react";
 
 function MessagesContent() {
@@ -103,60 +104,60 @@ function MessagesContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps -- open ?with= once on mount
   }, [withUserId]);
 
-  useEffect(() => {
-    if (!activeId) return;
-    const poll = setInterval(async () => {
-      const res = await getConversationMessages(activeId);
-      if (Array.isArray(res)) setMessages(res);
-    }, 4000);
-    return () => clearInterval(poll);
-  }, [activeId]);
-
-  useEffect(() => {
-    const poll = setInterval(() => {
-      void loadConversations();
-    }, 12000);
-    return () => clearInterval(poll);
-  }, [loadConversations]);
-
-  async function handleSend(e: React.FormEvent) {
-    e.preventDefault();
-    if (!activeId || !draft.trim()) return;
-    setSending(true);
-    setError(null);
-    const res = await sendMessage(activeId, draft.trim());
-    setSending(false);
-    if ("error" in res && res.error) {
-      setError(res.error);
-      return;
-    }
-    if (res && "id" in res) {
-      setMessages((prev) => [...prev, res]);
-      setDraft("");
-      const preview = draft.trim();
+  // WebSocket — real-time messages + presence
+  const { sendMessage: socketSend, connected } = useChatSocket({
+    conversationId: activeId,
+    onNewMessage: (msg) => {
+      setMessages((prev) => {
+        if (prev.some((m) => m.id === msg.id)) return prev;
+        return [...prev, msg as any];
+      });
       setConversations((prev) =>
         prev
           .map((c) =>
             c.id === activeId
-              ? {
-                  ...c,
-                  lastMessage: {
-                    id: res.id,
-                    content: preview,
-                    senderId: res.senderId,
-                    createdAt: res.createdAt,
-                    isRead: true,
-                  },
-                  lastMessageAt: res.createdAt,
-                }
+              ? { ...c, lastMessage: { id: msg.id, content: msg.content, senderId: msg.senderId, createdAt: msg.createdAt, isRead: false }, lastMessageAt: msg.createdAt }
               : c,
           )
-          .sort((a, b) => {
-            const ta = a.lastMessageAt ? new Date(a.lastMessageAt).getTime() : 0;
-            const tb = b.lastMessageAt ? new Date(b.lastMessageAt).getTime() : 0;
-            return tb - ta;
-          }),
+          .sort((a, b) => new Date(b.lastMessageAt ?? 0).getTime() - new Date(a.lastMessageAt ?? 0).getTime()),
       );
+    },
+    onPresence: (userId, online) => {
+      setConversations((prev) =>
+        prev.map((c) => {
+          if (c.otherUser?.id !== userId) return c;
+          const p = c.otherUser.profile;
+          return {
+            ...c,
+            otherUser: {
+              ...c.otherUser,
+              profile: p ? { ...p, onlineStatus: online } : p,
+            },
+          } as ConversationListItem;
+        }),
+      );
+    },
+  });
+
+  async function handleSend(e: React.FormEvent) {
+    e.preventDefault();
+    if (!activeId || !draft.trim()) return;
+    const content = draft.trim();
+    setDraft("");
+
+    if (connected) {
+      socketSend(activeId, content);
+      return;
+    }
+
+    // Fallback: HTTP if socket disconnected
+    setSending(true);
+    setError(null);
+    const res = await sendMessage(activeId, content);
+    setSending(false);
+    if ("error" in res && res.error) { setError(res.error); return; }
+    if (res && "id" in res) {
+      setMessages((prev) => [...prev, res]);
     }
   }
 

@@ -54,6 +54,7 @@ export default function WelcomePage({
 
   function handleRoleSelect(role: "CLIENT" | "FREELANCER") {
     document.cookie = `pending_role=${role}; path=/; max-age=3600`;
+    document.cookie = `pending_country=${encodeURIComponent(country)}; path=/; max-age=3600`;
     router.push("/register");
   }
 

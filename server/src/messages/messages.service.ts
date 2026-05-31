@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { BlocksService } from '../blocks/blocks.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { SendMessageDto } from './dto/send-message.dto';
 
 const participantUserSelect = {
@@ -25,6 +26,7 @@ export class MessagesService {
   constructor(
     private prisma: PrismaService,
     private blocks: BlocksService,
+    private notifications: NotificationsService,
   ) {}
 
   private async assertParticipant(conversationId: string, userId: string) {
@@ -235,26 +237,38 @@ export class MessagesService {
     const content = dto.content.trim();
     const now = new Date();
 
-    return this.prisma.$transaction(async (tx) => {
-      const message = await tx.message.create({
-        data: {
-          conversationId,
-          senderId: userId,
-          content,
-        },
+    const message = await this.prisma.$transaction(async (tx) => {
+      const msg = await tx.message.create({
+        data: { conversationId, senderId: userId, content },
         select: {
-          id: true,
-          content: true,
-          senderId: true,
-          isRead: true,
-          createdAt: true,
+          id: true, content: true, senderId: true, isRead: true, createdAt: true,
         },
       });
       await tx.conversation.update({
         where: { id: conversationId },
         data: { lastMessageAt: now },
       });
-      return message;
+      return msg;
     });
+
+    // Уведомление получателю (fire-and-forget)
+    if (otherParticipant) {
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: { username: true, profile: { select: { firstName: true, lastName: true } } },
+      }).then((sender) => {
+        const senderName = [sender?.profile?.firstName, sender?.profile?.lastName]
+          .filter(Boolean).join(' ') || sender?.username || 'Someone';
+        return this.notifications.create({
+          userId: otherParticipant.userId,
+          type: 'NEW_MESSAGE',
+          title: `New message from ${senderName}`,
+          body: content.slice(0, 100),
+          link: '/messages',
+        });
+      }).catch(() => {});
+    }
+
+    return message;
   }
 }
