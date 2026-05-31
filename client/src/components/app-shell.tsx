@@ -28,6 +28,9 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
 
   useEffect(() => {
     getMe().then(setMe);
+    const refresh = () => getMe().then(setMe);
+    window.addEventListener("user-updated", refresh);
+    return () => window.removeEventListener("user-updated", refresh);
   }, []);
 
   const displayName =
@@ -67,8 +70,11 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
         </nav>
         <div className="p-4 border-t border-border/60">
           <div className="glass rounded-xl p-3 flex items-center gap-3">
-            <div className="size-9 rounded-full bg-gradient-primary grid place-items-center text-sm font-semibold select-none">
-              {initials}
+            <div className="size-9 rounded-full bg-gradient-primary overflow-hidden grid place-items-center text-sm font-semibold select-none shrink-0">
+              {me?.avatarUrl
+                ? <img src={me.avatarUrl} alt="avatar" className="size-full object-cover" />
+                : initials
+              }
             </div>
             <div className="text-xs min-w-0">
               <div className="font-medium truncate">{displayName}</div>

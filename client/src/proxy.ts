@@ -36,7 +36,7 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith("/auth");
 
   if (!user && !isPublic) {
-    return NextResponse.redirect(new URL("/register", request.url));
+    return NextResponse.redirect(new URL("/register?signed-out=1", request.url));
   }
 
   if (user && pathname === "/register") {

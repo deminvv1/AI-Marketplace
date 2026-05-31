@@ -172,6 +172,7 @@ export default function SettingsPage() {
     } else {
       setAccountMsg({ ok: true, text: "Account settings saved." });
       setData((prev: any) => prev ? { ...prev, username, role } : null);
+      window.dispatchEvent(new Event("user-updated"));
     }
   }
 
@@ -197,7 +198,7 @@ export default function SettingsPage() {
     setLoggingOut(true);
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push("/register");
+    router.push("/register?signed-out=1");
   }
 
   if (!data) {
