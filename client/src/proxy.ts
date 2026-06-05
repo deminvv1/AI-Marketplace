@@ -1,65 +1,7 @@
-import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const LEGACY_ROUTES: Record<string, string> = {
-  "/orders": "/projects",
-  "/post-order": "/projects/new",
-  "/executors": "/freelancers",
-  "/offers": "/solutions",
-};
-
-export async function proxy(request: NextRequest) {
-  try {
-    const pathname = request.nextUrl.pathname;
-    const legacy = LEGACY_ROUTES[pathname];
-    if (legacy) {
-      return NextResponse.redirect(new URL(legacy, request.url));
-    }
-
-    let supabaseResponse = NextResponse.next({ request });
-
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-      {
-        cookies: {
-          getAll() {
-            return request.cookies.getAll();
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value }) =>
-              request.cookies.set(name, value)
-            );
-            supabaseResponse = NextResponse.next({ request });
-            cookiesToSet.forEach(({ name, value, options }) =>
-              supabaseResponse.cookies.set(name, value, options)
-            );
-          },
-        },
-      }
-    );
-
-    const { data: { session } } = await supabase.auth.getSession();
-    const user = session?.user ?? null;
-
-    const isPublic =
-      pathname === "/" ||
-      pathname === "/register" ||
-      pathname.startsWith("/welcome") ||
-      pathname.startsWith("/auth");
-
-    if (!user && !isPublic) {
-      return NextResponse.redirect(new URL("/register?signed-out=1", request.url));
-    }
-
-    if (user && pathname === "/register") {
-      return NextResponse.redirect(new URL("/dashboard", request.url));
-    }
-
-    return supabaseResponse;
-  } catch {
-    return NextResponse.next({ request });
-  }
+export function proxy(_request: NextRequest) {
+  return NextResponse.next();
 }
 
 export const config = {
