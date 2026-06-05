@@ -59,7 +59,7 @@ export default function WelcomePage({
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-6 py-16">
+    <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4 py-8 md:px-6 md:py-16">
       {/* Three.js Globe */}
       <div className="absolute inset-0" aria-hidden="true">
         <EarthGlobe
@@ -83,21 +83,17 @@ export default function WelcomePage({
           Country selected · {flag(country)} {country}
         </span>
 
-        <h1 className="mt-8 text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
-          {"You've arrived at the first"}
-          <br />
-          <span className="text-gradient">international platform</span>
-          <br />
-          uniting AI specialists and clients
-          <br />
-          from around the world.
+        <h1 className="mt-4 md:mt-8 text-3xl sm:text-4xl md:text-6xl font-extrabold tracking-tight leading-[1.1]">
+          {"You've arrived at the first"}{" "}
+          <span className="text-gradient">international platform</span>{" "}
+          uniting AI specialists and clients from around the world.
         </h1>
-        <p className="mt-6 text-muted-foreground text-lg max-w-2xl mx-auto">
+        <p className="mt-4 md:mt-6 text-muted-foreground text-sm md:text-lg max-w-2xl mx-auto">
           Join us — build, hire, learn and ship the next generation of AI
           products together.
         </p>
 
-        <div className="mt-12 grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
+        <div className="mt-6 md:mt-12 grid md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">
           {isAuthed === null ? (
             <div className="md:col-span-2 h-[200px]" />
           ) : isAuthed ? (
@@ -162,7 +158,7 @@ export default function WelcomePage({
           )}
         </div>
 
-        <div className="mt-20">
+        <div className="mt-10 md:mt-20">
           <h2 className="text-sm uppercase tracking-[0.4em] text-muted-foreground">
             Platform sections
           </h2>

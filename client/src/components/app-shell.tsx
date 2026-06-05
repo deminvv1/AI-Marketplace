@@ -62,9 +62,18 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
   const initials = displayName.slice(0, 2).toUpperCase();
   const roleLine = [me?.role ?? "", me?.profile?.country ?? ""].filter(Boolean).join(" · ");
 
+  const BOTTOM_NAV = [
+    { to: "/dashboard", label: "Home", icon: LayoutDashboard },
+    { to: "/projects", label: "Projects", icon: ClipboardList },
+    { to: "/search", label: "Search", icon: Search },
+    { to: "/messages", label: "Messages", icon: MessageCircle },
+    { to: "/profile", label: "Profile", icon: User },
+  ];
+
   return (
     <div className="min-h-screen flex">
-      <aside className="w-64 shrink-0 border-r border-border/60 bg-sidebar/60 backdrop-blur-2xl flex flex-col sticky top-0 h-screen">
+      {/* Sidebar — desktop only */}
+      <aside className="hidden md:flex w-64 shrink-0 border-r border-border/60 bg-sidebar/60 backdrop-blur-2xl flex-col sticky top-0 h-screen">
         <div className="px-6 py-5 flex items-center gap-2">
           <div className="size-9 rounded-xl bg-gradient-primary grid place-items-center glow-primary">
             <Sparkles className="size-5 text-white" />
@@ -105,9 +114,17 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
           </div>
         </div>
       </aside>
+
+      {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-16 border-b border-border/60 px-8 flex items-center gap-4 sticky top-0 z-30 bg-background/60 backdrop-blur-xl">
-          <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
+        <header className="h-14 md:h-16 border-b border-border/60 px-4 md:px-8 flex items-center gap-4 sticky top-0 z-30 bg-background/60 backdrop-blur-xl">
+          {/* Mobile: logo */}
+          <div className="md:hidden flex items-center gap-2">
+            <div className="size-7 rounded-lg bg-gradient-primary grid place-items-center glow-primary">
+              <Sparkles className="size-4 text-white" />
+            </div>
+          </div>
+          <h1 className="text-sm md:text-lg font-semibold tracking-tight truncate">{title}</h1>
           <div className="flex-1" />
           <form
             className="relative w-72 max-w-full hidden md:block"
@@ -127,8 +144,26 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
           </form>
           <NotificationsBell />
         </header>
-        <main className="flex-1 p-8">{children}</main>
+        <main className="flex-1 p-4 md:p-8 pb-24 md:pb-8">{children}</main>
       </div>
+
+      {/* Bottom nav — mobile only */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 border-t border-border/60 bg-sidebar/80 backdrop-blur-2xl">
+        <div className="flex items-center justify-around px-2 py-2 safe-area-pb">
+          {BOTTOM_NAV.map(({ to, label, icon: Icon }) => {
+            const active = pathname === to || (to !== "/dashboard" && pathname.startsWith(to));
+            return (
+              <Link key={to} href={to}
+                className={`flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all ${
+                  active ? "text-primary" : "text-muted-foreground"
+                }`}>
+                <Icon className={`size-5 ${active ? "glow-primary" : ""}`} />
+                <span className="text-[10px] font-medium">{label}</span>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
     </div>
   );
 }

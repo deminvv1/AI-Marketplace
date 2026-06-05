@@ -43,8 +43,15 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     container.appendChild(renderer.domElement);
 
+    // On narrow (portrait) screens widen the FOV so the globe fits horizontally
+    function computeFov(aspect: number) {
+      if (aspect >= 0.9) return 45;
+      const halfAngle = 22 * (Math.PI / 180);
+      return Math.min(110, 2 * Math.atan(Math.tan(halfAngle) / aspect) * (180 / Math.PI));
+    }
+
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(45, W / H, 0.01, 500);
+    const camera = new THREE.PerspectiveCamera(computeFov(W / H), W / H, 0.01, 500);
     camera.position.set(0, 0, 3.6);
 
     // ── Stars ──────────────────────────────────────────────────────────────
@@ -163,7 +170,9 @@ export default function LandingGlobe({ selectedCountry }: Props) {
 
     // ── Brand Text Ring ────────────────────────────────────────────────────
     const BRAND_TEXT = "AI  MARKETPLACE  ·  AI  MARKETPLACE  ·  ";
-    const RING_R = 1.3;
+    const isMobile = W < 768;
+    const RING_R = isMobile ? 1.45 : 1.3;
+    const LETTER_SIZE = isMobile ? 0.13 : 0.085;
     const brandRing = new THREE.Group();
     brandRing.rotation.x = 0.18; // slight Saturn-like tilt
 
@@ -183,10 +192,11 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       const mat = new THREE.MeshBasicMaterial({
         map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false,
       });
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.085, 0.085), mat);
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(LETTER_SIZE, LETTER_SIZE), mat);
 
       const angle = -(i / BRAND_TEXT.length) * Math.PI * 2;
       mesh.position.set(-Math.sin(angle) * RING_R, 0, Math.cos(angle) * RING_R);
+
       mesh.rotation.y = -angle;
 
       brandRing.add(mesh);
@@ -291,6 +301,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       W = container.clientWidth;
       H = container.clientHeight;
       camera.aspect = W / H;
+      camera.fov = computeFov(W / H);
       camera.updateProjectionMatrix();
       renderer.setSize(W, H);
     };
