@@ -9,36 +9,36 @@ const LEGACY_ROUTES: Record<string, string> = {
 };
 
 export async function proxy(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
-  const legacy = LEGACY_ROUTES[pathname];
-  if (legacy) {
-    return NextResponse.redirect(new URL(legacy, request.url));
-  }
-
-  let supabaseResponse = NextResponse.next({ request });
-
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return request.cookies.getAll();
-        },
-        setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
-          );
-          supabaseResponse = NextResponse.next({ request });
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          );
-        },
-      },
-    }
-  );
-
   try {
+    const pathname = request.nextUrl.pathname;
+    const legacy = LEGACY_ROUTES[pathname];
+    if (legacy) {
+      return NextResponse.redirect(new URL(legacy, request.url));
+    }
+
+    let supabaseResponse = NextResponse.next({ request });
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return request.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            cookiesToSet.forEach(({ name, value }) =>
+              request.cookies.set(name, value)
+            );
+            supabaseResponse = NextResponse.next({ request });
+            cookiesToSet.forEach(({ name, value, options }) =>
+              supabaseResponse.cookies.set(name, value, options)
+            );
+          },
+        },
+      }
+    );
+
     const { data: { session } } = await supabase.auth.getSession();
     const user = session?.user ?? null;
 
@@ -55,11 +55,11 @@ export async function proxy(request: NextRequest) {
     if (user && pathname === "/register") {
       return NextResponse.redirect(new URL("/dashboard", request.url));
     }
+
+    return supabaseResponse;
   } catch {
     return NextResponse.next({ request });
   }
-
-  return supabaseResponse;
 }
 
 export const config = {
