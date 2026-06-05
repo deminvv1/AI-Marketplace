@@ -38,21 +38,25 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const { data: { session } } = await supabase.auth.getSession();
-  const user = session?.user ?? null;
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    const user = session?.user ?? null;
 
-  const isPublic =
-    pathname === "/" ||
-    pathname === "/register" ||
-    pathname.startsWith("/welcome") ||
-    pathname.startsWith("/auth");
+    const isPublic =
+      pathname === "/" ||
+      pathname === "/register" ||
+      pathname.startsWith("/welcome") ||
+      pathname.startsWith("/auth");
 
-  if (!user && !isPublic) {
-    return NextResponse.redirect(new URL("/register?signed-out=1", request.url));
-  }
+    if (!user && !isPublic) {
+      return NextResponse.redirect(new URL("/register?signed-out=1", request.url));
+    }
 
-  if (user && pathname === "/register") {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    if (user && pathname === "/register") {
+      return NextResponse.redirect(new URL("/dashboard", request.url));
+    }
+  } catch {
+    return NextResponse.next({ request });
   }
 
   return supabaseResponse;
