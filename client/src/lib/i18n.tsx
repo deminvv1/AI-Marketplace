@@ -8,9 +8,9 @@ import {
   type ReactNode,
 } from "react";
 
-export type Locale = "en" | "ru" | "zh" | "de" | "es" | "fr" | "tr" | "hi";
+export type Locale = "en" | "ru" | "zh" | "de" | "es" | "fr" | "tr" | "hi" | "pt" | "ar" | "ja" | "id";
 
-export const LOCALES: { code: Locale; label: string; flag: string; native: string }[] = [
+export const LOCALES: { code: Locale; label: string; flag: string; native: string; rtl?: boolean }[] = [
   { code: "en", label: "English",    flag: "🇬🇧", native: "EN" },
   { code: "ru", label: "Русский",    flag: "🇷🇺", native: "RU" },
   { code: "zh", label: "中文",        flag: "🇨🇳", native: "ZH" },
@@ -19,6 +19,10 @@ export const LOCALES: { code: Locale; label: string; flag: string; native: strin
   { code: "fr", label: "Français",   flag: "🇫🇷", native: "FR" },
   { code: "tr", label: "Türkçe",     flag: "🇹🇷", native: "TR" },
   { code: "hi", label: "हिन्दी",      flag: "🇮🇳", native: "HI" },
+  { code: "pt", label: "Português",  flag: "🇧🇷", native: "PT" },
+  { code: "ar", label: "العربية",    flag: "🇸🇦", native: "AR", rtl: true },
+  { code: "ja", label: "日本語",      flag: "🇯🇵", native: "JA" },
+  { code: "id", label: "Indonesia",  flag: "🇮🇩", native: "ID" },
 ];
 
 const en = {
@@ -529,6 +533,258 @@ const translations: Record<Locale, Dict> = {
       desc:  "एक अप्रत्याशित त्रुटि हुई। कृपया पुनः प्रयास करें या होम पर जाएं।",
     },
   },
+
+  pt: {
+    nav: {
+      dashboard:    "Painel",
+      search:       "Buscar",
+      projects:     "Projetos",
+      proposals:    "Minhas propostas",
+      freelancers:  "Freelancers",
+      saved:        "Salvos",
+      solutions:    "Soluções",
+      forum:        "Fórum",
+      messages:     "Mensagens",
+      profile:      "Perfil",
+      settings:     "Configurações",
+    },
+    header: {
+      search_placeholder: "Buscar…",
+    },
+    notifications: {
+      title:         "Notificações",
+      mark_all_read: "Marcar tudo como lido",
+      empty:         "Sem notificações ainda.",
+      open:          "Abrir",
+    },
+    common: {
+      save:        "Salvar",
+      cancel:      "Cancelar",
+      edit:        "Editar perfil",
+      loading:     "Carregando…",
+      go_home:     "Ir para início",
+      try_again:   "Tentar novamente",
+      go_back:     "Voltar",
+      view_all:    "Ver tudo",
+      post_project:"Publicar projeto",
+      publish:     "Publicar",
+      write:       "Escrever",
+      send:        "Enviar",
+      submit:      "Enviar",
+      delete:      "Excluir",
+      report:      "Denunciar",
+      block:       "Bloquear",
+    },
+    empty: {
+      no_projects_title: "Nenhum projeto encontrado",
+      no_projects_desc:  "Nenhum projeto corresponde aos filtros. Ajuste-os ou publique um novo projeto.",
+      no_solutions_title:"Nenhuma solução encontrada",
+      no_solutions_desc: "Sem soluções disponíveis. Seja o primeiro a publicar uma solução de IA.",
+      no_forum_title:    "Nenhum tópico ainda",
+      no_forum_desc:     "Seja o primeiro a iniciar uma discussão nesta comunidade.",
+      no_convos_title:   "Nenhuma conversa",
+      no_convos_desc:    "Abra um perfil de freelancer e clique em Escrever para começar.",
+      no_saved_title:    "Nenhum freelancer salvo",
+      no_saved_desc:     "Explore os freelancers e salve os que lhe interessam.",
+    },
+    not_found: {
+      title: "Página não encontrada",
+      desc:  "A página que você procura não existe, foi movida ou está temporariamente indisponível.",
+    },
+    error: {
+      title: "Algo deu errado",
+      desc:  "Ocorreu um erro inesperado. Tente novamente ou volte ao início.",
+    },
+  },
+
+  ar: {
+    nav: {
+      dashboard:    "لوحة التحكم",
+      search:       "بحث",
+      projects:     "المشاريع",
+      proposals:    "عروضي",
+      freelancers:  "المستقلون",
+      saved:        "المحفوظات",
+      solutions:    "الحلول",
+      forum:        "المنتدى",
+      messages:     "الرسائل",
+      profile:      "الملف الشخصي",
+      settings:     "الإعدادات",
+    },
+    header: {
+      search_placeholder: "ابحث…",
+    },
+    notifications: {
+      title:         "الإشعارات",
+      mark_all_read: "تعيين الكل كمقروء",
+      empty:         "لا توجد إشعارات بعد.",
+      open:          "فتح",
+    },
+    common: {
+      save:        "حفظ",
+      cancel:      "إلغاء",
+      edit:        "تعديل الملف الشخصي",
+      loading:     "جار التحميل…",
+      go_home:     "الذهاب للرئيسية",
+      try_again:   "المحاولة مجددًا",
+      go_back:     "رجوع",
+      view_all:    "عرض الكل",
+      post_project:"نشر مشروع",
+      publish:     "نشر",
+      write:       "كتابة",
+      send:        "إرسال",
+      submit:      "إرسال",
+      delete:      "حذف",
+      report:      "إبلاغ",
+      block:       "حظر",
+    },
+    empty: {
+      no_projects_title: "لم يتم العثور على مشاريع",
+      no_projects_desc:  "لا توجد مشاريع تطابق الفلاتر. عدّل الفلاتر أو انشر مشروعًا جديدًا.",
+      no_solutions_title:"لم يتم العثور على حلول",
+      no_solutions_desc: "لا توجد حلول متاحة. كن أول من ينشر حلًا للذكاء الاصطناعي.",
+      no_forum_title:    "لا توجد موضوعات بعد",
+      no_forum_desc:     "كن أول من يبدأ نقاشًا في هذا المجتمع.",
+      no_convos_title:   "لا توجد محادثات",
+      no_convos_desc:    "افتح ملف مستقل واضغط على كتابة لبدء محادثة.",
+      no_saved_title:    "لا يوجد مستقلون محفوظون",
+      no_saved_desc:     "تصفح المستقلين واحفظ من تريد العمل معهم.",
+    },
+    not_found: {
+      title: "الصفحة غير موجودة",
+      desc:  "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+    },
+    error: {
+      title: "حدث خطأ ما",
+      desc:  "حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى أو العودة للرئيسية.",
+    },
+  },
+
+  ja: {
+    nav: {
+      dashboard:    "ダッシュボード",
+      search:       "検索",
+      projects:     "プロジェクト",
+      proposals:    "提案",
+      freelancers:  "フリーランサー",
+      saved:        "保存済み",
+      solutions:    "ソリューション",
+      forum:        "フォーラム",
+      messages:     "メッセージ",
+      profile:      "プロフィール",
+      settings:     "設定",
+    },
+    header: {
+      search_placeholder: "検索…",
+    },
+    notifications: {
+      title:         "通知",
+      mark_all_read: "すべて既読にする",
+      empty:         "まだ通知はありません。",
+      open:          "開く",
+    },
+    common: {
+      save:        "保存",
+      cancel:      "キャンセル",
+      edit:        "プロフィール編集",
+      loading:     "読み込み中…",
+      go_home:     "ホームへ戻る",
+      try_again:   "再試行",
+      go_back:     "戻る",
+      view_all:    "すべて見る",
+      post_project:"プロジェクト投稿",
+      publish:     "公開",
+      write:       "書く",
+      send:        "送信",
+      submit:      "送信",
+      delete:      "削除",
+      report:      "報告",
+      block:       "ブロック",
+    },
+    empty: {
+      no_projects_title: "プロジェクトが見つかりません",
+      no_projects_desc:  "フィルターに一致するプロジェクトがありません。条件を変更するか新しいプロジェクトを投稿してください。",
+      no_solutions_title:"ソリューションが見つかりません",
+      no_solutions_desc: "ソリューションがありません。最初のAIソリューションを公開しましょう。",
+      no_forum_title:    "まだトピックがありません",
+      no_forum_desc:     "このコミュニティで最初のディスカッションを始めましょう。",
+      no_convos_title:   "まだ会話がありません",
+      no_convos_desc:    "フリーランサーのプロフィールを開き「書く」をクリックしてください。",
+      no_saved_title:    "保存済みフリーランサーなし",
+      no_saved_desc:     "フリーランサーを閲覧して気に入った方を保存してください。",
+    },
+    not_found: {
+      title: "ページが見つかりません",
+      desc:  "お探しのページは存在しないか、移動されました。",
+    },
+    error: {
+      title: "エラーが発生しました",
+      desc:  "予期しないエラーが発生しました。再試行するかホームへ戻ってください。",
+    },
+  },
+
+  id: {
+    nav: {
+      dashboard:    "Dasbor",
+      search:       "Cari",
+      projects:     "Proyek",
+      proposals:    "Proposal Saya",
+      freelancers:  "Freelancer",
+      saved:        "Tersimpan",
+      solutions:    "Solusi",
+      forum:        "Forum",
+      messages:     "Pesan",
+      profile:      "Profil",
+      settings:     "Pengaturan",
+    },
+    header: {
+      search_placeholder: "Cari…",
+    },
+    notifications: {
+      title:         "Notifikasi",
+      mark_all_read: "Tandai semua telah dibaca",
+      empty:         "Belum ada notifikasi.",
+      open:          "Buka",
+    },
+    common: {
+      save:        "Simpan",
+      cancel:      "Batal",
+      edit:        "Edit Profil",
+      loading:     "Memuat…",
+      go_home:     "Ke Beranda",
+      try_again:   "Coba Lagi",
+      go_back:     "Kembali",
+      view_all:    "Lihat Semua",
+      post_project:"Pasang Proyek",
+      publish:     "Publikasikan",
+      write:       "Tulis",
+      send:        "Kirim",
+      submit:      "Kirim",
+      delete:      "Hapus",
+      report:      "Laporkan",
+      block:       "Blokir",
+    },
+    empty: {
+      no_projects_title: "Tidak ada proyek ditemukan",
+      no_projects_desc:  "Tidak ada proyek yang sesuai filter. Sesuaikan filter atau pasang proyek baru.",
+      no_solutions_title:"Tidak ada solusi ditemukan",
+      no_solutions_desc: "Belum ada solusi tersedia. Jadilah yang pertama menerbitkan solusi AI.",
+      no_forum_title:    "Belum ada topik",
+      no_forum_desc:     "Jadilah yang pertama memulai diskusi di komunitas ini.",
+      no_convos_title:   "Belum ada percakapan",
+      no_convos_desc:    "Buka profil freelancer dan klik Tulis untuk memulai percakapan.",
+      no_saved_title:    "Tidak ada freelancer tersimpan",
+      no_saved_desc:     "Jelajahi freelancer dan simpan yang ingin Anda ajak bekerja sama.",
+    },
+    not_found: {
+      title: "Halaman tidak ditemukan",
+      desc:  "Halaman yang Anda cari tidak ada, dipindahkan, atau tidak tersedia sementara.",
+    },
+    error: {
+      title: "Ada yang salah",
+      desc:  "Terjadi kesalahan tak terduga. Coba lagi atau kembali ke halaman aman.",
+    },
+  },
 };
 
 // ── Context ──────────────────────────────────────────────────────────────────
@@ -559,7 +815,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const isRtl = LOCALES.find((l) => l.code === locale)?.rtl;
     document.documentElement.setAttribute("lang", locale);
+    document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
   }, [locale]);
 
   function setLocale(l: Locale) {

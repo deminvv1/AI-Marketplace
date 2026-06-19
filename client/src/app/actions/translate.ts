@@ -11,6 +11,10 @@ const LOCALE_TO_LANG: Record<Locale, string> = {
   fr: "fr",
   tr: "tr",
   hi: "hi",
+  pt: "pt",
+  ar: "ar",
+  ja: "ja",
+  id: "id",
 };
 
 export async function translateText(
