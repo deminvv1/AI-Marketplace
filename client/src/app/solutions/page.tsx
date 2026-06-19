@@ -16,7 +16,8 @@ import { useTaxonomy } from "@/lib/use-taxonomy";
 import { skillLabel } from "@/lib/taxonomy";
 import { solutionAuthorName, SOLUTION_FORMATS } from "@/lib/solutions";
 import { Stars } from "@/components/ui-bits";
-import { Loader2, Plus, Search } from "lucide-react";
+import { Loader2, Plus, Search, ShoppingBag } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 
 const gradients = [
   "linear-gradient(135deg,#1e293b,#6366f1)",
@@ -135,12 +136,14 @@ export default function SolutionsPage() {
       {error && <p className="text-sm text-destructive">{error}</p>}
 
       {!loading && !error && items.length === 0 && (
-        <p className="text-sm text-muted-foreground glass rounded-2xl p-6 text-center">
-          No solutions yet.{" "}
-          <Link href="/solutions/new" className="text-primary hover:underline">
-            Publish the first one
-          </Link>
-        </p>
+        <div className="glass rounded-2xl">
+          <EmptyState
+            icon={ShoppingBag}
+            title="No solutions found"
+            description="No solutions match your filters. Be the first to publish an AI solution."
+            action={{ label: "Publish a solution", href: "/solutions/new" }}
+          />
+        </div>
       )}
 
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">

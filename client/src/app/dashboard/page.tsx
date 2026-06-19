@@ -24,6 +24,7 @@ import {
   MessageCircle,
 } from "lucide-react";
 import { StatusBadge } from "@/components/ui-bits";
+import { EmptyState } from "@/components/empty-state";
 
 const stats = [
   {
@@ -153,13 +154,12 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-3">
               {myProjects.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  No projects yet.{" "}
-                  <Link href="/projects/new" className="text-primary hover:underline">
-                    Post your first project
-                  </Link>
-                  .
-                </p>
+                <EmptyState
+                  icon={ClipboardList}
+                  title="No projects yet"
+                  description="Post your first project to start receiving proposals."
+                  action={{ label: "Post a project", href: "/projects/new" }}
+                />
               ) : (
                 myProjects.slice(0, 3).map((o) => (
                   <Link
@@ -204,9 +204,12 @@ export default function DashboardPage() {
             </div>
             <div className="space-y-3 max-h-[420px] overflow-y-auto pr-1">
               {savedFreelancers.length === 0 ? (
-                <p className="text-sm text-muted-foreground">
-                  Save freelancers from their profile page to see them here.
-                </p>
+                <EmptyState
+                  icon={Bookmark}
+                  title="No saved freelancers"
+                  description="Browse freelancers and save the ones you'd like to work with."
+                  action={{ label: "Browse freelancers", href: "/freelancers" }}
+                />
               ) : (
                 savedFreelancers.map((f) => {
                   const u = f.freelancer;

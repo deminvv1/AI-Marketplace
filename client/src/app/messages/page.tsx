@@ -16,7 +16,7 @@ import {
 } from "@/app/actions/messages";
 import { formatMessageTime, messageUserName } from "@/lib/messages";
 import { useChatSocket } from "@/lib/use-chat-socket";
-import { Loader2, Send } from "lucide-react";
+import { ArrowLeft, Loader2, Send } from "lucide-react";
 
 function MessagesContent() {
   const router = useRouter();
@@ -171,8 +171,9 @@ function MessagesContent() {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-0 glass rounded-2xl overflow-hidden h-[calc(100vh-12rem)]">
-        <div className="col-span-4 border-r border-border overflow-y-auto">
+      <div className="glass rounded-2xl overflow-hidden h-[calc(100dvh-8rem)] lg:h-[calc(100vh-12rem)] flex">
+        {/* Conversations list */}
+        <div className={`w-full md:w-80 lg:w-96 border-r border-border flex-col overflow-y-auto shrink-0 ${activeId ? "hidden md:flex" : "flex"}`}>
           {conversations.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground">
               No conversations yet. Open a freelancer profile and click Write.
@@ -224,15 +225,25 @@ function MessagesContent() {
           )}
         </div>
 
-        <div className="col-span-8 flex flex-col">
+        {/* Chat panel */}
+        <div className={`flex-1 flex-col min-w-0 ${activeId ? "flex" : "hidden md:flex"}`}>
           {!active ? (
             <div className="flex-1 grid place-items-center text-sm text-muted-foreground">
               Select a conversation
             </div>
           ) : (
             <>
-              <div className="h-16 border-b border-border px-5 flex items-center gap-3">
-                <div className="relative">
+              <div className="h-14 lg:h-16 border-b border-border px-3 lg:px-5 flex items-center gap-2 lg:gap-3">
+                {/* Back button — mobile only */}
+                <button
+                  type="button"
+                  onClick={() => setActiveId(null)}
+                  className="size-8 grid place-items-center rounded-lg hover:bg-white/5 transition md:hidden shrink-0"
+                  aria-label="Back"
+                >
+                  <ArrowLeft className="size-4" />
+                </button>
+                <div className="relative shrink-0">
                   <div className="size-9 rounded-full bg-gradient-primary grid place-items-center text-sm font-semibold">
                     {messageUserName(active.otherUser)[0]?.toUpperCase()}
                   </div>

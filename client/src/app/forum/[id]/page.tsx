@@ -27,6 +27,7 @@ import {
 import { flag } from "@/lib/mock-data";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
 import { ArrowLeft, Loader2, Pencil, ThumbsUp, Trash2 } from "lucide-react";
+import { TranslateButton } from "@/components/translate-button";
 
 function updateCommentTree(
   items: ForumCommentItem[],
@@ -82,6 +83,7 @@ function CommentBlock({
   const [saving, setSaving] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [translatedContent, setTranslatedContent] = useState<string | null>(null);
 
   async function handleDelete() {
     if (!confirm("Delete this comment and its replies?")) return;
@@ -156,7 +158,14 @@ function CommentBlock({
               </div>
             </div>
           ) : (
-            <p className="text-sm mt-1 whitespace-pre-wrap">{comment.content}</p>
+            <div>
+              <p className="text-sm mt-1 whitespace-pre-wrap">
+                {translatedContent ?? comment.content}
+              </p>
+              {translatedContent && (
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5 italic">Translated</p>
+              )}
+            </div>
           )}
           <div className="mt-2 flex flex-wrap items-center gap-3">
             <button
@@ -182,6 +191,13 @@ function CommentBlock({
               >
                 Reply
               </button>
+            )}
+            {!editing && (
+              <TranslateButton
+                text={comment.content}
+                translated={translatedContent !== null}
+                onTranslated={setTranslatedContent}
+              />
             )}
             {isAuthor && !editing && (
               <>
@@ -246,6 +262,7 @@ export default function ForumTopicPage() {
   const [postLikeBusy, setPostLikeBusy] = useState(false);
   const [likedCommentIds, setLikedCommentIds] = useState<Set<string>>(new Set());
   const [commentLikeBusyId, setCommentLikeBusyId] = useState<string | null>(null);
+  const [translatedPost, setTranslatedPost] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const [p, c, me] = await Promise.all([
@@ -401,7 +418,21 @@ export default function ForumTopicPage() {
             {post.industry}
           </span>
         )}
-        <p className="mt-4 text-sm whitespace-pre-wrap leading-relaxed">{post.content}</p>
+        <div className="mt-4">
+          <p className="text-sm whitespace-pre-wrap leading-relaxed">
+            {translatedPost ?? post.content}
+          </p>
+          {translatedPost && (
+            <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+          )}
+          <div className="mt-2">
+            <TranslateButton
+              text={post.content}
+              translated={translatedPost !== null}
+              onTranslated={setTranslatedPost}
+            />
+          </div>
+        </div>
 
         <button
           type="button"

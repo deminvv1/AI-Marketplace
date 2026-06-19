@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
+import { Strict } from '../common/strict-throttle.decorator';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ReviewsService } from './reviews.service';
 
@@ -26,6 +27,7 @@ export class ReviewsController {
 
   /** POST /api/reviews — оставить отзыв */
   @Post()
+  @Strict()
   @UseGuards(AuthGuard)
   create(
     @CurrentUser() user: { id: string },

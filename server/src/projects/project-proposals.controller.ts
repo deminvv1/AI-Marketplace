@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
+import { Strict } from '../common/strict-throttle.decorator';
 import { CreateProposalDto } from './dto/create-proposal.dto';
 import { ProjectProposalsService } from './project-proposals.service';
 
@@ -14,6 +15,7 @@ export class ProjectProposalsController {
 
   /** POST — фрилансер отправляет отклик. */
   @Post()
+  @Strict()
   @UseGuards(AuthGuard)
   create(
     @Param('projectId') projectId: string,

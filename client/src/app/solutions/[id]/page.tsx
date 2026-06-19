@@ -16,6 +16,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { UserSafetyActions } from "@/components/user-safety-actions";
 import { Stars } from "@/components/ui-bits";
 import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
+import { TranslateButton } from "@/components/translate-button";
 
 export default function SolutionDetailPage() {
   const params = useParams();
@@ -28,6 +29,7 @@ export default function SolutionDetailPage() {
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [toggling, setToggling] = useState(false);
+  const [translatedDesc, setTranslatedDesc] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -116,8 +118,18 @@ export default function SolutionDetailPage() {
           {item.preview && (
             <p className="text-lg text-muted-foreground">{item.preview}</p>
           )}
-          <div className="glass rounded-2xl p-6 text-sm whitespace-pre-wrap leading-relaxed">
-            {item.description}
+          <div className="glass rounded-2xl p-6 text-sm leading-relaxed">
+            <p className="whitespace-pre-wrap">{translatedDesc ?? item.description}</p>
+            {translatedDesc && (
+              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+            )}
+            <div className="mt-3">
+              <TranslateButton
+                text={item.description}
+                translated={translatedDesc !== null}
+                onTranslated={setTranslatedDesc}
+              />
+            </div>
           </div>
           <div className="flex flex-wrap gap-2">
             {item.format && (

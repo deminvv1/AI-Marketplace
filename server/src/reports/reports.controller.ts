@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
+import { Strict } from '../common/strict-throttle.decorator';
 import { CreateReportDto } from './dto/create-report.dto';
 import { ReportsService } from './reports.service';
 
@@ -9,6 +10,7 @@ export class ReportsController {
   constructor(private reports: ReportsService) {}
 
   @Post()
+  @Strict()
   @UseGuards(AuthGuard)
   create(
     @CurrentUser() user: { id: string },

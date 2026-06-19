@@ -46,6 +46,7 @@ import { FavoriteButton } from "@/components/favorite-button";
 import { UserSafetyActions } from "@/components/user-safety-actions";
 import { ReviewsList } from "@/components/reviews-list";
 import { ArrowLeft, Loader2, Pencil, Send, Star, Trash2 } from "lucide-react";
+import { TranslateButton } from "@/components/translate-button";
 
 export default function ProjectDetailPage() {
   const params = useParams();
@@ -81,6 +82,7 @@ export default function ProjectDetailPage() {
   const [reviewRating, setReviewRating] = useState(5);
   const [reviewText, setReviewText] = useState("");
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [translatedDesc, setTranslatedDesc] = useState<string | null>(null);
 
   const loadProjectData = useCallback(async () => {
     const [projResult, me] = await Promise.all([getProject(projectId), getMe()]);
@@ -284,8 +286,18 @@ export default function ProjectDetailPage() {
             <p className="text-lg text-muted-foreground">{project.shortDescription}</p>
           )}
 
-          <div className="glass rounded-2xl p-6 whitespace-pre-wrap text-sm leading-relaxed">
-            {project.description}
+          <div className="glass rounded-2xl p-6 text-sm leading-relaxed">
+            <p className="whitespace-pre-wrap">{translatedDesc ?? project.description}</p>
+            {translatedDesc && (
+              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+            )}
+            <div className="mt-3">
+              <TranslateButton
+                text={project.description}
+                translated={translatedDesc !== null}
+                onTranslated={setTranslatedDesc}
+              />
+            </div>
           </div>
 
           <div className="flex flex-wrap gap-2">

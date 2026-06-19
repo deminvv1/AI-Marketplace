@@ -398,7 +398,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Tabs */}
-        <div className="px-8 border-b border-border/60 bg-background/60 backdrop-blur-xl flex gap-1">
+        <div className="px-4 lg:px-8 border-b border-border/60 bg-background/60 backdrop-blur-xl flex gap-1 overflow-x-auto">
           {TABS.map(({ key, label }) => (
             <button
               key={key}
@@ -416,10 +416,10 @@ export default function ProfilePage() {
       </div>
 
       {/* ── Content ── */}
-      <div className="mt-6 grid grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* Main — 2/3 */}
-        <div className="col-span-2 space-y-5">
+        <div className="lg:col-span-2 space-y-5">
           {activeTab === "about" && (
             <>
               {/* About card */}

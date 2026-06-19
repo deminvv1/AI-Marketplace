@@ -16,7 +16,8 @@ import { getForumPosts, type ForumPostListItem } from "@/app/actions/forum";
 import { useTaxonomy } from "@/lib/use-taxonomy";
 import { skillLabel } from "@/lib/taxonomy";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
-import { Loader2, MessageSquare, Plus, Search, ThumbsUp } from "lucide-react";
+import { Loader2, MessageSquare, MessagesSquare, Plus, Search, ThumbsUp } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 
 export default function ForumPage() {
   const [posts, setPosts] = useState<ForumPostListItem[]>([]);
@@ -95,12 +96,14 @@ export default function ForumPage() {
           {error && <p className="text-sm text-destructive">{error}</p>}
 
           {!loading && !error && posts.length === 0 && (
-            <p className="text-sm text-muted-foreground glass rounded-2xl p-6 text-center">
-              No topics yet.{" "}
-              <Link href="/forum/new" className="text-primary hover:underline">
-                Start the first discussion
-              </Link>
-            </p>
+            <div className="glass rounded-2xl">
+              <EmptyState
+                icon={MessagesSquare}
+                title="No topics yet"
+                description="Be the first to start a discussion in this community."
+                action={{ label: "Start a discussion", href: "/forum/new" }}
+              />
+            </div>
           )}
 
           {posts.map((t) => (

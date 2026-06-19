@@ -13,7 +13,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
 @WebSocketGateway({
-  cors: { origin: process.env.CLIENT_URL ?? 'http://localhost:3000', credentials: true },
+  cors: {
+    origin: process.env.CLIENT_URL
+      ? process.env.CLIENT_URL.split(',').map((o) => o.trim())
+      : ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+  },
   namespace: '/chat',
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {

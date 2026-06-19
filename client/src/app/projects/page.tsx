@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { flag } from "@/lib/mock-data";
-import { Search, ArrowRight, Loader2, X, Bell } from "lucide-react";
+import { Search, ArrowRight, Loader2, X, Bell, ClipboardList } from "lucide-react";
+import { EmptyState } from "@/components/empty-state";
 import { createProjectAlert } from "@/app/actions/project-alerts";
 import { StatusBadge } from "@/components/ui-bits";
 import {
@@ -182,12 +183,14 @@ export default function ProjectsPage() {
           )}
 
           {!loading && !error && projects.length === 0 && (
-            <p className="text-sm text-muted-foreground glass rounded-2xl p-6">
-              No projects match your filters.{" "}
-              <Link href="/projects/new" className="text-primary hover:underline">
-                Post a project
-              </Link>
-            </p>
+            <div className="glass rounded-2xl">
+              <EmptyState
+                icon={ClipboardList}
+                title="No projects found"
+                description="No projects match your filters. Try adjusting them or post a new project."
+                action={{ label: "Post a project", href: "/projects/new" }}
+              />
+            </div>
           )}
 
           <div className="grid sm:grid-cols-2 gap-4">
