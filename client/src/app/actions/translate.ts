@@ -9,7 +9,7 @@ const LOCALE_TO_LANG: Record<Locale, string> = {
   de: "de",
   es: "es",
   fr: "fr",
-  ar: "ar",
+  tr: "tr",
   hi: "hi",
 };
 
