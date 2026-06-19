@@ -543,12 +543,19 @@ const I18nContext = createContext<I18nCtx>({
   setLocale: () => {},
 });
 
+function detectLocale(): Locale {
+  const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
+  if (saved && saved in translations) return saved;
+  const lang = navigator.language?.slice(0, 2).toLowerCase();
+  const match = LOCALES.find((l) => l.code === lang);
+  return match ? match.code : "en";
+}
+
 export function I18nProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
-    if (saved && saved in translations) setLocaleState(saved);
+    setLocaleState(detectLocale());
   }, []);
 
   useEffect(() => {

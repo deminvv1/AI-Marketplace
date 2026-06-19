@@ -5,6 +5,7 @@ import dynamic from "next/dynamic";
 import { Search, Sparkles } from "lucide-react";
 import { COUNTRIES, flag } from "@/lib/mock-data";
 import { getCountryCoords } from "@/lib/country-coords";
+import { LanguageSwitcher } from "@/components/language-switcher";
 
 const LandingGlobe = dynamic(
   () => import("@/components/globe/LandingGlobe"),
@@ -38,6 +39,11 @@ export default function LandingPage() {
     <div className="relative h-screen overflow-hidden bg-[#060912]">
       {/* Three.js fullscreen scene */}
       <LandingGlobe selectedCountry={selectedCountry} />
+
+      {/* Language switcher — top right */}
+      <div className="absolute top-4 right-4 z-20">
+        <LanguageSwitcher />
+      </div>
 
       {/* Left sidebar — matches AppShell style */}
       <aside
