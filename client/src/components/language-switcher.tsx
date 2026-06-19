@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Globe } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { LOCALES, useI18n, type Locale } from "@/lib/i18n";
 
 export function LanguageSwitcher() {
@@ -29,33 +29,57 @@ export function LanguageSwitcher() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="size-9 grid place-items-center rounded-lg bg-white/5 border border-border hover:border-primary/50 transition text-sm"
+        className={`
+          h-9 px-2.5 flex items-center gap-1.5 rounded-lg border text-sm font-medium
+          transition-all duration-200 select-none
+          ${open
+            ? "bg-primary/15 border-primary/50 text-foreground"
+            : "bg-white/5 border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+          }
+        `}
         aria-label="Change language"
-        title={current.label}
       >
-        <Globe className="size-4" />
+        <span className="text-base leading-none">{current.flag}</span>
+        <span className="text-xs tracking-wider font-semibold hidden sm:block">{current.native}</span>
+        <ChevronDown
+          className={`size-3 transition-transform duration-200 hidden sm:block ${open ? "rotate-180" : ""}`}
+        />
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full mt-2 w-44 rounded-xl border border-border bg-card shadow-xl z-50 overflow-hidden">
-          {LOCALES.map((l) => (
-            <button
-              key={l.code}
-              type="button"
-              onClick={() => pick(l.code)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-sm transition-colors ${
-                locale === l.code
-                  ? "bg-primary/15 text-foreground"
-                  : "hover:bg-white/5 text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span className="text-base leading-none">{l.flag}</span>
-              <span>{l.label}</span>
-              {locale === l.code && (
-                <span className="ml-auto size-1.5 rounded-full bg-primary" />
-              )}
-            </button>
-          ))}
+        <div
+          className="absolute right-0 top-full mt-2 w-52 rounded-2xl border border-white/10 overflow-hidden z-50"
+          style={{
+            background: "rgba(10,10,20,0.94)",
+            backdropFilter: "blur(24px)",
+            boxShadow: "0 8px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06) inset",
+          }}
+        >
+          <div className="p-1.5 space-y-0.5">
+            {LOCALES.map((l) => {
+              const active = locale === l.code;
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => pick(l.code)}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all duration-150
+                    ${active
+                      ? "bg-primary/20 text-foreground"
+                      : "text-muted-foreground hover:bg-white/6 hover:text-foreground"
+                    }
+                  `}
+                >
+                  <span className="text-lg leading-none w-6 text-center shrink-0">{l.flag}</span>
+                  <span className="flex-1 text-left font-medium">{l.label}</span>
+                  <span className="text-[10px] font-bold tracking-widest text-muted-foreground/50 uppercase">{l.native}</span>
+                  {active && <Check className="size-3.5 text-primary shrink-0" />}
+                </button>
+              );
+            })}
+          </div>
+          <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
       )}
     </div>

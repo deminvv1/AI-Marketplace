@@ -8,17 +8,17 @@ import {
   type ReactNode,
 } from "react";
 
-export type Locale = "en" | "ru" | "zh" | "de" | "es" | "fr" | "ar" | "hi";
+export type Locale = "en" | "ru" | "zh" | "de" | "es" | "fr" | "tr" | "hi";
 
-export const LOCALES: { code: Locale; label: string; flag: string; rtl?: boolean }[] = [
-  { code: "en", label: "English",    flag: "🇬🇧" },
-  { code: "ru", label: "Русский",    flag: "🇷🇺" },
-  { code: "zh", label: "中文",        flag: "🇨🇳" },
-  { code: "de", label: "Deutsch",    flag: "🇩🇪" },
-  { code: "es", label: "Español",    flag: "🇪🇸" },
-  { code: "fr", label: "Français",   flag: "🇫🇷" },
-  { code: "ar", label: "العربية",    flag: "🇸🇦", rtl: true },
-  { code: "hi", label: "हिन्दी",      flag: "🇮🇳" },
+export const LOCALES: { code: Locale; label: string; flag: string; native: string }[] = [
+  { code: "en", label: "English",    flag: "🇬🇧", native: "EN" },
+  { code: "ru", label: "Русский",    flag: "🇷🇺", native: "RU" },
+  { code: "zh", label: "中文",        flag: "🇨🇳", native: "ZH" },
+  { code: "de", label: "Deutsch",    flag: "🇩🇪", native: "DE" },
+  { code: "es", label: "Español",    flag: "🇪🇸", native: "ES" },
+  { code: "fr", label: "Français",   flag: "🇫🇷", native: "FR" },
+  { code: "tr", label: "Türkçe",     flag: "🇹🇷", native: "TR" },
+  { code: "hi", label: "हिन्दी",      flag: "🇮🇳", native: "HI" },
 ];
 
 const en = {
@@ -404,66 +404,66 @@ const translations: Record<Locale, Dict> = {
     },
   },
 
-  ar: {
+  tr: {
     nav: {
-      dashboard:    "لوحة التحكم",
-      search:       "بحث",
-      projects:     "المشاريع",
-      proposals:    "عروضي",
-      freelancers:  "المستقلون",
-      saved:        "المحفوظات",
-      solutions:    "الحلول",
-      forum:        "المنتدى",
-      messages:     "الرسائل",
-      profile:      "الملف الشخصي",
-      settings:     "الإعدادات",
+      dashboard:    "Panel",
+      search:       "Ara",
+      projects:     "Projeler",
+      proposals:    "Tekliflerim",
+      freelancers:  "Freelancerlar",
+      saved:        "Kaydedilenler",
+      solutions:    "Çözümler",
+      forum:        "Forum",
+      messages:     "Mesajlar",
+      profile:      "Profil",
+      settings:     "Ayarlar",
     },
     header: {
-      search_placeholder: "ابحث…",
+      search_placeholder: "Ara…",
     },
     notifications: {
-      title:         "الإشعارات",
-      mark_all_read: "تعليم الكل مقروءاً",
-      empty:         "لا إشعارات حتى الآن.",
-      open:          "فتح",
+      title:         "Bildirimler",
+      mark_all_read: "Tümünü okundu işaretle",
+      empty:         "Henüz bildirim yok.",
+      open:          "Aç",
     },
     common: {
-      save:        "حفظ",
-      cancel:      "إلغاء",
-      edit:        "تعديل الملف",
-      loading:     "جارٍ التحميل…",
-      go_home:     "الصفحة الرئيسية",
-      try_again:   "حاول مرة أخرى",
-      go_back:     "رجوع",
-      view_all:    "عرض الكل",
-      post_project:"نشر مشروع",
-      publish:     "نشر",
-      write:       "كتابة",
-      send:        "إرسال",
-      submit:      "إرسال",
-      delete:      "حذف",
-      report:      "إبلاغ",
-      block:       "حظر",
+      save:        "Kaydet",
+      cancel:      "İptal",
+      edit:        "Profili Düzenle",
+      loading:     "Yükleniyor…",
+      go_home:     "Ana Sayfaya Git",
+      try_again:   "Tekrar Dene",
+      go_back:     "Geri",
+      view_all:    "Tümünü Gör",
+      post_project:"Proje Yayınla",
+      publish:     "Yayınla",
+      write:       "Yaz",
+      send:        "Gönder",
+      submit:      "Gönder",
+      delete:      "Sil",
+      report:      "Şikayet Et",
+      block:       "Engelle",
     },
     empty: {
-      no_projects_title: "لا توجد مشاريع",
-      no_projects_desc:  "لا توجد مشاريع تطابق الفلاتر. عدّل الفلاتر أو انشر مشروعاً جديداً.",
-      no_solutions_title:"لا توجد حلول",
-      no_solutions_desc: "لا توجد حلول متاحة. كن أول من ينشر حلاً بالذكاء الاصطناعي.",
-      no_forum_title:    "لا توجد مواضيع بعد",
-      no_forum_desc:     "كن أول من يبدأ نقاشاً في هذا المجتمع.",
-      no_convos_title:   "لا توجد محادثات",
-      no_convos_desc:    "افتح ملف مستقل واضغط كتابة لبدء المحادثة.",
-      no_saved_title:    "لا يوجد مستقلون محفوظون",
-      no_saved_desc:     "تصفح المستقلين وأضف من تريد التعاون معهم.",
+      no_projects_title: "Proje bulunamadı",
+      no_projects_desc:  "Filtrelerinizle eşleşen proje yok. Filtreleri değiştirin veya yeni proje yayınlayın.",
+      no_solutions_title:"Çözüm bulunamadı",
+      no_solutions_desc: "Hiç çözüm yok. İlk AI çözümünü yayınlayan siz olun.",
+      no_forum_title:    "Henüz konu yok",
+      no_forum_desc:     "Bu toplulukta ilk tartışmayı siz başlatın.",
+      no_convos_title:   "Henüz konuşma yok",
+      no_convos_desc:    "Bir freelancer profili açın ve Yaz'a tıklayın.",
+      no_saved_title:    "Kaydedilen freelancer yok",
+      no_saved_desc:     "Freelancer'ları gözatın ve birlikte çalışmak istediklerinizi kaydedin.",
     },
     not_found: {
-      title: "الصفحة غير موجودة",
-      desc:  "الصفحة التي تبحث عنها غير موجودة أو تم نقلها.",
+      title: "Sayfa bulunamadı",
+      desc:  "Aradığınız sayfa mevcut değil veya taşınmış.",
     },
     error: {
-      title: "حدث خطأ ما",
-      desc:  "حدث خطأ غير متوقع. يمكنك المحاولة مرة أخرى أو العودة للرئيسية.",
+      title: "Bir şeyler yanlış gitti",
+      desc:  "Beklenmeyen bir hata oluştu. Tekrar deneyin veya ana sayfaya dönün.",
     },
   },
 
@@ -552,8 +552,6 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const isRtl = LOCALES.find((l) => l.code === locale)?.rtl;
-    document.documentElement.setAttribute("dir", isRtl ? "rtl" : "ltr");
     document.documentElement.setAttribute("lang", locale);
   }, [locale]);
 
