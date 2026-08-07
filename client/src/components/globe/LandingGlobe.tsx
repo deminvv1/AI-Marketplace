@@ -161,29 +161,36 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       })
     ));
 
-    // ── Brand Text Ring ────────────────────────────────────────────────────
+    // ── Brand Text Ring (Universal Pictures style) ─────────────────────────
     const BRAND_TEXT = "AI  MARKETPLACE  ·  AI  MARKETPLACE  ·  ";
-    const RING_R = 1.3;
+    const RING_R = 1.35;
     const brandRing = new THREE.Group();
-    brandRing.rotation.x = 0.18; // slight Saturn-like tilt
+    brandRing.rotation.x = 0.12;
 
     const letterMeshes: { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial }[] = [];
+    let brandOpacity = 0;
+    const BRAND_FADE_DUR = 2200;
+    const brandFadeStart = performance.now();
 
     [...BRAND_TEXT].forEach((char, i) => {
       const cvs = document.createElement("canvas");
-      cvs.width = 80; cvs.height = 80;
+      cvs.width = 160; cvs.height = 160;
       const ctx = cvs.getContext("2d")!;
-      ctx.fillStyle = char === "·" ? "rgba(139,92,246,0.95)" : "rgba(200,180,255,0.95)";
-      ctx.font = `bold 46px Arial`;
+
+      const isDot = char === "·";
+      ctx.shadowColor = isDot ? "rgba(160,100,255,0.9)" : "rgba(220,200,255,0.8)";
+      ctx.shadowBlur = 18;
+      ctx.fillStyle = isDot ? "rgba(180,120,255,1.0)" : "rgba(255,252,240,1.0)";
+      ctx.font = `900 88px 'Arial Black', Arial, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      ctx.fillText(char, 36, 38);
+      ctx.fillText(char, 80, 82);
 
       const tex = new THREE.CanvasTexture(cvs);
       const mat = new THREE.MeshBasicMaterial({
-        map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false,
+        map: tex, transparent: true, side: THREE.FrontSide, depthWrite: false, opacity: 0,
       });
-      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.085, 0.085), mat);
+      const mesh = new THREE.Mesh(new THREE.PlaneGeometry(0.13, 0.13), mat);
 
       const angle = -(i / BRAND_TEXT.length) * Math.PI * 2;
       mesh.position.set(-Math.sin(angle) * RING_R, 0, Math.cos(angle) * RING_R);
@@ -233,9 +240,13 @@ export default function LandingGlobe({ selectedCountry }: Props) {
 
       cloudUniforms.time.value += dt * 0.001;
 
+      // Brand text fade-in
+      brandOpacity = Math.min(1, (now - brandFadeStart) / BRAND_FADE_DUR);
+      letterMeshes.forEach(({ mat }) => { mat.opacity = brandOpacity; });
+
       if (phase === "idle") {
-        earth.rotation.y -= 0.0012;
-        brandRing.rotation.y -= 0.0028;
+        earth.rotation.y += 0.0012;
+        brandRing.rotation.y += 0.0028;
 
         if (selectedRef.current !== null) {
           phase = "rotating";
@@ -250,7 +261,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       if (phase === "rotating") {
         const t = Math.min((now - phaseStart) / ROTATE_DUR, 1);
         earth.quaternion.copy(startQuat).slerp(targetQuat, ease(t));
-        brandRing.rotation.y -= 0.0008;
+        brandRing.rotation.y += 0.0008;
 
         if (t >= 1) {
           phase = "zooming";
