@@ -34,7 +34,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     const camera = new THREE.PerspectiveCamera(40, W / H, 0.01, 1000);
     camera.position.set(0, 0.22, 3.35);
 
-    // ── Milky Way background ──────────────────────────────────────────────
+    // ── Milky Way — realistic with galactic core, dust lanes, varied stars ──
     const mwMat = new THREE.ShaderMaterial({
       side: THREE.BackSide,
       transparent: true,
@@ -47,15 +47,36 @@ export default function LandingGlobe({ selectedCountry }: Props) {
         float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
         void main(){
           vec2 uv=vUv;
-          float bY=uv.y-.40+sin(uv.x*3.14159)*.06;
-          float band=exp(-bY*bY*13.)*0.6+exp(-bY*bY*3.8)*.28;
-          band*=.5+fbm(vec2(uv.x*5.5,uv.y*14.));
-          float s1=h(floor(uv*420.)),s2=h(floor(uv*175.)+vec2(4.2,7.1)),s3=h(floor(uv*720.)+vec2(1.3,3.7)),s4=h(floor(uv*1300.)+vec2(9.1,2.5));
-          float stars=step(.983,s1)*.65+step(.989,s2)*1.3+step(.9968,s3)*2.5+step(.9992,s4)*4.;
-          vec3 gc=mix(vec3(.50,.62,.96),vec3(1.,.82,.75),fbm(uv*2.3));
-          vec3 sc=mix(vec3(.88,.94,1.),vec3(1.,.90,.70),h(floor(uv*75.)));
-          vec3 col=gc*band*.18+sc*min(stars,3.)*.55;
-          gl_FragColor=vec4(col,band*.25+min(stars,1.)*.92);
+          // Galaxy band with slight warp (realistic tilt)
+          float bY=uv.y-.42+sin(uv.x*6.2832)*.045;
+          // Multi-scale band: narrow bright core + wider diffuse halo
+          float band=exp(-bY*bY*22.)*0.90+exp(-bY*bY*6.)*0.50+exp(-bY*bY*1.8)*0.22;
+          // Dust lanes: dark streaks inside the band
+          float dust=fbm(vec2(uv.x*9.,uv.y*28.));
+          band*=0.38+dust*0.85;
+          // Galactic core: bright warm bulge (center of galaxy, x≈0.62)
+          float cX=uv.x-.62, cY=bY;
+          float core=exp(-(cX*cX*18.+cY*cY*55.))*1.8;
+          float coreWarm=exp(-(cX*cX*8.+cY*cY*30.))*0.9;
+          band+=core;
+          // Stars: 5 density layers for depth
+          float s1=h(floor(uv*520.));
+          float s2=h(floor(uv*210.)+vec2(4.2,7.1));
+          float s3=h(floor(uv*880.)+vec2(1.3,3.7));
+          float s4=h(floor(uv*1500.)+vec2(9.1,2.5));
+          float s5=h(floor(uv*85.) +vec2(3.3,6.8));  // very bright rare stars
+          float stars=step(.981,s1)*.55+step(.988,s2)*1.25+step(.9963,s3)*2.3+step(.9991,s4)*5.0+step(.9982,s5)*8.0;
+          // Color: core=warm yellow-orange, band=blue-purple, bg stars=blue/white/warm
+          vec3 coreCol=mix(vec3(1.,.80,.40),vec3(1.,.92,.60),coreWarm/(core+.001));
+          vec3 bandCol=mix(vec3(.45,.60,.96),vec3(.80,.65,.95),fbm(uv*2.1));
+          vec3 bgCol  =mix(bandCol,coreCol,clamp(core*0.8,0.,1.));
+          // Star color: warm/cool variation + rare vivid blue stars
+          vec3 starCol=mix(vec3(.88,.94,1.),vec3(1.,.90,.62),h(floor(uv*60.)));
+          starCol=mix(starCol,vec3(.55,.80,1.),step(.9985,h(floor(uv*220.)+vec2(5.,3.)))*0.8);
+          // Combine: galaxy band uses bgCol, stars use starCol
+          vec3 col=bgCol*band*.32+starCol*min(stars,5.)*.62;
+          float alpha=band*.44+min(stars*.5,1.)*.95;
+          gl_FragColor=vec4(col,alpha);
         }
       `,
     });
@@ -79,22 +100,24 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       return t;
     };
 
-    const earthUniforms = {
+    const earthUniforms: Record<string, THREE.IUniform> = {
       sunDir:     { value: SUN_DIR },
       time:       { value: 0.0 },
-      dayTex:     { value: makeBlank(10, 30, 80) },   // ocean blue fallback
-      specTex:    { value: makeBlank(200, 200, 200) }, // all shiny fallback
+      dayTex:     { value: makeBlank(10, 30, 80) as THREE.Texture },
+      specTex:    { value: makeBlank(200, 200, 200) as THREE.Texture },
       hasRealTex: { value: 0.0 },
     };
 
     const texLoader = new THREE.TextureLoader();
     texLoader.load("/textures/earth-color.jpg", (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
-      earthUniforms.dayTex.value    = tex;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (earthUniforms.dayTex as any).value    = tex;
       earthUniforms.hasRealTex.value = 1.0;
     });
     texLoader.load("/textures/earth-specular.jpg", (tex) => {
-      earthUniforms.specTex.value = tex;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (earthUniforms.specTex as any).value = tex;
     }, undefined, () => {/* optional */});
 
     const earthGeo = new THREE.SphereGeometry(1, 128, 64);
@@ -254,6 +277,90 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     sunSprite.position.copy(SUN_DIR.clone().multiplyScalar(9));
     scene.add(sunSprite);
 
+    // ── Comet ─────────────────────────────────────────────────────────────
+    // Canvas: nucleus (right) + fading tail (left) → sprite rotated to travel dir
+    const cometCvs = document.createElement("canvas");
+    cometCvs.width = 320; cometCvs.height = 28;
+    const cx = cometCvs.getContext("2d")!;
+
+    // Tail — soft blue-white gradient
+    const tailG = cx.createLinearGradient(0, 14, 320, 14);
+    tailG.addColorStop(0,    "rgba(140,200,255,0.00)");
+    tailG.addColorStop(0.35, "rgba(160,215,255,0.10)");
+    tailG.addColorStop(0.65, "rgba(190,228,255,0.35)");
+    tailG.addColorStop(0.85, "rgba(220,240,255,0.70)");
+    tailG.addColorStop(1,    "rgba(255,255,255,0.85)");
+    cx.fillStyle = tailG;
+    // Narrow elongated shape
+    cx.beginPath();
+    cx.moveTo(0, 14);
+    cx.bezierCurveTo(80, 10, 200, 9, 308, 6);
+    cx.lineTo(320, 14);
+    cx.bezierCurveTo(200, 19, 80, 18, 0, 14);
+    cx.fill();
+
+    // Nucleus glow
+    const nucG = cx.createRadialGradient(310, 14, 0, 310, 14, 12);
+    nucG.addColorStop(0,   "rgba(255,255,255,1.0)");
+    nucG.addColorStop(0.25,"rgba(230,242,255,0.95)");
+    nucG.addColorStop(0.6, "rgba(180,220,255,0.55)");
+    nucG.addColorStop(1,   "rgba(140,200,255,0.00)");
+    cx.fillStyle = nucG;
+    cx.fillRect(295, 2, 25, 24);
+
+    const cometMat = new THREE.SpriteMaterial({
+      map: new THREE.CanvasTexture(cometCvs),
+      transparent: true,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      depthTest: false,
+    });
+    const cometSprite = new THREE.Sprite(cometMat);
+    cometSprite.scale.set(9, 0.55, 1);
+    cometSprite.visible = false;
+    scene.add(cometSprite);
+
+    // Comet paths (start → end in world space, z deep behind earth)
+    const COMET_PATHS = [
+      { s: new THREE.Vector3(7, 3.5, -8),   e: new THREE.Vector3(-4, -1.5, -8) },
+      { s: new THREE.Vector3(-6, 4.2, -10), e: new THREE.Vector3(5,  0.5, -10) },
+      { s: new THREE.Vector3(4, -3.5, -9),  e: new THREE.Vector3(-5, 2.8, -9)  },
+      { s: new THREE.Vector3(6, 2,   -11),  e: new THREE.Vector3(-2, -3,  -11) },
+    ];
+    const COMET_DUR    = 3200;   // ms to cross screen
+    const COMET_PERIOD = 18000;  // ms between comets
+    let cometStart     = -COMET_PERIOD + 5000; // first comet after ~5 s
+    let cometPathIdx   = 0;
+
+    function updateComet(now: number) {
+      const elapsed = now - cometStart;
+
+      if (elapsed < 0 || elapsed > COMET_DUR) {
+        cometSprite.visible = false;
+        if (elapsed > COMET_PERIOD) {
+          cometStart   = now;
+          cometPathIdx = (cometPathIdx + 1) % COMET_PATHS.length;
+        }
+        return;
+      }
+
+      const t    = elapsed / COMET_DUR; // 0 → 1
+      const path = COMET_PATHS[cometPathIdx];
+      const pos  = path.s.clone().lerp(path.e, t);
+      cometSprite.position.copy(pos);
+
+      // Rotate sprite so tail faces direction of travel (project to screen)
+      const sp = path.s.clone().project(camera);
+      const ep = path.e.clone().project(camera);
+      const angle = Math.atan2(ep.y - sp.y, ep.x - sp.x);
+      cometMat.rotation = angle;
+
+      // Fade in/out
+      const fade = t < 0.10 ? t / 0.10 : t > 0.85 ? (1 - t) / 0.15 : 1;
+      cometMat.opacity = fade * 0.95;
+      cometSprite.visible = true;
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
     function latLngTo3D(lat: number, lng: number) {
       const phi   = (90 - lat) * (Math.PI / 180);
@@ -284,6 +391,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       const t = now * 0.001;
       earthUniforms.time.value = t;
       cloudUniforms.time.value = t;
+      updateComet(now);
 
       if (phase === "idle") {
         earth.rotation.y     += 0.00092;
