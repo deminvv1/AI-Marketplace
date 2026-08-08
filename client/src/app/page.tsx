@@ -52,7 +52,8 @@ export default function LandingPage() {
           {/* Main title — chrome depth via layered shadows */}
           <div style={{
             fontFamily: "'Arial Black', 'Arial Bold', Impact, 'Haettenschweiler', sans-serif",
-            fontSize:    "clamp(2.8rem, 9.5vw, 8.5rem)",
+            fontSize:    "clamp(1.8rem, 5.2vw, 6.5rem)",
+            whiteSpace:  "nowrap",
             fontWeight:  900,
             letterSpacing: "0.14em",
             textAlign:   "center",

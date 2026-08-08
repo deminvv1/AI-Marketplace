@@ -45,38 +45,45 @@ export default function LandingGlobe({ selectedCountry }: Props) {
         float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
         float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
         float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
+
+        // KEY FIX: star(scale, offset, threshold, tightness)
+        // Uses fract() to get position WITHIN the cell → circular falloff → point star
+        float star(vec2 uv, float sc, vec2 off, float thr, float tight){
+          vec2 g=floor(uv*sc)+off;
+          vec2 f=fract(uv*sc)-0.5; // centered position inside cell
+          return step(thr,h(g))*max(0.,1.-length(f)*tight);
+        }
+
         void main(){
           vec2 uv=vUv;
-          // Galaxy band with slight warp (realistic tilt)
+
+          // === POINT STARS — 5 layers (fine → giant) ===
+          float s  = star(uv,700.,vec2(0.),   .9865,30.)*0.55
+                   + star(uv,300.,vec2(4.2,7.1),.9820,22.)*1.1
+                   + star(uv,130.,vec2(1.3,3.7),.9900,14.)*2.2
+                   + star(uv, 55.,vec2(9.1,2.5),.9940, 8.)*4.5
+                   + star(uv, 25.,vec2(3.3,6.8),.9970, 5.)*8.0;
+
+          // Star color: blue-white + warm + rare vivid blue
+          vec3 sc2=mix(vec3(.88,.94,1.),vec3(1.,.88,.60),h(floor(uv*55.)));
+          sc2=mix(sc2,vec3(.4,.68,1.),step(.9985,h(floor(uv*40.)+vec2(5.,3.))));
+
+          // === MILKY WAY BAND ===
           float bY=uv.y-.42+sin(uv.x*6.2832)*.045;
-          // Multi-scale band: narrow bright core + wider diffuse halo
-          float band=exp(-bY*bY*22.)*0.90+exp(-bY*bY*6.)*0.50+exp(-bY*bY*1.8)*0.22;
-          // Dust lanes: dark streaks inside the band
-          float dust=fbm(vec2(uv.x*9.,uv.y*28.));
-          band*=0.38+dust*0.85;
-          // Galactic core: bright warm bulge (center of galaxy, x≈0.62)
-          float cX=uv.x-.62, cY=bY;
-          float core=exp(-(cX*cX*18.+cY*cY*55.))*1.8;
-          float coreWarm=exp(-(cX*cX*8.+cY*cY*30.))*0.9;
-          band+=core;
-          // Stars: 5 density layers for depth
-          float s1=h(floor(uv*520.));
-          float s2=h(floor(uv*210.)+vec2(4.2,7.1));
-          float s3=h(floor(uv*880.)+vec2(1.3,3.7));
-          float s4=h(floor(uv*1500.)+vec2(9.1,2.5));
-          float s5=h(floor(uv*85.) +vec2(3.3,6.8));  // very bright rare stars
-          float stars=step(.981,s1)*.55+step(.988,s2)*1.25+step(.9963,s3)*2.3+step(.9991,s4)*5.0+step(.9982,s5)*8.0;
-          // Color: core=warm yellow-orange, band=blue-purple, bg stars=blue/white/warm
-          vec3 coreCol=mix(vec3(1.,.80,.40),vec3(1.,.92,.60),coreWarm/(core+.001));
-          vec3 bandCol=mix(vec3(.45,.60,.96),vec3(.80,.65,.95),fbm(uv*2.1));
-          vec3 bgCol  =mix(bandCol,coreCol,clamp(core*0.8,0.,1.));
-          // Star color: warm/cool variation + rare vivid blue stars
-          vec3 starCol=mix(vec3(.88,.94,1.),vec3(1.,.90,.62),h(floor(uv*60.)));
-          starCol=mix(starCol,vec3(.55,.80,1.),step(.9985,h(floor(uv*220.)+vec2(5.,3.)))*0.8);
-          // Combine: galaxy band uses bgCol, stars use starCol
-          vec3 col=bgCol*band*.32+starCol*min(stars,5.)*.62;
-          float alpha=band*.44+min(stars*.5,1.)*.95;
-          gl_FragColor=vec4(col,alpha);
+          float band=exp(-bY*bY*14.)*.32+exp(-bY*bY*4.)*.16;
+          band*=.42+fbm(vec2(uv.x*5.,uv.y*13.))*.75;
+
+          // Galactic core — subtle warm bulge only
+          float cX=uv.x-.60;
+          float core=exp(-(cX*cX*24.+bY*bY*65.))*.38;
+
+          vec3 bandCol=mix(vec3(.38,.54,.90),vec3(.68,.50,.88),n(vec2(uv.x*2.,uv.y*5.)));
+          vec3 coreCol=vec3(.95,.78,.42);
+          vec3 galCol=mix(bandCol,coreCol,clamp(core*1.8,0.,1.));
+
+          vec3 col=sc2*min(s,1.)*.82+galCol*(band+core)*.20;
+          float alpha=min(s*.65,1.)*.92+(band+core)*.26;
+          gl_FragColor=vec4(col,clamp(alpha,0.,1.));
         }
       `,
     });
@@ -252,7 +259,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     scene.add(new THREE.Mesh(atmoGeo, atmoMat));
 
     // ── Orbital ring ──────────────────────────────────────────────────────
-    const ringGeo = new THREE.TorusGeometry(1.46, 0.0020, 8, 256);
+    const ringGeo = new THREE.TorusGeometry(1.46, 0.0020, 32, 256);
     const ringMat = new THREE.MeshBasicMaterial({ color: 0x7788cc, transparent: true, opacity: 0.38 });
     const ring    = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI * 0.12;
