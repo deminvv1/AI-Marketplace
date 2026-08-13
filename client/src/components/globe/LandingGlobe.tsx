@@ -15,7 +15,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
   const routerRef    = useRef(router);
 
   useEffect(() => { selectedRef.current = selectedCountry; }, [selectedCountry]);
-  useEffect(() => { routerRef.current   = router; },         [router]);
+  useEffect(() => { routerRef.current = router; }, [router]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -32,100 +32,78 @@ export default function LandingGlobe({ selectedCountry }: Props) {
 
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(40, W / H, 0.01, 1000);
-    camera.position.set(0, 0.22, 3.35);
+    camera.position.set(0, 0.18, 3.35);
 
-    // ── Milky Way — realistic with galactic core, dust lanes, varied stars ──
-    const mwMat = new THREE.ShaderMaterial({
-      side: THREE.BackSide,
+    // ── Stars — simple round point particles, no rectangles ───────────────
+    const STAR_COUNT = 3200;
+    const starPos    = new Float32Array(STAR_COUNT * 3);
+    for (let i = 0; i < STAR_COUNT; i++) {
+      const phi   = Math.acos(2 * Math.random() - 1);
+      const theta = Math.random() * Math.PI * 2;
+      // More stars toward one side (hint of Milky Way density)
+      const r = 220 + Math.random() * 30;
+      starPos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+      starPos[i * 3 + 1] = r * Math.cos(phi);
+      starPos[i * 3 + 2] = r * Math.sin(phi) * Math.sin(theta);
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute("position", new THREE.BufferAttribute(starPos, 3));
+
+    // Round soft star texture
+    const sc = document.createElement("canvas");
+    sc.width = 32; sc.height = 32;
+    const sx = sc.getContext("2d")!;
+    const sg = sx.createRadialGradient(16, 16, 0, 16, 16, 16);
+    sg.addColorStop(0,    "rgba(255,255,255,1.0)");
+    sg.addColorStop(0.25, "rgba(220,232,255,0.7)");
+    sg.addColorStop(0.55, "rgba(180,210,255,0.15)");
+    sg.addColorStop(1,    "rgba(120,170,255,0.0)");
+    sx.fillStyle = sg; sx.fillRect(0, 0, 32, 32);
+
+    const starMat = new THREE.PointsMaterial({
+      map: new THREE.CanvasTexture(sc),
+      size: 1.4,
       transparent: true,
+      opacity: 0.90,
+      sizeAttenuation: true,
       depthWrite: false,
-      vertexShader: `varying vec2 vUv; void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
-      fragmentShader: `
-        varying vec2 vUv;
-        float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
-        float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
-        float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.1;a*=.5;}return v;}
-
-        // KEY FIX: star(scale, offset, threshold, tightness)
-        // Uses fract() to get position WITHIN the cell → circular falloff → point star
-        float star(vec2 uv, float sc, vec2 off, float thr, float tight){
-          vec2 g=floor(uv*sc)+off;
-          vec2 f=fract(uv*sc)-0.5; // centered position inside cell
-          return step(thr,h(g))*max(0.,1.-length(f)*tight);
-        }
-
-        void main(){
-          vec2 uv=vUv;
-
-          // === POINT STARS — 5 layers (fine → giant) ===
-          float s  = star(uv,700.,vec2(0.),   .9865,30.)*0.55
-                   + star(uv,300.,vec2(4.2,7.1),.9820,22.)*1.1
-                   + star(uv,130.,vec2(1.3,3.7),.9900,14.)*2.2
-                   + star(uv, 55.,vec2(9.1,2.5),.9940, 8.)*4.5
-                   + star(uv, 25.,vec2(3.3,6.8),.9970, 5.)*8.0;
-
-          // Star color: blue-white + warm + rare vivid blue
-          vec3 sc2=mix(vec3(.88,.94,1.),vec3(1.,.88,.60),h(floor(uv*55.)));
-          sc2=mix(sc2,vec3(.4,.68,1.),step(.9985,h(floor(uv*40.)+vec2(5.,3.))));
-
-          // === MILKY WAY BAND ===
-          float bY=uv.y-.42+sin(uv.x*6.2832)*.045;
-          float band=exp(-bY*bY*14.)*.32+exp(-bY*bY*4.)*.16;
-          band*=.42+fbm(vec2(uv.x*5.,uv.y*13.))*.75;
-
-          // Galactic core — subtle warm bulge only
-          float cX=uv.x-.60;
-          float core=exp(-(cX*cX*24.+bY*bY*65.))*.38;
-
-          vec3 bandCol=mix(vec3(.38,.54,.90),vec3(.68,.50,.88),n(vec2(uv.x*2.,uv.y*5.)));
-          vec3 coreCol=vec3(.95,.78,.42);
-          vec3 galCol=mix(bandCol,coreCol,clamp(core*1.8,0.,1.));
-
-          vec3 col=sc2*min(s,1.)*.82+galCol*(band+core)*.20;
-          float alpha=min(s*.65,1.)*.92+(band+core)*.26;
-          gl_FragColor=vec4(col,clamp(alpha,0.,1.));
-        }
-      `,
+      blending: THREE.AdditiveBlending,
     });
-    const mwGeo  = new THREE.SphereGeometry(500, 64, 32);
-    const mwMesh = new THREE.Mesh(mwGeo, mwMat);
-    scene.add(mwMesh);
+    scene.add(new THREE.Points(starGeo, starMat));
 
-    // ── Sun direction (dramatic side light, like Universal Pictures) ───────
+    // ── Lighting ───────────────────────────────────────────────────────────
     const SUN_DIR = new THREE.Vector3(4.0, 1.0, 3.2).normalize();
-
-    scene.add(new THREE.AmbientLight(0x04091a, 0.6));
-    const sunLight = new THREE.DirectionalLight(0xfff2d8, 3.0);
+    const sunLight = new THREE.DirectionalLight(0xfff4e0, 2.8);
     sunLight.position.copy(SUN_DIR.clone().multiplyScalar(10));
     scene.add(sunLight);
+    scene.add(new THREE.AmbientLight(0x03060f, 0.5));
 
-    // ── Earth — texture + day/night shader ────────────────────────────────
-    // 1-pixel default textures so shader runs before real textures load
-    const makeBlank = (r: number, g: number, b: number) => {
-      const t = new THREE.DataTexture(new Uint8Array([r, g, b, 255]), 1, 1, THREE.RGBAFormat);
+    // ── Earth — real texture + day/night terminator ───────────────────────
+    const makeBlank = (r: number, g: number, b: number): THREE.Texture => {
+      const t = new THREE.DataTexture(
+        new Uint8Array([r, g, b, 255]), 1, 1, THREE.RGBAFormat
+      );
       t.needsUpdate = true;
-      return t;
+      return t as unknown as THREE.Texture;
     };
 
     const earthUniforms: Record<string, THREE.IUniform> = {
       sunDir:     { value: SUN_DIR },
       time:       { value: 0.0 },
-      dayTex:     { value: makeBlank(10, 30, 80) as THREE.Texture },
-      specTex:    { value: makeBlank(200, 200, 200) as THREE.Texture },
+      dayTex:     { value: makeBlank(8, 22, 68) },
+      specTex:    { value: makeBlank(180, 180, 180) },
       hasRealTex: { value: 0.0 },
     };
 
     const texLoader = new THREE.TextureLoader();
     texLoader.load("/textures/earth-color.jpg", (tex) => {
       tex.colorSpace = THREE.SRGBColorSpace;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (earthUniforms.dayTex as any).value    = tex;
-      earthUniforms.hasRealTex.value = 1.0;
+      (earthUniforms.dayTex as THREE.IUniform).value    = tex;
+      (earthUniforms.hasRealTex as THREE.IUniform).value = 1.0;
     });
     texLoader.load("/textures/earth-specular.jpg", (tex) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (earthUniforms.specTex as any).value = tex;
-    }, undefined, () => {/* optional */});
+      (earthUniforms.specTex as THREE.IUniform).value = tex;
+    }, undefined, () => {});
 
     const earthGeo = new THREE.SphereGeometry(1, 128, 64);
     const earthMat = new THREE.ShaderMaterial({
@@ -151,51 +129,45 @@ export default function LandingGlobe({ selectedCountry }: Props) {
           float sunDot=dot(N,sunDir);
           vec2 uv=vUv;
 
-          // ── Day color: real texture OR procedural fallback ──────────────
-          vec3 texDay=pow(texture2D(dayTex,uv).rgb, vec3(1.0));
-
-          // Boost texture contrast and saturation for cinematic look
+          // Real texture (boosted saturation + contrast)
+          vec3 texDay=texture2D(dayTex,uv).rgb;
           float lum=dot(texDay,vec3(.299,.587,.114));
-          texDay=mix(vec3(lum),texDay,1.4); // saturate
-          texDay=pow(texDay,vec3(0.85));    // slight gamma lift
+          texDay=mix(vec3(lum),texDay,1.45);
+          texDay=pow(texDay,vec3(.88));
 
-          // Procedural fallback (visible before texture loads)
+          // Procedural fallback before texture loads
           float c1=fbm(uv*3.7+vec2(2.1,.8)), c2=fbm(uv*2.2+vec2(5.4,4.2));
-          float landP=smoothstep(.490,.535,c1*.62+c2*.38);
-          float lat=abs(uv.y-.5)*2.; float ice=smoothstep(.76,.93,lat); landP=max(landP,ice);
+          float landP=smoothstep(.49,.535,c1*.62+c2*.38);
+          float lat=abs(uv.y-.5)*2.; float ice=smoothstep(.76,.93,lat);
+          landP=max(landP,ice);
           float det=fbm(uv*7.2+vec2(3.1,1.4));
-          vec3 oceanP=mix(vec3(.01,.05,.20),vec3(.03,.13,.38),fbm(uv*5.)*.7);
-          vec3 grassP=mix(vec3(.05,.17,.04),vec3(.10,.27,.06),det);
-          vec3 desP  =mix(vec3(.37,.27,.09),vec3(.52,.40,.16),det);
-          vec3 terrP =mix(grassP,desP,smoothstep(.33,.68,det)*.55);
-          vec3 dayP  =mix(oceanP,terrP,landP); dayP=mix(dayP,vec3(.83,.92,1.),ice*.9);
+          vec3 oceanP=mix(vec3(.01,.05,.20),vec3(.03,.13,.38),fbm(uv*4.5)*.7);
+          vec3 terrP=mix(mix(vec3(.05,.17,.04),vec3(.10,.27,.06),det),
+                         mix(vec3(.37,.27,.09),vec3(.52,.40,.16),det),
+                         smoothstep(.33,.68,det)*.55);
+          vec3 dayP=mix(oceanP,terrP,landP); dayP=mix(dayP,vec3(.83,.92,1.),ice*.9);
 
-          vec3 dayCol=mix(dayP, texDay, hasRealTex);
+          vec3 dayCol=mix(dayP,texDay,hasRealTex);
 
-          // ── Ocean specular ──────────────────────────────────────────────
-          // specTex: white=ocean/shiny, dark=land/matte
+          // Ocean specular
           float specMask=texture2D(specTex,uv).r;
-          // For procedural: ocean is 1-landP
-          float oceanMask=mix(1.-landP, specMask, hasRealTex);
+          float oceanMask=mix(1.-landP,specMask,hasRealTex);
+          float landFinal=mix(landP,1.-step(.35,specMask),hasRealTex);
 
           float diff=max(0.,sunDot);
-          float spec=pow(max(0.,sunDot),60.)*oceanMask*.85;
-          dayCol=dayCol*(0.025+diff*1.18)+vec3(1.,.96,.86)*spec;
+          float spec=pow(max(0.,sunDot),60.)*oceanMask*.90;
+          dayCol=dayCol*(0.02+diff*1.18)+vec3(1.,.96,.86)*spec;
+          dayCol+=landFinal*diff*.08*vec3(1.,.94,.84);
 
-          // Slightly brighten land on day side (more vivid continents)
-          float landMaskFinal=mix(landP, 1.-step(.35,specMask), hasRealTex);
-          dayCol+=landMaskFinal*diff*0.08*vec3(1.,.95,.85);
+          // Night city lights
+          float cn=fbm(uv*13.)*fbm(uv*27.+vec2(2.,3.5));
+          float cities=pow(max(0.,cn),1.7)*(1.-ice)*clamp(landFinal*2.2,0.,1.);
+          vec3 cityGlow=mix(vec3(1.,.68,.26),vec3(1.,.90,.58),cn)*cities*4.2;
 
-          // ── Night city lights ────────────────────────────────────────────
-          float cn=fbm(uv*13.5)*fbm(uv*27.+vec2(2.,3.5));
-          float cities=pow(max(0.,cn),1.65)*(1.-ice)*clamp(landMaskFinal*2.2,0.,1.);
-          vec3 cityGlow=mix(vec3(1.,.68,.26),vec3(1.,.90,.58),cn)*cities*4.5;
-
-          // ── Terminator ───────────────────────────────────────────────────
-          float term=smoothstep(-.09,.14,sunDot);
+          float term=smoothstep(-.10,.14,sunDot);
           vec3 color=mix(cityGlow,dayCol,term);
 
-          // ── Atmospheric rim scatter ──────────────────────────────────────
+          // Rim atmosphere
           float fr=pow(1.-abs(dot(N,vec3(0,0,1))),2.5);
           color+=vec3(.18,.44,1.)*fr*.24*max(0.,sunDot+.55);
 
@@ -203,31 +175,29 @@ export default function LandingGlobe({ selectedCountry }: Props) {
         }
       `,
     });
-
     const earth = new THREE.Mesh(earthGeo, earthMat);
     scene.add(earth);
 
     // ── Clouds ────────────────────────────────────────────────────────────
     const cloudUniforms = { time: { value: 0.0 }, sunDir: { value: SUN_DIR } };
-    const cloudGeo = new THREE.SphereGeometry(1.020, 96, 48);
+    const cloudGeo = new THREE.SphereGeometry(1.019, 96, 48);
     const cloudMat = new THREE.ShaderMaterial({
       uniforms: cloudUniforms,
       transparent: true,
       depthWrite: false,
-      vertexShader: `varying vec2 vUv; varying vec3 vNormal; void main(){vUv=uv;vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      vertexShader: `varying vec2 vUv; varying vec3 vN; void main(){vUv=uv;vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
       fragmentShader: `
         uniform float time; uniform vec3 sunDir;
-        varying vec2 vUv; varying vec3 vNormal;
+        varying vec2 vUv; varying vec3 vN;
         float h(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5);}
         float n(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1,0)),f.x),mix(h(i+vec2(0,1)),h(i+vec2(1,1)),f.x),f.y);}
         float fbm(vec2 p){float v=0.,a=.5;for(int i=0;i<5;i++){v+=a*n(p);p*=2.2;a*=.45;}return v;}
         void main(){
-          vec2 uv=vUv+vec2(time*.0052,time*.0017);
+          vec2 uv=vUv+vec2(time*.005,time*.0016);
           float c=fbm(uv*3.0);
-          float alpha=smoothstep(.43,.63,c)*.82;
-          float lit=max(0.,dot(normalize(vNormal),sunDir));
-          // Bright lit side, grey dark side
-          vec3 col=mix(vec3(.55,.60,.72),vec3(1.,1.,1.),lit*.88+.12);
+          float alpha=smoothstep(.44,.63,c)*.78;
+          float lit=max(0.,dot(normalize(vN),sunDir));
+          vec3 col=mix(vec3(.52,.58,.72),vec3(1.,1.,1.),lit*.90+.10);
           gl_FragColor=vec4(col,alpha);
         }
       `,
@@ -237,83 +207,48 @@ export default function LandingGlobe({ selectedCountry }: Props) {
 
     // ── Atmosphere ────────────────────────────────────────────────────────
     const atmoGeo = new THREE.SphereGeometry(1.075, 64, 32);
-    const atmoMat = new THREE.ShaderMaterial({
+    scene.add(new THREE.Mesh(atmoGeo, new THREE.ShaderMaterial({
       uniforms: { sunDir: { value: SUN_DIR } },
       transparent: true,
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
-      vertexShader: `varying vec3 vNormal; void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
+      vertexShader: `varying vec3 vN; void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,
       fragmentShader: `
-        varying vec3 vNormal; uniform vec3 sunDir;
+        varying vec3 vN; uniform vec3 sunDir;
         void main(){
-          float f=pow(1.-abs(dot(vNormal,vec3(0,0,1))),2.8);
-          float s=max(0.,dot(vNormal,sunDir));
-          vec3 col=mix(vec3(.08,.26,.88),vec3(.28,.58,1.),s*.75);
-          // Add warm horizon on sun side
-          col=mix(col,vec3(.9,.55,.2),pow(s,8.)*.35);
-          gl_FragColor=vec4(col,f*.65);
+          float f=pow(1.-abs(dot(vN,vec3(0,0,1))),2.8);
+          float s=max(0.,dot(vN,sunDir));
+          vec3 col=mix(vec3(.06,.22,.88),vec3(.22,.55,1.),s*.8);
+          col=mix(col,vec3(.88,.50,.18),pow(s,10.)*.28); // warm horizon glow
+          gl_FragColor=vec4(col,f*.68);
         }
       `,
-    });
-    scene.add(new THREE.Mesh(atmoGeo, atmoMat));
-
-    // ── Orbital ring ──────────────────────────────────────────────────────
-    const ringGeo = new THREE.TorusGeometry(1.46, 0.0020, 32, 256);
-    const ringMat = new THREE.MeshBasicMaterial({ color: 0x7788cc, transparent: true, opacity: 0.38 });
-    const ring    = new THREE.Mesh(ringGeo, ringMat);
-    ring.rotation.x = Math.PI * 0.12;
-    ring.rotation.z = Math.PI * 0.04;
-    scene.add(ring);
-
-    // ── Sun glow sprite ───────────────────────────────────────────────────
-    const gc = document.createElement("canvas");
-    gc.width = 64; gc.height = 64;
-    const gx = gc.getContext("2d")!;
-    const gr = gx.createRadialGradient(32, 32, 0, 32, 32, 32);
-    gr.addColorStop(0,    "rgba(255,245,200,1)");
-    gr.addColorStop(0.25, "rgba(255,235,160,0.5)");
-    gr.addColorStop(1,    "rgba(255,200,100,0)");
-    gx.fillStyle = gr; gx.fillRect(0, 0, 64, 64);
-    const sunSprite = new THREE.Sprite(new THREE.SpriteMaterial({
-      map: new THREE.CanvasTexture(gc),
-      transparent: true, opacity: 0.6,
-      blending: THREE.AdditiveBlending, depthWrite: false,
-    }));
-    sunSprite.scale.set(2.8, 2.8, 1);
-    sunSprite.position.copy(SUN_DIR.clone().multiplyScalar(9));
-    scene.add(sunSprite);
+    })));
 
     // ── Comet ─────────────────────────────────────────────────────────────
-    // Canvas: nucleus (right) + fading tail (left) → sprite rotated to travel dir
     const cometCvs = document.createElement("canvas");
     cometCvs.width = 320; cometCvs.height = 28;
     const cx = cometCvs.getContext("2d")!;
-
-    // Tail — soft blue-white gradient
     const tailG = cx.createLinearGradient(0, 14, 320, 14);
     tailG.addColorStop(0,    "rgba(140,200,255,0.00)");
-    tailG.addColorStop(0.35, "rgba(160,215,255,0.10)");
-    tailG.addColorStop(0.65, "rgba(190,228,255,0.35)");
-    tailG.addColorStop(0.85, "rgba(220,240,255,0.70)");
-    tailG.addColorStop(1,    "rgba(255,255,255,0.85)");
+    tailG.addColorStop(0.38, "rgba(165,218,255,0.12)");
+    tailG.addColorStop(0.68, "rgba(195,230,255,0.40)");
+    tailG.addColorStop(0.88, "rgba(225,242,255,0.78)");
+    tailG.addColorStop(1,    "rgba(255,255,255,0.90)");
     cx.fillStyle = tailG;
-    // Narrow elongated shape
     cx.beginPath();
     cx.moveTo(0, 14);
-    cx.bezierCurveTo(80, 10, 200, 9, 308, 6);
+    cx.bezierCurveTo(80, 10, 200, 9, 310, 6);
     cx.lineTo(320, 14);
     cx.bezierCurveTo(200, 19, 80, 18, 0, 14);
     cx.fill();
-
-    // Nucleus glow
-    const nucG = cx.createRadialGradient(310, 14, 0, 310, 14, 12);
+    const nucG = cx.createRadialGradient(311, 14, 0, 311, 14, 11);
     nucG.addColorStop(0,   "rgba(255,255,255,1.0)");
-    nucG.addColorStop(0.25,"rgba(230,242,255,0.95)");
-    nucG.addColorStop(0.6, "rgba(180,220,255,0.55)");
-    nucG.addColorStop(1,   "rgba(140,200,255,0.00)");
-    cx.fillStyle = nucG;
-    cx.fillRect(295, 2, 25, 24);
+    nucG.addColorStop(0.3, "rgba(220,240,255,0.9)");
+    nucG.addColorStop(0.7, "rgba(170,215,255,0.4)");
+    nucG.addColorStop(1,   "rgba(130,195,255,0.0)");
+    cx.fillStyle = nucG; cx.fillRect(297, 3, 23, 22);
 
     const cometMat = new THREE.SpriteMaterial({
       map: new THREE.CanvasTexture(cometCvs),
@@ -323,48 +258,34 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       depthTest: false,
     });
     const cometSprite = new THREE.Sprite(cometMat);
-    cometSprite.scale.set(9, 0.55, 1);
+    cometSprite.scale.set(9, 0.52, 1);
     cometSprite.visible = false;
     scene.add(cometSprite);
 
-    // Comet paths (start → end in world space, z deep behind earth)
     const COMET_PATHS = [
-      { s: new THREE.Vector3(7, 3.5, -8),   e: new THREE.Vector3(-4, -1.5, -8) },
-      { s: new THREE.Vector3(-6, 4.2, -10), e: new THREE.Vector3(5,  0.5, -10) },
-      { s: new THREE.Vector3(4, -3.5, -9),  e: new THREE.Vector3(-5, 2.8, -9)  },
-      { s: new THREE.Vector3(6, 2,   -11),  e: new THREE.Vector3(-2, -3,  -11) },
+      { s: new THREE.Vector3(7, 3.5, -8),  e: new THREE.Vector3(-4, -1.5, -8) },
+      { s: new THREE.Vector3(-6, 4, -10),  e: new THREE.Vector3(5,  0.5, -10) },
+      { s: new THREE.Vector3(4, -3.5, -9), e: new THREE.Vector3(-5, 2.8, -9)  },
+      { s: new THREE.Vector3(6, 2, -11),   e: new THREE.Vector3(-2, -3, -11)  },
     ];
-    const COMET_DUR    = 3200;   // ms to cross screen
-    const COMET_PERIOD = 18000;  // ms between comets
-    let cometStart     = -COMET_PERIOD + 5000; // first comet after ~5 s
-    let cometPathIdx   = 0;
+    const COMET_DUR = 3200, COMET_PERIOD = 18000;
+    let cometStart = -COMET_PERIOD + 5000;
+    let cometPathIdx = 0;
 
     function updateComet(now: number) {
       const elapsed = now - cometStart;
-
       if (elapsed < 0 || elapsed > COMET_DUR) {
         cometSprite.visible = false;
-        if (elapsed > COMET_PERIOD) {
-          cometStart   = now;
-          cometPathIdx = (cometPathIdx + 1) % COMET_PATHS.length;
-        }
+        if (elapsed > COMET_PERIOD) { cometStart = now; cometPathIdx = (cometPathIdx + 1) % COMET_PATHS.length; }
         return;
       }
-
-      const t    = elapsed / COMET_DUR; // 0 → 1
+      const t    = elapsed / COMET_DUR;
       const path = COMET_PATHS[cometPathIdx];
-      const pos  = path.s.clone().lerp(path.e, t);
-      cometSprite.position.copy(pos);
-
-      // Rotate sprite so tail faces direction of travel (project to screen)
+      cometSprite.position.copy(path.s.clone().lerp(path.e, t));
       const sp = path.s.clone().project(camera);
       const ep = path.e.clone().project(camera);
-      const angle = Math.atan2(ep.y - sp.y, ep.x - sp.x);
-      cometMat.rotation = angle;
-
-      // Fade in/out
-      const fade = t < 0.10 ? t / 0.10 : t > 0.85 ? (1 - t) / 0.15 : 1;
-      cometMat.opacity = fade * 0.95;
+      cometMat.rotation = Math.atan2(ep.y - sp.y, ep.x - sp.x);
+      cometMat.opacity  = (t < .10 ? t/.10 : t > .85 ? (1-t)/.15 : 1) * .95;
       cometSprite.visible = true;
     }
 
@@ -381,11 +302,10 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     // ── Animation ─────────────────────────────────────────────────────────
     type Phase = "idle" | "rotating" | "zooming" | "done";
     let phase: Phase = "idle";
-    let phaseStart = 0;
+    let phaseStart = 0, prevTime = 0;
     let startQuat  = new THREE.Quaternion();
     let targetQuat = new THREE.Quaternion();
     let targetSlug = "";
-    let prevTime   = 0;
     const ROTATE_DUR = 900, ZOOM_DUR = 2200;
     const CAM_FAR = 3.35, CAM_NEAR = 0.55;
     let raf: number;
@@ -394,17 +314,13 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       raf = requestAnimationFrame(tick);
       if (prevTime === 0) prevTime = now;
       prevTime = now;
-
-      const t = now * 0.001;
-      earthUniforms.time.value = t;
-      cloudUniforms.time.value = t;
+      earthUniforms.time.value = now * 0.001;
+      cloudUniforms.time.value = now * 0.001;
       updateComet(now);
 
       if (phase === "idle") {
-        earth.rotation.y     += 0.00092;
-        cloudMesh.rotation.y += 0.00102;
-        ring.rotation.y      += 0.00036;
-
+        earth.rotation.y     += 0.00088;
+        cloudMesh.rotation.y += 0.00098;
         if (selectedRef.current) {
           phase = "rotating"; phaseStart = now;
           targetSlug = selectedRef.current.name.toLowerCase().replace(/\s+/g, "-");
@@ -419,7 +335,6 @@ export default function LandingGlobe({ selectedCountry }: Props) {
         const t2 = Math.min((now - phaseStart) / ROTATE_DUR, 1);
         earth.quaternion.copy(startQuat).slerp(targetQuat, ease(t2));
         cloudMesh.rotation.y += 0.0005;
-        ring.rotation.y      += 0.0002;
         if (t2 >= 1) { phase = "zooming"; phaseStart = now; }
       }
       if (phase === "zooming") {
@@ -431,7 +346,6 @@ export default function LandingGlobe({ selectedCountry }: Props) {
 
       renderer.render(scene, camera);
     }
-
     raf = requestAnimationFrame(tick);
 
     const onResize = () => {
@@ -448,9 +362,8 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       renderer.dispose();
       earthGeo.dispose(); earthMat.dispose();
       cloudGeo.dispose(); cloudMat.dispose();
-      atmoGeo.dispose();  atmoMat.dispose();
-      ringGeo.dispose();  ringMat.dispose();
-      mwGeo.dispose();    mwMat.dispose();
+      atmoGeo.dispose();
+      starGeo.dispose();  starMat.dispose();
     };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

@@ -49,27 +49,17 @@ export default function LandingPage() {
             transition: "transform 2.2s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.8s ease",
           }}
         >
-          {/* Main title — chrome depth via layered shadows */}
+          {/* Main title — clean modern white */}
           <div style={{
-            fontFamily: "'Arial Black', 'Arial Bold', Impact, 'Haettenschweiler', sans-serif",
-            fontSize:    "clamp(1.8rem, 5.2vw, 6.5rem)",
-            whiteSpace:  "nowrap",
-            fontWeight:  900,
-            letterSpacing: "0.14em",
-            textAlign:   "center",
-            lineHeight:  1,
-            color: "#f0f4ff",
-            WebkitTextStroke: "0.5px rgba(160,190,255,0.55)",
-            textShadow: [
-              "0 1px 0 rgba(220,230,255,0.95)",
-              "0 2px 0 rgba(180,200,255,0.75)",
-              "0 3px 0 rgba(140,165,240,0.55)",
-              "0 5px 4px rgba(0,0,0,0.65)",
-              "0 10px 18px rgba(0,0,0,0.45)",
-              "0 0   55px rgba(130,175,255,0.70)",
-              "0 0  110px rgba(100,145,255,0.40)",
-              "0 0  180px rgba(80,120,255,0.20)",
-            ].join(", "),
+            fontFamily:    "system-ui, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif",
+            fontSize:      "clamp(2rem, 5.5vw, 6rem)",
+            fontWeight:    700,
+            letterSpacing: "0.22em",
+            textAlign:     "center",
+            lineHeight:    1,
+            whiteSpace:    "nowrap",
+            color:         "#ffffff",
+            textShadow:    "0 0 80px rgba(100,160,255,0.35), 0 2px 40px rgba(0,0,0,0.6)",
           }}>
             AI MARKETPLACE
           </div>
@@ -77,13 +67,12 @@ export default function LandingPage() {
           {/* Subtitle */}
           <div style={{
             textAlign:     "center",
-            marginTop:     "0.9rem",
-            fontSize:      "clamp(0.55rem, 1.2vw, 0.85rem)",
-            letterSpacing: "0.58em",
-            color:         "rgba(165,192,255,0.60)",
-            fontFamily:    "Arial, sans-serif",
-            fontWeight:    400,
-            textShadow:    "0 0 28px rgba(120,160,255,0.45)",
+            marginTop:     "1rem",
+            fontSize:      "clamp(0.55rem, 1.1vw, 0.78rem)",
+            letterSpacing: "0.50em",
+            color:         "rgba(180,205,255,0.50)",
+            fontFamily:    "system-ui, -apple-system, Helvetica, Arial, sans-serif",
+            fontWeight:    300,
           }}>
             A GLOBAL AI PLATFORM
           </div>
