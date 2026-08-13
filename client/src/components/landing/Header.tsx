@@ -424,7 +424,7 @@ export function Header() {
             )}
           </div>
 
-          {["Why AI Market", "Pricing", "Enterprise"].map((label) => (
+          {["Why AI Market"].map((label) => (
             <Link
               key={label}
               href={`/${label.toLowerCase().replace(/\s+/g, "-")}`}
@@ -488,7 +488,7 @@ export function Header() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 px-5 py-4 flex flex-col gap-1">
-          {["Find Talent", "Find Work", "Why AI Market", "Pricing", "Enterprise"].map((label) => (
+          {["Find Talent", "Find Work", "Why AI Market"].map((label) => (
             <Link
               key={label}
               href={`/${label.toLowerCase().replace(/\s+/g, "-")}`}

@@ -4,11 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Search, Bot, Code2, Palette, TrendingUp, FileText, Briefcase,
-  DollarSign, Scale, Users, Cpu, Facebook, Linkedin, Twitter,
-  Youtube, Instagram, ChevronRight, Star,
+  DollarSign, Scale, Users, Cpu, ChevronRight, Star,
 } from "lucide-react";
 import { Header } from "@/components/landing/Header";
 import GlobeGL from "@/components/globe/GlobeGL";
+
+// Inline SVG brand icons (lucide-react deprecated social brand icons in v0.5xx)
+const SocialFacebook = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+);
+const SocialLinkedin = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+);
+const SocialX = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+);
+const SocialYoutube = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46a2.78 2.78 0 0 0-1.95 1.96A29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58A2.78 2.78 0 0 0 3.41 19.6C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#1c1c1c"/></svg>
+);
+const SocialInstagram = () => (
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+);
 
 // ── Star canvas ─────────────────────────────────────────────────────────────
 function StarCanvas() {
@@ -567,11 +583,11 @@ function CTASection() {
 const FOOTER_COLS = [
   {
     heading: "For Clients",
-    links: ["How to hire", "Talent Marketplace", "Project Catalog", "Hire an Agency", "Enterprise", "Business Plus", "Any Hire", "Contract-to-hire", "Direct Contracts", "Hire worldwide"],
+    links: ["How to hire", "Talent Marketplace", "Project Catalog", "Hire an Agency", "Any Hire", "Contract-to-hire", "Direct Contracts", "Hire worldwide"],
   },
   {
     heading: "For Talent",
-    links: ["How to find work", "Direct Contracts", "Find jobs worldwide", "Find jobs in the USA", "Win work with ads", "Freelancer Plus"],
+    links: ["How to find work", "Direct Contracts", "Find jobs worldwide", "Find jobs in the USA", "Win work with ads"],
   },
   {
     heading: "Resources",
@@ -584,11 +600,11 @@ const FOOTER_COLS = [
 ];
 
 const SOCIAL = [
-  { icon: Facebook, href: "#" },
-  { icon: Linkedin, href: "#" },
-  { icon: Twitter,  href: "#" },
-  { icon: Youtube,  href: "#" },
-  { icon: Instagram, href: "#" },
+  { icon: SocialFacebook,  href: "#" },
+  { icon: SocialLinkedin,  href: "#" },
+  { icon: SocialX,         href: "#" },
+  { icon: SocialYoutube,   href: "#" },
+  { icon: SocialInstagram, href: "#" },
 ];
 
 function Footer() {
@@ -631,7 +647,7 @@ function Footer() {
             <span style={{ fontSize: "0.78rem", color: "#9ca3af" }}>Follow us</span>
             {SOCIAL.map(({ icon: Icon, href }, i) => (
               <Link key={i} href={href} style={{ color: "#9ca3af" }}>
-                <Icon size={16} />
+                <Icon />
               </Link>
             ))}
           </div>
