@@ -226,69 +226,6 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       `,
     })));
 
-    // ── Comet ─────────────────────────────────────────────────────────────
-    const cometCvs = document.createElement("canvas");
-    cometCvs.width = 320; cometCvs.height = 28;
-    const cx = cometCvs.getContext("2d")!;
-    const tailG = cx.createLinearGradient(0, 14, 320, 14);
-    tailG.addColorStop(0,    "rgba(140,200,255,0.00)");
-    tailG.addColorStop(0.38, "rgba(165,218,255,0.12)");
-    tailG.addColorStop(0.68, "rgba(195,230,255,0.40)");
-    tailG.addColorStop(0.88, "rgba(225,242,255,0.78)");
-    tailG.addColorStop(1,    "rgba(255,255,255,0.90)");
-    cx.fillStyle = tailG;
-    cx.beginPath();
-    cx.moveTo(0, 14);
-    cx.bezierCurveTo(80, 10, 200, 9, 310, 6);
-    cx.lineTo(320, 14);
-    cx.bezierCurveTo(200, 19, 80, 18, 0, 14);
-    cx.fill();
-    const nucG = cx.createRadialGradient(311, 14, 0, 311, 14, 11);
-    nucG.addColorStop(0,   "rgba(255,255,255,1.0)");
-    nucG.addColorStop(0.3, "rgba(220,240,255,0.9)");
-    nucG.addColorStop(0.7, "rgba(170,215,255,0.4)");
-    nucG.addColorStop(1,   "rgba(130,195,255,0.0)");
-    cx.fillStyle = nucG; cx.fillRect(297, 3, 23, 22);
-
-    const cometMat = new THREE.SpriteMaterial({
-      map: new THREE.CanvasTexture(cometCvs),
-      transparent: true,
-      blending: THREE.AdditiveBlending,
-      depthWrite: false,
-      depthTest: false,
-    });
-    const cometSprite = new THREE.Sprite(cometMat);
-    cometSprite.scale.set(9, 0.52, 1);
-    cometSprite.visible = false;
-    scene.add(cometSprite);
-
-    const COMET_PATHS = [
-      { s: new THREE.Vector3(7, 3.5, -8),  e: new THREE.Vector3(-4, -1.5, -8) },
-      { s: new THREE.Vector3(-6, 4, -10),  e: new THREE.Vector3(5,  0.5, -10) },
-      { s: new THREE.Vector3(4, -3.5, -9), e: new THREE.Vector3(-5, 2.8, -9)  },
-      { s: new THREE.Vector3(6, 2, -11),   e: new THREE.Vector3(-2, -3, -11)  },
-    ];
-    const COMET_DUR = 3200, COMET_PERIOD = 18000;
-    let cometStart = -COMET_PERIOD + 5000;
-    let cometPathIdx = 0;
-
-    function updateComet(now: number) {
-      const elapsed = now - cometStart;
-      if (elapsed < 0 || elapsed > COMET_DUR) {
-        cometSprite.visible = false;
-        if (elapsed > COMET_PERIOD) { cometStart = now; cometPathIdx = (cometPathIdx + 1) % COMET_PATHS.length; }
-        return;
-      }
-      const t    = elapsed / COMET_DUR;
-      const path = COMET_PATHS[cometPathIdx];
-      cometSprite.position.copy(path.s.clone().lerp(path.e, t));
-      const sp = path.s.clone().project(camera);
-      const ep = path.e.clone().project(camera);
-      cometMat.rotation = Math.atan2(ep.y - sp.y, ep.x - sp.x);
-      cometMat.opacity  = (t < .10 ? t/.10 : t > .85 ? (1-t)/.15 : 1) * .95;
-      cometSprite.visible = true;
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────
     function latLngTo3D(lat: number, lng: number) {
       const phi   = (90 - lat) * (Math.PI / 180);
@@ -316,7 +253,6 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       prevTime = now;
       earthUniforms.time.value = now * 0.001;
       cloudUniforms.time.value = now * 0.001;
-      updateComet(now);
 
       if (phase === "idle") {
         earth.rotation.y     += 0.00088;
