@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   Search, Bot, Code2, Palette, TrendingUp, FileText, Briefcase,
-  DollarSign, Scale, Users, Cpu, ChevronRight, Star,
+  DollarSign, ChevronRight, Star, Film, Music, Lightbulb, BarChart2,
 } from "lucide-react";
 import { Header } from "@/components/landing/Header";
 import GlobeGL from "@/components/globe/GlobeGL";
@@ -286,16 +286,16 @@ function TrustedSection() {
 
 // ── Categories ────────────────────────────────────────────────────────────────
 const CATS = [
-  { name: "AI Services",                icon: Bot,         slug: "ai-services" },
-  { name: "Development & IT",           icon: Code2,       slug: "development-it" },
-  { name: "Design & Creative",          icon: Palette,     slug: "design-creative" },
-  { name: "Sales & Marketing",          icon: TrendingUp,  slug: "marketing" },
-  { name: "Writing & Translation",      icon: FileText,    slug: "writing" },
-  { name: "Admin & Support",            icon: Briefcase,   slug: "admin-support" },
-  { name: "Finance & Accounting",       icon: DollarSign,  slug: "finance" },
-  { name: "Legal",                      icon: Scale,       slug: "legal" },
-  { name: "HR & Training",              icon: Users,       slug: "hr-training" },
-  { name: "Engineering & Architecture", icon: Cpu,         slug: "engineering" },
+  { name: "AI Services",        icon: Bot,        slug: "ai-services" },
+  { name: "Programming & Tech", icon: Code2,      slug: "programming-tech" },
+  { name: "Design & Creative",  icon: Palette,    slug: "design-creative" },
+  { name: "Marketing & Growth", icon: TrendingUp, slug: "marketing" },
+  { name: "Writing & Content",  icon: FileText,   slug: "writing-content" },
+  { name: "Video & Animation",  icon: Film,       slug: "video-animation" },
+  { name: "Data & Analytics",   icon: BarChart2,  slug: "data-analytics" },
+  { name: "Admin & Support",    icon: Briefcase,  slug: "admin-support" },
+  { name: "Music & Audio",      icon: Music,      slug: "music-audio" },
+  { name: "Consulting",         icon: Lightbulb,  slug: "consulting" },
 ];
 
 function CategoryCard({ cat }: { cat: typeof CATS[0] }) {
@@ -579,24 +579,36 @@ function CTASection() {
   );
 }
 
-// ── Footer ────────────────────────────────────────────────────────────────────
-const FOOTER_COLS = [
-  {
-    heading: "For Clients",
-    links: ["How to hire", "Talent Marketplace", "Project Catalog", "Hire an Agency", "Any Hire", "Contract-to-hire", "Direct Contracts", "Hire worldwide"],
-  },
-  {
-    heading: "For Talent",
-    links: ["How to find work", "Direct Contracts", "Find jobs worldwide", "Find jobs in the USA", "Win work with ads"],
-  },
-  {
-    heading: "Resources",
-    links: ["Help & support", "Success stories", "Platform reviews", "Resources", "Blog", "Affiliate program", "Refer a client", "Free Business Tools", "Release notes"],
-  },
-  {
-    heading: "Company",
-    links: ["About us", "Leadership", "Investor relations", "Careers", "Our impact", "Press", "Contact us", "Trust & safety", "Modern slavery statement"],
-  },
+// ── Footer — Fiverr style (5 cols + Categories for SEO) ──────────────────────
+const FOOTER_CATS_LIST = [
+  "AI Services", "Programming & Tech", "Design & Creative",
+  "Marketing & Growth", "Writing & Content", "Video & Animation",
+  "Data & Analytics", "Admin & Support", "Music & Audio",
+  "Consulting", "Photography", "Finance",
+  "End-to-End Projects", "Service Catalog",
+];
+
+const FOOTER_FOR_CLIENTS = [
+  "How AI Marketplace Works", "Success Stories", "Safety & Trust",
+  "Quality Standards", "Platform Guides", "Reviews", "Referral Programme",
+];
+
+const FOOTER_FOR_FREELANCERS = [
+  "Become a Specialist", "Community Hub", "Forum", "Events",
+  "Help Center", "Win Work with Ads", "Ways to Earn", "Certifications",
+];
+
+const FOOTER_BUSINESS = [
+  "AI Marketplace Business", "Project Management",
+  "Expert Sourcing Service", "AI Store Builder",
+  "Customer Success Manager", "Expert Catalog",
+];
+
+const FOOTER_COMPANY = [
+  "About AI Marketplace", "Help Center", "Trust & Safety",
+  "Social Impact", "Careers", "Terms of Service", "Privacy Policy",
+  "Do Not Sell My Info", "Partnerships", "Creator Network",
+  "Affiliates", "Invite a Friend", "Press & News",
 ];
 
 const SOCIAL = [
@@ -607,59 +619,96 @@ const SOCIAL = [
   { icon: SocialInstagram, href: "#" },
 ];
 
+function FooterCol({ heading, links, catLinks }: { heading: string; links: string[]; catLinks?: boolean }) {
+  return (
+    <div>
+      <div style={{ fontSize: "0.72rem", color: "#9ca3af", fontWeight: 600, letterSpacing: "0.07em", textTransform: "uppercase", marginBottom: "1rem" }}>
+        {heading}
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+        {links.map((l) => (
+          <Link
+            key={l}
+            href={catLinks ? `/browse?category=${encodeURIComponent(l)}` : "#"}
+            style={{ fontSize: "0.82rem", color: "#d1d5db", textDecoration: "none", lineHeight: 1.5 }}
+          >
+            {l}
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Footer() {
   return (
     <footer style={{ background: "#1c1c1c", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "56px 24px 40px" }}>
-        {/* 4-column grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "2.5rem", marginBottom: "3rem" }}>
-          {FOOTER_COLS.map((col) => (
-            <div key={col.heading}>
-              <div style={{ fontSize: "0.78rem", color: "#9ca3af", fontWeight: 500, letterSpacing: "0.06em", textTransform: "uppercase", marginBottom: "1rem" }}>
-                {col.heading}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-                {col.links.map((l) => (
-                  <Link
-                    key={l}
-                    href={`/${l.toLowerCase().replace(/\s+/g, "-")}`}
-                    style={{ fontSize: "0.88rem", color: "#d1d5db", textDecoration: "none", lineHeight: 1.4 }}
-                  >
-                    {l}
-                  </Link>
-                ))}
-              </div>
-            </div>
+      {/* Category nav strip */}
+      <div style={{ borderBottom: "1px solid #2d2d2d", padding: "16px 0", overflowX: "auto" }}>
+        <div style={{ maxWidth: 1220, margin: "0 auto", padding: "0 24px", display: "flex", gap: "2rem", whiteSpace: "nowrap" }}>
+          {FOOTER_CATS_LIST.slice(0, 10).map((cat) => (
+            <Link
+              key={cat}
+              href={`/browse?category=${encodeURIComponent(cat)}`}
+              style={{ fontSize: "0.82rem", color: "#9ca3af", textDecoration: "none", flexShrink: 0 }}
+            >
+              {cat}
+            </Link>
           ))}
         </div>
+      </div>
 
-        {/* Bottom bar */}
-        <div
-          style={{
-            borderTop: "1px solid #2d2d2d", paddingTop: "1.5rem",
-            display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "1.4rem", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "1rem", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em" }}>
-              aimarket<span style={{ color: "#14a800" }}>.</span>
-            </span>
-            <span style={{ fontSize: "0.78rem", color: "#9ca3af" }}>Follow us</span>
-            {SOCIAL.map(({ icon: Icon, href }, i) => (
-              <Link key={i} href={href} style={{ color: "#9ca3af" }}>
-                <Icon />
-              </Link>
-            ))}
+      {/* 5-column grid */}
+      <div style={{ maxWidth: 1220, margin: "0 auto", padding: "48px 24px 0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "1.45fr 1fr 1fr 1fr 1.15fr", gap: "2rem", paddingBottom: "2.5rem" }}>
+          <FooterCol heading="Categories"        links={FOOTER_CATS_LIST}       catLinks />
+          <FooterCol heading="For Clients"       links={FOOTER_FOR_CLIENTS} />
+          <FooterCol heading="For Freelancers"   links={FOOTER_FOR_FREELANCERS} />
+          <FooterCol heading="Business Solutions" links={FOOTER_BUSINESS} />
+          <FooterCol heading="Company"           links={FOOTER_COMPANY} />
+        </div>
+
+        {/* Divider + logo + social */}
+        <div style={{ borderTop: "1px solid #2d2d2d", padding: "24px 0 32px" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "1rem", marginBottom: "1rem" }}>
+            {/* Logo */}
+            <Link href="/" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
+              <svg width="28" height="28" viewBox="0 0 32 32" fill="none">
+                <rect width="32" height="32" rx="8" fill="#14a800"/>
+                <circle cx="16" cy="9"  r="2.6" fill="white"/>
+                <circle cx="9"  cy="23" r="2.6" fill="white"/>
+                <circle cx="23" cy="23" r="2.6" fill="white"/>
+                <line x1="16" y1="9"  x2="9"  y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+                <line x1="16" y1="9"  x2="23" y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+                <line x1="9"  y1="23" x2="23" y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
+              <span style={{ fontWeight: 800, fontSize: "0.95rem", color: "#fff", letterSpacing: "-0.02em" }}>
+                AI <span style={{ color: "#14a800" }}>Marketplace</span>
+              </span>
+            </Link>
+            {/* Social */}
+            <div style={{ display: "flex", alignItems: "center", gap: "1.1rem" }}>
+              {SOCIAL.map(({ icon: Icon, href }, i) => (
+                <Link key={i} href={href} style={{ color: "#9ca3af" }}>
+                  <Icon />
+                </Link>
+              ))}
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
-            {["Terms of Service", "Privacy Policy", "Cookie Settings"].map((l) => (
-              <Link key={l} href="#" style={{ fontSize: "0.78rem", color: "#9ca3af", textDecoration: "none" }}>
-                {l}
-              </Link>
-            ))}
-            <span style={{ fontSize: "0.78rem", color: "#6b7280" }}>
-              © 2026 AI Marketplace. All rights reserved.
+          {/* Copyright + legal */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "0.75rem" }}>
+            <span style={{ fontSize: "0.73rem", color: "#6b7280" }}>
+              © 2026 AI Marketplace International Ltd.
             </span>
+            <div style={{ display: "flex", gap: "1.2rem", flexWrap: "wrap", alignItems: "center" }}>
+              {["Terms of Service", "Privacy Policy", "Cookie Policy", "Accessibility"].map((l) => (
+                <Link key={l} href="#" style={{ fontSize: "0.73rem", color: "#9ca3af", textDecoration: "none" }}>
+                  {l}
+                </Link>
+              ))}
+              <span style={{ fontSize: "0.73rem", color: "#4b5563" }}>🌐 English</span>
+              <span style={{ fontSize: "0.73rem", color: "#4b5563" }}>$ USD</span>
+            </div>
           </div>
         </div>
       </div>

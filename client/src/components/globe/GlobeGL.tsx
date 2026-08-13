@@ -19,9 +19,7 @@ export default function GlobeGL() {
       try {
         const mod = await import("globe.gl");
         GlobeClass = mod.default;
-      } catch {
-        return;
-      }
+      } catch { return; }
       if (unmounted || !el) return;
 
       const W = el.offsetWidth || window.innerWidth;
@@ -45,14 +43,32 @@ export default function GlobeGL() {
 
       globe.pointOfView({ lat: 25, lng: 15, altitude: 2.0 }, 0);
 
+      // IP geolocation → pulsing location marker
       try {
         const resp = await fetch("https://ipapi.co/json/");
         const data = await resp.json();
         if (!unmounted && data.latitude && data.longitude) {
-          globe.pointOfView(
-            { lat: data.latitude, lng: data.longitude, altitude: 1.9 },
-            3000
-          );
+          const lat: number = data.latitude;
+          const lng: number = data.longitude;
+
+          // Fly to user's city
+          globe.pointOfView({ lat, lng, altitude: 1.9 }, 2800);
+
+          // Static dot — red core
+          globe
+            .pointsData([{ lat, lng }])
+            .pointColor(() => "#ff3b3b")
+            .pointAltitude(0.012)
+            .pointRadius(0.45)
+            .pointsMerge(false);
+
+          // Pulsing ring — radar/sonar animation
+          globe
+            .ringsData([{ lat, lng }])
+            .ringColor(() => "rgba(255, 80, 60, 0.85)")
+            .ringMaxRadius(4.5)
+            .ringPropagationSpeed(3.5)
+            .ringRepeatPeriod(1400);
         }
       } catch {}
     };

@@ -349,11 +349,40 @@ export function Header() {
     >
       <div className="max-w-screen-xl mx-auto px-5 h-16 flex items-center gap-4">
         {/* Logo */}
-        <Link href="/" className="flex items-end flex-shrink-0 select-none" style={{ textDecoration: "none" }}>
-          <span style={{ fontSize: "1.4rem", fontWeight: 800, color: textCol, letterSpacing: "-0.03em", lineHeight: 1 }}>
-            aimarket
-          </span>
-          <span style={{ color: "#14a800", fontSize: "1.6rem", fontWeight: 900, lineHeight: 1, marginBottom: -1 }}>.</span>
+        <Link href="/" className="flex items-center gap-2.5 flex-shrink-0 select-none" style={{ textDecoration: "none" }}>
+          {/* Brand mark — network graph symbolising connections */}
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ flexShrink: 0 }}>
+            <rect width="32" height="32" rx="8" fill="#14a800"/>
+            <circle cx="16" cy="9"  r="2.6" fill="white"/>
+            <circle cx="9"  cy="23" r="2.6" fill="white"/>
+            <circle cx="23" cy="23" r="2.6" fill="white"/>
+            <line x1="16" y1="9"  x2="9"  y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="16" y1="9"  x2="23" y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+            <line x1="9"  y1="23" x2="23" y2="23" stroke="rgba(255,255,255,0.65)" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+          {/* Wordmark */}
+          <div style={{ lineHeight: 1, display: "flex", alignItems: "baseline", gap: 1 }}>
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: "1.08rem",
+                letterSpacing: "-0.03em",
+                background: "linear-gradient(130deg, #14a800 0%, #00c4a0 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+              }}
+            >AI</span>
+            <span
+              style={{
+                fontWeight: 700,
+                fontSize: "1.08rem",
+                letterSpacing: "-0.025em",
+                color: dark ? "#111827" : "#ffffff",
+                transition: "color 0.3s",
+              }}
+            >&nbsp;Marketplace</span>
+          </div>
         </Link>
 
         {/* Desktop nav */}
