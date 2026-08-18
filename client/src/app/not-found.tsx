@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Home, Search, ArrowLeft, Sparkles } from "lucide-react";
 
 export default function NotFound() {
+  const t = useTranslations("app");
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-background px-4 relative overflow-hidden">
       {/* Background glows */}
@@ -25,9 +27,9 @@ export default function NotFound() {
           404
         </div>
 
-        <h1 className="mt-2 text-2xl font-bold text-foreground">Page not found</h1>
+        <h1 className="mt-2 text-2xl font-bold text-foreground">{t("not_found.title")}</h1>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed max-w-sm mx-auto">
-          The page you're looking for doesn't exist, was moved, or is temporarily unavailable.
+          {t("not_found.desc")}
         </p>
 
         {/* Actions */}
@@ -37,14 +39,14 @@ export default function NotFound() {
             className="inline-flex items-center gap-2 h-10 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition"
           >
             <Home className="size-4" />
-            Go home
+            {t("common.go_home")}
           </Link>
           <Link
             href="/search"
-            className="inline-flex items-center gap-2 h-10 px-5 rounded-xl glass border border-border text-sm font-medium hover:bg-white/5 transition"
+            className="inline-flex items-center gap-2 h-10 px-5 rounded-xl glass border border-border text-sm font-medium hover:bg-muted/60 transition"
           >
             <Search className="size-4" />
-            Search
+            {t("common.search")}
           </Link>
           <button
             type="button"
@@ -52,20 +54,20 @@ export default function NotFound() {
             className="inline-flex items-center gap-2 h-10 px-5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground transition"
           >
             <ArrowLeft className="size-4" />
-            Go back
+            {t("common.go_back")}
           </button>
         </div>
 
         {/* Quick links */}
         <div className="mt-10 pt-8 border-t border-border/40">
-          <p className="text-xs text-muted-foreground mb-3">Or jump to</p>
+          <p className="text-xs text-muted-foreground mb-3">{t("common.orJumpTo")}</p>
           <div className="flex flex-wrap justify-center gap-2">
             {[
-              { href: "/dashboard", label: "Dashboard" },
-              { href: "/projects", label: "Projects" },
-              { href: "/freelancers", label: "Freelancers" },
-              { href: "/forum", label: "Forum" },
-              { href: "/messages", label: "Messages" },
+              { href: "/dashboard", label: t("nav.dashboard") },
+              { href: "/projects", label: t("nav.projects") },
+              { href: "/specialists", label: t("nav.freelancers") },
+              { href: "/forum", label: t("nav.forum") },
+              { href: "/messages", label: t("nav.messages") },
             ].map(({ href, label }) => (
               <Link
                 key={href}

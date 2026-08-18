@@ -1,7 +1,94 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { ChevronDown, Search, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { useRouter, usePathname } from "@/i18n/navigation";
+import { usePathname as useRawPathname } from "next/navigation";
+
+// ── Language switcher ─────────────────────────────────────────────────────────
+const LANG_OPTIONS = [
+  { code: "en", flag: "🇺🇸", label: "English" },
+  { code: "ru", flag: "🇷🇺", label: "Русский" },
+  { code: "zh", flag: "🇨🇳", label: "中文" },
+  { code: "de", flag: "🇩🇪", label: "Deutsch" },
+  { code: "es", flag: "🇪🇸", label: "Español" },
+  { code: "fr", flag: "🇫🇷", label: "Français" },
+  { code: "tr", flag: "🇹🇷", label: "Türkçe" },
+  { code: "hi", flag: "🇮🇳", label: "हिन्दी" },
+  { code: "pt", flag: "🇧🇷", label: "Português" },
+  { code: "ar", flag: "🇸🇦", label: "العربية" },
+  { code: "ja", flag: "🇯🇵", label: "日本語" },
+  { code: "id", flag: "🇮🇩", label: "Bahasa Indonesia" },
+];
+
+function LangSwitcher({ dark }: { dark: boolean }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();       // locale-stripped path (next-intl)
+  const rawPathname = useRawPathname(); // full URL path with locale prefix
+  const router = useRouter();           // next-intl router (sets NEXT_LOCALE cookie)
+
+  // Detect current locale from raw URL (works without NextIntlClientProvider)
+  const seg = rawPathname.split("/")[1];
+  const locale = LANG_OPTIONS.some((l) => l.code === seg) ? seg : "en";
+  const current = LANG_OPTIONS.find((l) => l.code === locale) ?? LANG_OPTIONS[0];
+
+  useEffect(() => {
+    function onDoc(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  function switchLocale(code: string) {
+    setOpen(false);
+    router.push(pathname, { locale: code });
+  }
+
+  const borderColor = dark ? "rgba(0,0,0,0.12)" : "rgba(255,255,255,0.25)";
+  const bg = dark ? "rgba(0,0,0,0.04)" : "rgba(255,255,255,0.1)";
+  const textCol = dark ? "#374151" : "rgba(255,255,255,0.9)";
+
+  return (
+    <div className="relative" ref={ref}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-1.5 px-2.5 h-8 rounded-lg text-sm font-medium transition-colors"
+        style={{ border: `1px solid ${borderColor}`, background: bg, color: textCol }}
+      >
+        <span className="text-base leading-none">{current.flag}</span>
+        <span className="hidden sm:block text-xs font-semibold uppercase tracking-wide">{current.code}</span>
+        <ChevronDown size={11} className={`opacity-60 transition-transform ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      {open && (
+        <div
+          className="absolute right-0 top-full mt-2 w-52 rounded-2xl overflow-hidden z-50"
+          style={{ background: "rgba(8,8,20,0.96)", backdropFilter: "blur(24px)", border: "1px solid rgba(255,255,255,0.08)", boxShadow: "0 8px 40px rgba(0,0,0,0.5)" }}
+        >
+          <div className="p-1.5 grid grid-cols-1 gap-0.5 max-h-80 overflow-y-auto">
+            {LANG_OPTIONS.map((l) => (
+              <button
+                key={l.code}
+                type="button"
+                onClick={() => switchLocale(l.code)}
+                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-left transition-colors hover:bg-white/10"
+                style={{ color: l.code === current.code ? "#a78bfa" : "rgba(255,255,255,0.8)", fontWeight: l.code === current.code ? 600 : 400 }}
+              >
+                <span className="text-lg w-6 text-center">{l.flag}</span>
+                <span className="flex-1">{l.label}</span>
+                <span className="text-xs opacity-40 uppercase">{l.code}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 interface SubItem { title: string; desc: string; }
 interface Category { name: string; sub: SubItem[]; }
@@ -10,118 +97,136 @@ const HIRE_CATEGORIES: Category[] = [
   {
     name: "AI & Automation",
     sub: [
-      { title: "AI Video Creators & Editors", desc: "Generate and edit AI-powered video" },
-      { title: "AI Integration Developers", desc: "Connect AI to your existing tools" },
-      { title: "Chatbot Developers", desc: "Build AI for support and sales" },
-      { title: "Machine Learning Engineers", desc: "Models that learn from your data" },
       { title: "AI Developers", desc: "Custom AI-powered apps and features" },
-      { title: "Automation Experts", desc: "Streamline your business processes" },
-      { title: "N8N Experts", desc: "No-code workflow automation" },
-      { title: "Vibe Coders", desc: "Prototype and build rapidly with AI" },
-      { title: "Claude Experts", desc: "Build with Anthropic's Claude" },
-      { title: "AI Consultants", desc: "Strategic AI guidance for business" },
+      { title: "Machine Learning Engineers", desc: "Models that learn from your data" },
+      { title: "Chatbot Developers", desc: "Conversational AI for support and sales" },
+      { title: "Computer Vision Engineers", desc: "Image and video recognition systems" },
+      { title: "NLP Engineers", desc: "Natural language processing solutions" },
+      { title: "AI Integration Developers", desc: "Connect AI to your existing tools" },
+      { title: "Automation Experts", desc: "Workflow automation with AI" },
+      { title: "Prompt Engineers", desc: "Craft effective AI model prompts" },
+      { title: "n8n / Make / Zapier Experts", desc: "No-code AI workflow automation" },
+      { title: "AI Consultants", desc: "Strategic AI roadmap and guidance" },
     ],
   },
   {
-    name: "Development & IT",
+    name: "Programming & Tech",
     sub: [
-      { title: "Full-Stack Developers", desc: "Front and back end development" },
-      { title: "WordPress Developers", desc: "Build and maintain WordPress sites" },
-      { title: "Web Developers", desc: "Build and maintain websites/apps" },
+      { title: "Website Development", desc: "Build any website from scratch or template" },
+      { title: "WordPress Developers", desc: "WordPress sites, plugins and themes" },
       { title: "Shopify Developers", desc: "Launch and customize Shopify stores" },
-      { title: "Mobile App Developers", desc: "Native and cross-platform apps" },
-      { title: "Webflow Developers", desc: "Build in Webflow, no code" },
-      { title: "Front-End Developers", desc: "Pixel-perfect interfaces and UX" },
-      { title: "Ecommerce Developers", desc: "Build stores that convert and scale" },
-      { title: "React JS Developers", desc: "Fast, dynamic front ends with React" },
-      { title: "Bubble.io Developers", desc: "No-code apps built on Bubble" },
+      { title: "Webflow Developers", desc: "No-code websites and landing pages" },
+      { title: "Full-Stack Developers", desc: "End-to-end web application development" },
+      { title: "Mobile App Developers", desc: "iOS, Android and React Native apps" },
+      { title: "React / Next.js Developers", desc: "Modern, fast web applications" },
+      { title: "Python Developers", desc: "Scripting, automation and backend tools" },
+      { title: "Cybersecurity Specialists", desc: "Protect systems and data from threats" },
+      { title: "Blockchain Developers", desc: "Web3, smart contracts and DeFi" },
+    ],
+  },
+  {
+    name: "Data Science & ML",
+    sub: [
+      { title: "Data Scientists", desc: "Extract insights from complex data" },
+      { title: "ML Engineers", desc: "Build and deploy ML models" },
+      { title: "Data Analysts", desc: "Transform raw data into decisions" },
+      { title: "Data Engineers", desc: "Build scalable data pipelines" },
+      { title: "NLP Engineers", desc: "Text analysis and language models" },
+      { title: "Computer Vision Engineers", desc: "Image recognition and analysis" },
+      { title: "BI & Power BI Analysts", desc: "Dashboards and business intelligence" },
+      { title: "MLOps Engineers", desc: "ML model deployment and monitoring" },
+      { title: "Quantitative Analysts", desc: "Statistical modeling and predictions" },
+      { title: "AI Research Scientists", desc: "Cutting-edge ML research" },
     ],
   },
   {
     name: "Design & Creative",
     sub: [
-      { title: "Logo Designers", desc: "Marks and identities that stick" },
+      { title: "UI/UX Designers", desc: "Intuitive digital experiences" },
+      { title: "Logo & Brand Designers", desc: "Marks and visual identities" },
       { title: "Graphic Designers", desc: "Visual assets for any format" },
-      { title: "Web Designers", desc: "Conversion-focused web design" },
-      { title: "Video Editors", desc: "Polished edits for any platform" },
-      { title: "Photo Editors", desc: "Retouch, composite, and color work" },
-      { title: "Adobe Photoshop Experts", desc: "Advanced image editing" },
-      { title: "UX/UI Designers", desc: "Interfaces backed by user research" },
+      { title: "AI Image Generators", desc: "Create visuals with AI tools" },
+      { title: "3D Designers & Modelers", desc: "3D assets and renders" },
+      { title: "Motion Designers", desc: "Animated graphics and transitions" },
+      { title: "Product Designers", desc: "Product UX from concept to launch" },
+      { title: "AR/VR Designers", desc: "Immersive experiences and interfaces" },
       { title: "Presentation Designers", desc: "Decks that communicate and impress" },
-      { title: "Brand Identity Designers", desc: "Cohesive visual systems for brands" },
-      { title: "3D Modelers & Rendering", desc: "3D assets, photorealistic renders" },
+      { title: "Web Designers", desc: "Conversion-focused website design" },
     ],
   },
   {
-    name: "Marketing",
+    name: "Marketing & Growth",
     sub: [
+      { title: "SEO Specialists", desc: "Rank higher, drive organic traffic" },
+      { title: "PPC & Google Ads Experts", desc: "Drive clicks and conversions" },
       { title: "Social Media Managers", desc: "Grow your social presence" },
-      { title: "Google Ads Experts", desc: "Drive clicks and conversions" },
-      { title: "SEO Experts", desc: "Rank higher, drive organic traffic" },
-      { title: "Facebook Ads Experts", desc: "Targeted Facebook/Instagram ads" },
-      { title: "Email Marketers", desc: "Email campaigns that convert" },
-      { title: "Marketing Automation Consultants", desc: "Workflows that run without you" },
-      { title: "Social Media Marketers", desc: "Content and strategy, all platforms" },
-      { title: "Search Engine Marketers", desc: "Paid search strategy and execution" },
-      { title: "Marketing Strategists", desc: "Planning for sustainable growth" },
+      { title: "Email Marketers", desc: "Campaigns that convert" },
+      { title: "Growth Hackers", desc: "Data-driven scaling strategies" },
+      { title: "CRO Specialists", desc: "Convert more visitors into customers" },
+      { title: "Content Marketers", desc: "Content strategy and execution" },
+      { title: "Affiliate Marketing Experts", desc: "Build and manage affiliate programs" },
+      { title: "Brand Strategists", desc: "Build a brand that stands out" },
       { title: "Lead Generation Specialists", desc: "Fill your pipeline with prospects" },
-    ],
-  },
-  {
-    name: "Data & Analytics",
-    sub: [
-      { title: "Data Analysts", desc: "Raw data into clear insights" },
-      { title: "Data Scientists", desc: "Advanced modeling and prediction" },
-      { title: "Data Engineers", desc: "Build the pipelines your data needs" },
-      { title: "Data Visualization Specialists", desc: "Charts and dashboards that explain" },
-      { title: "Business Analysts", desc: "Connect data to business decisions" },
-      { title: "Data Mining Specialists", desc: "Find patterns in large datasets" },
-      { title: "Power BI Specialists", desc: "Interactive Power BI reporting" },
-      { title: "Quantitative Researchers", desc: "Analysis for complex research needs" },
-    ],
-  },
-  {
-    name: "Admin & Support",
-    sub: [
-      { title: "Virtual Assistants", desc: "Reliable day-to-day support" },
-      { title: "Data Entry Specialists", desc: "Fast, accurate data processing" },
-      { title: "Bookkeepers", desc: "Keep your books clean and current" },
-      { title: "Microsoft Excel Experts", desc: "Formulas, dashboards, wrangling" },
-      { title: "Cold Callers", desc: "Outreach that opens doors" },
-      { title: "PowerPoint Producers", desc: "Presentations built to impress" },
-      { title: "QuickBooks Contractors", desc: "Setup, cleanup, ongoing bookkeeping" },
-      { title: "Personal Assistants", desc: "Day-to-day support so you can focus" },
-      { title: "Appointment Setters", desc: "Calendars of qualified meetings" },
-      { title: "Customer Service Representatives", desc: "Support your customers will notice" },
     ],
   },
   {
     name: "Writing & Content",
     sub: [
-      { title: "Resume Writers", desc: "Resumes that get interviews" },
       { title: "Copywriters", desc: "Words that persuade and convert" },
-      { title: "Creative Writers", desc: "Compelling stories for any audience" },
-      { title: "Ghostwriters", desc: "Your ideas, expertly written" },
       { title: "Technical Writers", desc: "Clear docs for complex topics" },
+      { title: "AI Content Creators", desc: "Scale content with AI assistance" },
       { title: "Script Writers", desc: "Scripts for video, podcast, stage" },
+      { title: "Ghostwriters", desc: "Your ideas, expertly written" },
+      { title: "Blog & Article Writers", desc: "Research-backed content, any topic" },
       { title: "Grant Writers", desc: "Proposals that win funding" },
-      { title: "Editors", desc: "Sharp, polished writing every level" },
-      { title: "Proofreaders", desc: "Catch every error before publish" },
+      { title: "Translators & Localizers", desc: "Reach global audiences" },
+      { title: "Proofreaders & Editors", desc: "Sharp, polished writing" },
+      { title: "Resume & LinkedIn Writers", desc: "Land interviews and opportunities" },
     ],
   },
   {
-    name: "Video & Audio",
+    name: "Video & Animation",
     sub: [
-      { title: "Video Editing", desc: "Cut and polish video, any platform" },
-      { title: "Voice Over", desc: "Pro voice recording, any project" },
-      { title: "Voice Acting", desc: "Bring characters and scripts alive" },
-      { title: "Animation", desc: "Characters, logos, explainers" },
-      { title: "Narration", desc: "Clear, engaging spoken content" },
-      { title: "Subtitling", desc: "Add captions and subtitles to video" },
-      { title: "Videography", desc: "Shoot and produce pro video" },
-      { title: "Motion Graphics", desc: "Animated graphics for video/social" },
-      { title: "Audio Production", desc: "Record, mix, and master audio" },
-      { title: "Podcasting", desc: "Produce and edit podcast content" },
+      { title: "Video Editors", desc: "Cut and polish video, any platform" },
+      { title: "AI Video Generators", desc: "Create videos with generative AI" },
+      { title: "Motion Graphics Artists", desc: "Animated graphics for video/social" },
+      { title: "2D & 3D Animators", desc: "Characters, logos, explainers" },
+      { title: "VFX Artists", desc: "Visual effects for film and video" },
+      { title: "Voice Over Artists", desc: "Pro voice recording, any project" },
+      { title: "Videographers", desc: "Shoot and produce professional video" },
+      { title: "Subtitling & Captioning", desc: "Reach wider audiences with captions" },
+      { title: "YouTube Channel Managers", desc: "Grow and manage YouTube channels" },
+      { title: "Podcast Producers", desc: "Produce and edit podcast content" },
+    ],
+  },
+  {
+    name: "Industry Solutions",
+    sub: [
+      { title: "Healthcare AI Developers", desc: "Medical imaging, diagnostics and clinical AI" },
+      { title: "FinTech & Algorithmic Trading AI", desc: "Risk analysis, fraud detection, trading bots" },
+      { title: "Manufacturing & Industry 4.0", desc: "Predictive maintenance and quality control AI" },
+      { title: "Legal AI & Document Processing", desc: "Contract analysis and legal automation" },
+      { title: "Agriculture & Precision Farming AI", desc: "Crop analysis and yield prediction systems" },
+      { title: "Energy & Smart Grid AI", desc: "Renewable energy and grid optimization" },
+      { title: "Logistics & Route Optimization AI", desc: "Fleet management and supply chain AI" },
+      { title: "Real Estate & PropTech AI", desc: "Property valuation and market analysis" },
+      { title: "Retail & E-Commerce AI", desc: "Recommendation engines and pricing AI" },
+      { title: "EdTech & Adaptive Learning AI", desc: "Tutoring systems and learning automation" },
+    ],
+  },
+  {
+    name: "Business & Support",
+    sub: [
+      { title: "Virtual Assistants", desc: "Reliable day-to-day business support" },
+      { title: "Business Analysts", desc: "Connect data to business decisions" },
+      { title: "Project Managers", desc: "Deliver projects on time and budget" },
+      { title: "CRM Specialists", desc: "Salesforce, HubSpot and CRM automation" },
+      { title: "ERP Consultants", desc: "SAP, Oracle, NetSuite integration" },
+      { title: "Bookkeepers", desc: "Keep your books clean and current" },
+      { title: "Data Entry Specialists", desc: "Fast, accurate data processing" },
+      { title: "Customer Service Reps", desc: "Support your customers effectively" },
+      { title: "HR & Recruitment AI", desc: "AI-powered hiring and talent assessment" },
+      { title: "Legal Document Specialists", desc: "Contracts, compliance and document review" },
     ],
   },
 ];
@@ -131,105 +236,135 @@ const FIND_WORK_CATEGORIES: Category[] = [
     name: "AI & Automation",
     sub: [
       { title: "Artificial Intelligence", desc: "Work on cutting-edge AI projects" },
-      { title: "AI Generated Video", desc: "Create AI-powered video content" },
-      { title: "AI Model Training", desc: "Label, train and fine-tune AI models" },
-      { title: "Prompt Engineering", desc: "Craft prompts for better AI outputs" },
-      { title: "AI Content Creation", desc: "Write and edit AI-assisted content" },
-      { title: "Generative AI", desc: "Build with generative AI tools" },
-      { title: "AI Writing", desc: "Write with and about AI" },
-      { title: "Automation", desc: "Workflows that cut manual work" },
-      { title: "Chatbot", desc: "Deploy conversational bots" },
-      { title: "ChatGPT", desc: "Projects using ChatGPT and OpenAI" },
+      { title: "Machine Learning", desc: "Build and train ML models" },
+      { title: "Natural Language Processing", desc: "Text analysis and language AI" },
+      { title: "Computer Vision", desc: "Image and video recognition" },
+      { title: "Chatbot Development", desc: "Build conversational AI products" },
+      { title: "AI Integration", desc: "Connect AI to existing systems" },
+      { title: "Process Automation", desc: "Automate workflows with AI" },
+      { title: "Prompt Engineering", desc: "Optimize AI model performance" },
+      { title: "Generative AI", desc: "Build with GPT, Claude, Stable Diffusion" },
+      { title: "AI Consulting", desc: "Guide companies on AI strategy" },
     ],
   },
   {
-    name: "Development & IT",
+    name: "Programming & Tech",
     sub: [
-      { title: "Website Development", desc: "Sites from scratch or templates" },
-      { title: "Coding", desc: "Coding across languages and stacks" },
-      { title: "Software Development", desc: "Build software products and tools" },
-      { title: "Python", desc: "Scripting, automation, Python" },
-      { title: "Frontend Development", desc: "Build interfaces users love" },
-      { title: "Web Design", desc: "Design clean, functional websites" },
-      { title: "React JS", desc: "Build dynamic UIs with React" },
-      { title: "WordPress", desc: "Build and maintain WordPress sites" },
-      { title: "Full Stack Development", desc: "Full front and back end development" },
-      { title: "Shopify", desc: "Build and customize Shopify stores" },
+      { title: "Website Development", desc: "Build websites for clients" },
+      { title: "WordPress", desc: "Sites, plugins and theme work" },
+      { title: "Shopify", desc: "Customize and build Shopify stores" },
+      { title: "Full-Stack Development", desc: "Build complete web applications" },
+      { title: "Mobile Development", desc: "iOS, Android and React Native" },
+      { title: "React / Next.js", desc: "Modern JavaScript frameworks" },
+      { title: "Python", desc: "Scripting, automation and backend" },
+      { title: "Cloud & DevOps", desc: "AWS, GCP, Azure, Docker, Kubernetes" },
+      { title: "Cybersecurity", desc: "Protect systems and data" },
+      { title: "Blockchain & Web3", desc: "Smart contracts, DeFi, NFTs" },
     ],
   },
   {
-    name: "Marketing",
+    name: "Data Science & ML",
     sub: [
-      { title: "Pay Per Click", desc: "Manage paid search and display ads" },
-      { title: "Social Media Marketing", desc: "Grow audiences on social platforms" },
-      { title: "Digital Marketing", desc: "Full-funnel marketing, all channels" },
-      { title: "Social Media Management", desc: "Manage accounts, content, community" },
-      { title: "Affiliate Marketing", desc: "Build and manage affiliate programs" },
-      { title: "SEO", desc: "Improve rankings, organic traffic" },
-      { title: "Email Marketing", desc: "Campaigns written to convert" },
-      { title: "Lead Generation", desc: "Find and qualify sales prospects" },
-      { title: "Google Ads", desc: "Run and optimize Google ads" },
-      { title: "Influencer Marketing", desc: "Connect brands with top creators" },
+      { title: "Data Science", desc: "Turn data into insights" },
+      { title: "Machine Learning Engineering", desc: "Build production ML systems" },
+      { title: "Data Analysis", desc: "Analyse and visualize data" },
+      { title: "Data Engineering", desc: "Build data pipelines and warehouses" },
+      { title: "NLP Engineering", desc: "Language understanding and generation" },
+      { title: "Computer Vision", desc: "Visual recognition systems" },
+      { title: "Business Intelligence", desc: "Dashboards and reporting" },
+      { title: "MLOps", desc: "Deploy and monitor ML models" },
+      { title: "Statistical Modeling", desc: "Predictive and prescriptive analytics" },
+      { title: "AI Research", desc: "Advance the state of AI" },
     ],
   },
   {
     name: "Design & Creative",
     sub: [
-      { title: "Graphic Design", desc: "Visual assets for brands/campaigns" },
-      { title: "Logo Design", desc: "Marks and wordmarks for brands" },
-      { title: "Illustration", desc: "Custom artwork for any use case" },
-      { title: "Photo Editing", desc: "Retouch, composite, color-correct" },
-      { title: "Canva", desc: "Social graphics and decks in Canva" },
-      { title: "UX/UI Design", desc: "Intuitive digital experiences" },
-      { title: "Presentation Design", desc: "Decks that communicate clearly" },
-      { title: "3D Modeling", desc: "Create 3D assets and renders" },
-      { title: "CAD Design", desc: "Technical drawings and CAD models" },
-      { title: "Interior Design", desc: "Space planning, interior concepts" },
+      { title: "UI/UX Design", desc: "Design intuitive digital experiences" },
+      { title: "Logo & Brand Design", desc: "Create iconic brand identities" },
+      { title: "Graphic Design", desc: "Visual assets for any medium" },
+      { title: "AI Art & Image Generation", desc: "Create art using AI tools" },
+      { title: "3D Design & Modeling", desc: "3D assets and renders" },
+      { title: "Motion Design", desc: "Animated graphics and transitions" },
+      { title: "Product Design", desc: "User-centred product experiences" },
+      { title: "AR/VR Design", desc: "Immersive experience design" },
+      { title: "Presentation Design", desc: "Compelling slide decks" },
+      { title: "Web Design", desc: "Beautiful, functional websites" },
     ],
   },
   {
-    name: "Video & Audio",
+    name: "Marketing & Growth",
     sub: [
-      { title: "Video Editing", desc: "Cut and polish video, any platform" },
-      { title: "Voice Over", desc: "Pro voice recording, any project" },
-      { title: "Voice Acting", desc: "Bring characters and scripts alive" },
-      { title: "Animation", desc: "Characters, logos, explainers" },
-      { title: "Narration", desc: "Clear, engaging spoken content" },
-      { title: "Subtitling", desc: "Add captions and subtitles to video" },
-      { title: "Videography", desc: "Shoot and produce pro video" },
-      { title: "Motion Graphics", desc: "Animated graphics for video/social" },
-      { title: "Audio Production", desc: "Record, mix, and master audio" },
-      { title: "Podcasting", desc: "Produce and edit podcast content" },
+      { title: "SEO", desc: "Improve organic search rankings" },
+      { title: "Pay Per Click", desc: "Google, Bing and display ads" },
+      { title: "Social Media Marketing", desc: "Build and engage audiences" },
+      { title: "Email Marketing", desc: "Campaigns that convert" },
+      { title: "Growth Hacking", desc: "Data-driven user acquisition" },
+      { title: "Content Marketing", desc: "Strategy and execution" },
+      { title: "Affiliate Marketing", desc: "Performance-based promotion" },
+      { title: "Brand Strategy", desc: "Position your brand to win" },
+      { title: "Marketing Automation", desc: "AI-powered campaign automation" },
+      { title: "Lead Generation", desc: "Qualify and nurture prospects" },
+    ],
+  },
+  {
+    name: "Video & Animation",
+    sub: [
+      { title: "Video Editing", desc: "Edit and polish video content" },
+      { title: "AI Video Generation", desc: "Create videos using generative AI" },
+      { title: "Motion Graphics", desc: "Animated visuals for any format" },
+      { title: "Animation", desc: "2D and 3D character animation" },
+      { title: "VFX", desc: "Visual effects and compositing" },
+      { title: "Voice Over", desc: "Professional narration and recording" },
+      { title: "Videography", desc: "Shoot professional video content" },
+      { title: "Subtitling", desc: "Captions and subtitle creation" },
+      { title: "YouTube Management", desc: "Grow a YouTube channel" },
+      { title: "Podcast Production", desc: "Audio editing and production" },
     ],
   },
   {
     name: "Writing & Content",
     sub: [
-      { title: "Writing", desc: "Writing across topics and formats" },
       { title: "Copywriting", desc: "Persuasive copy for ads and web" },
-      { title: "Ghostwriting", desc: "Write content under another's name" },
-      { title: "Proofreading", desc: "Catch errors before going live" },
-      { title: "Content Writing", desc: "Blog posts, articles, web content" },
-      { title: "Technical Writing", desc: "Docs and guides for complex topics" },
-      { title: "Scriptwriting", desc: "Scripts for video, film, and audio" },
-      { title: "Article Writing", desc: "Research-backed articles, any topic" },
-      { title: "Creative Writing", desc: "Fiction, stories, creative work" },
-      { title: "Resume Writing", desc: "Help job seekers land interviews" },
+      { title: "Technical Writing", desc: "Docs, guides and API references" },
+      { title: "AI-Assisted Content", desc: "Scale content output with AI" },
+      { title: "Scriptwriting", desc: "Scripts for video, film and audio" },
+      { title: "Ghostwriting", desc: "Write under another's name" },
+      { title: "Blog Writing", desc: "Engaging articles and blog posts" },
+      { title: "Translation", desc: "Reach global audiences" },
+      { title: "Proofreading", desc: "Catch errors before publishing" },
+      { title: "Creative Writing", desc: "Fiction, poetry and creative work" },
+      { title: "Resume Writing", desc: "Help clients land interviews" },
     ],
   },
   {
-    name: "Admin & Support",
+    name: "Industry Solutions",
     sub: [
-      { title: "Data Entry", desc: "Fast, accurate data processing work" },
-      { title: "Virtual Assistant", desc: "Remote support for professionals" },
-      { title: "Chat Support", desc: "Real-time customer chat support" },
-      { title: "Data Annotation", desc: "Label data that trains AI models" },
-      { title: "Transcription", desc: "Convert audio and video to text" },
-      { title: "Microsoft Excel", desc: "Spreadsheets, formulas, cleanup" },
+      { title: "Healthcare AI", desc: "Medical AI systems and health tech" },
+      { title: "FinTech AI", desc: "Finance, trading and risk systems" },
+      { title: "Manufacturing AI", desc: "Industry 4.0 and smart factories" },
+      { title: "Legal AI", desc: "Legal tech and document automation" },
+      { title: "Agriculture AI", desc: "Precision farming and crop AI" },
+      { title: "Energy AI", desc: "Smart grid and renewable energy" },
+      { title: "Logistics AI", desc: "Supply chain and route optimization" },
+      { title: "Real Estate AI", desc: "PropTech and property analytics" },
+      { title: "Retail AI", desc: "E-commerce and recommendation AI" },
+      { title: "EdTech AI", desc: "Adaptive learning and tutoring AI" },
+    ],
+  },
+  {
+    name: "Business & Support",
+    sub: [
+      { title: "Virtual Assistance", desc: "Remote business support" },
+      { title: "Business Analysis", desc: "Process improvement and insights" },
+      { title: "Project Management", desc: "Deliver projects successfully" },
+      { title: "CRM Management", desc: "Salesforce, HubSpot expertise" },
+      { title: "Bookkeeping", desc: "Accounting and financial records" },
+      { title: "Data Entry", desc: "Accurate data processing" },
       { title: "Customer Service", desc: "Support customers across channels" },
-      { title: "Appointment Setting", desc: "Book meetings for sales and service" },
-      { title: "Executive Assistant", desc: "High-level support for executives" },
-      { title: "Email Support", desc: "Handle customer inquiries by email" },
+      { title: "HR & Recruitment", desc: "Hire and retain top talent" },
+      { title: "Legal Support", desc: "Contracts and compliance assistance" },
+      { title: "Research & Analysis", desc: "Market research and insights" },
     ],
   },
 ];
@@ -258,9 +393,9 @@ function MegaMenu({ categories, onClose, footerLinks }: MegaMenuProps) {
             className="w-full flex items-center justify-between px-5 py-2.5 text-sm text-left transition-all"
             style={{
               background: activeIdx === idx ? "#fff" : "transparent",
-              color: activeIdx === idx ? "#14a800" : "#374151",
+              color: activeIdx === idx ? "#6366f1" : "#374151",
               fontWeight: activeIdx === idx ? 600 : 400,
-              borderRight: activeIdx === idx ? "2px solid #14a800" : "2px solid transparent",
+              borderRight: activeIdx === idx ? "2px solid #6366f1" : "2px solid transparent",
             }}
             onMouseEnter={() => setActiveIdx(idx)}
           >
@@ -283,7 +418,7 @@ function MegaMenu({ categories, onClose, footerLinks }: MegaMenuProps) {
               onClick={onClose}
               className="block group"
             >
-              <div className="text-sm font-semibold text-gray-800 group-hover:text-green-600 transition-colors leading-snug">
+              <div className="text-sm font-semibold text-gray-800 group-hover:text-indigo-500 transition-colors leading-snug">
                 {item.title}
               </div>
               <div className="text-xs text-gray-500 leading-snug">{item.desc}</div>
@@ -297,7 +432,7 @@ function MegaMenu({ categories, onClose, footerLinks }: MegaMenuProps) {
                 key={fl.label}
                 href={fl.href}
                 onClick={onClose}
-                className="text-sm font-semibold text-green-600 hover:text-green-700 transition-colors"
+                className="text-sm font-semibold text-indigo-500 hover:text-indigo-400 transition-colors"
               >
                 {fl.label} →
               </Link>
@@ -310,6 +445,7 @@ function MegaMenu({ categories, onClose, footerLinks }: MegaMenuProps) {
 }
 
 export function Header() {
+  const t = useTranslations("nav");
   const [scrolled, setScrolled] = useState(false);
   const [activeMenu, setActiveMenu] = useState<"hire" | "work" | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -335,7 +471,7 @@ export function Header() {
 
   const dark = scrolled || mobileOpen;
   const textCol = dark ? "#111827" : "#ffffff";
-  const borderCol = dark ? "rgba(17,24,39,0.12)" : "rgba(255,255,255,0.25)";
+
 
   return (
     <header
@@ -397,7 +533,7 @@ export function Header() {
               className="flex items-center gap-1 px-3.5 py-2 rounded-md text-sm font-medium transition-colors"
               style={{ color: textCol }}
             >
-              Find Talent
+              {t("findTalent")}
               <ChevronDown
                 size={13}
                 style={{
@@ -412,7 +548,7 @@ export function Header() {
                 <MegaMenu
                   categories={HIRE_CATEGORIES}
                   onClose={closeMenu}
-                  footerLinks={[{ label: "See all skills", href: "/browse" }]}
+                  footerLinks={[{ label: t("seeAllSkills"), href: "/hire" }]}
                 />
               </div>
             )}
@@ -428,7 +564,7 @@ export function Header() {
               className="flex items-center gap-1 px-3.5 py-2 rounded-md text-sm font-medium transition-colors"
               style={{ color: textCol }}
             >
-              Find Work
+              {t("findWork")}
               <ChevronDown
                 size={13}
                 style={{
@@ -444,65 +580,53 @@ export function Header() {
                   categories={FIND_WORK_CATEGORIES}
                   onClose={closeMenu}
                   footerLinks={[
-                    { label: "See all jobs", href: "/jobs" },
-                    { label: "Win work with ads", href: "/ads" },
-                    { label: "Ways to earn", href: "/earn" },
+                    { label: t("browseAllProjects"), href: "/work" },
+                    { label: t("createProfile"), href: "/register" },
                   ]}
                 />
               </div>
             )}
           </div>
 
-          {["Why AI Market"].map((label) => (
-            <Link
-              key={label}
-              href={`/${label.toLowerCase().replace(/\s+/g, "-")}`}
-              className="px-3.5 py-2 rounded-md text-sm font-medium"
-              style={{ color: textCol }}
-            >
-              {label}
-            </Link>
-          ))}
+          <Link
+            href="/why-ai-market"
+            className="px-3.5 py-2 rounded-md text-sm font-medium"
+            style={{ color: textCol }}
+          >
+            {t("whyAiMarket")}
+          </Link>
         </nav>
 
         {/* Right actions - desktop */}
         <div className="hidden lg:flex items-center gap-2 ml-auto">
-          <div
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full text-sm cursor-pointer transition-all"
-            style={{
-              border: `1px solid ${borderCol}`,
-              background: dark ? "white" : "rgba(255,255,255,0.08)",
-              backdropFilter: "blur(10px)",
-              color: dark ? "#6b7280" : "rgba(255,255,255,0.7)",
-            }}
-          >
-            <Search size={13} />
-            <span style={{ fontSize: "0.78rem" }}>Search</span>
-          </div>
+          <LangSwitcher dark={dark} />
           <Link
-            href="/login"
+            href="/register?skip_role=1"
             className="text-sm font-medium px-3 py-2 rounded-md transition-colors"
             style={{ color: textCol }}
           >
-            Log in
+            {t("logIn")}
           </Link>
           <Link
             href="/register"
             className="text-sm font-semibold px-5 py-2 rounded-full transition-all"
             style={{
-              background: "#14a800",
+              background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
               color: "#fff",
-              boxShadow: "0 1px 4px rgba(20,168,0,0.35)",
+              boxShadow: "0 1px 8px rgba(99,102,241,0.45)",
             }}
           >
-            Sign up
+            {t("signUp")}
           </Link>
         </div>
 
-        {/* Mobile: right side */}
-        <div className="flex lg:hidden items-center gap-2 ml-auto">
-          <Link href="/register" className="text-sm font-semibold px-4 py-1.5 rounded-full" style={{ background: "#14a800", color: "#fff" }}>
-            Sign up
+        {/* Mobile: right side. Below 360px the sign-up pill is dropped — the
+            language switcher and the burger alone already fill the row, and
+            sign-up stays reachable from the drawer. */}
+        <div className="flex lg:hidden items-center gap-1.5 min-[400px]:gap-2 ml-auto min-w-0">
+          <LangSwitcher dark={dark} />
+          <Link href="/register" className="hidden min-[360px]:inline-block text-sm font-semibold px-4 py-1.5 rounded-full whitespace-nowrap" style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)", color: "#fff" }}>
+            {t("signUp")}
           </Link>
           <button
             onClick={() => setMobileOpen((p) => !p)}
@@ -517,10 +641,14 @@ export function Header() {
       {/* Mobile menu */}
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-gray-100 px-5 py-4 flex flex-col gap-1">
-          {["Find Talent", "Find Work", "Why AI Market"].map((label) => (
+          {([
+            { label: t("findTalent"),   href: "/hire" },
+            { label: t("findWork"),     href: "/work" },
+            { label: t("whyAiMarket"), href: "/why-ai-market" },
+          ] as { label: string; href: string }[]).map(({ label, href }) => (
             <Link
               key={label}
-              href={`/${label.toLowerCase().replace(/\s+/g, "-")}`}
+              href={href}
               onClick={() => setMobileOpen(false)}
               className="py-3 text-sm font-medium text-gray-800 border-b border-gray-100"
             >
@@ -528,11 +656,11 @@ export function Header() {
             </Link>
           ))}
           <div className="flex gap-3 mt-3">
-            <Link href="/login" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700">
-              Log in
+            <Link href="/register?skip_role=1" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2.5 rounded-full border border-gray-300 text-sm font-medium text-gray-700">
+              {t("logIn")}
             </Link>
-            <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2.5 rounded-full bg-green-600 text-white text-sm font-semibold">
-              Sign up
+            <Link href="/register" onClick={() => setMobileOpen(false)} className="flex-1 text-center py-2.5 rounded-full text-white text-sm font-semibold" style={{ background: "linear-gradient(135deg, #6366f1, #8b5cf6)" }}>
+              {t("signUp")}
             </Link>
           </div>
         </div>
