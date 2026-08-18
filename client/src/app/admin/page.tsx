@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import {
   adminGetStats, adminListUsers, adminBanUser, adminUnbanUser,
@@ -15,6 +16,7 @@ import {
 type Tab = "stats" | "users" | "reports";
 
 export default function AdminPage() {
+  const t = useTranslations("admin");
   const [tab, setTab] = useState<Tab>("stats");
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [statsError, setStatsError] = useState<string | null>(null);
@@ -89,7 +91,7 @@ export default function AdminPage() {
   const totalReportsPages = Math.ceil(reportsTotal / 20);
 
   return (
-    <AppShell title="Admin Panel">
+    <AppShell title={t("title")}>
       {/* Access denied for non-admins is handled by the API returning 403 */}
       <div className="space-y-6">
 
@@ -117,7 +119,7 @@ export default function AdminPage() {
             {statsError && (
               <div className="glass rounded-2xl p-6 flex items-center gap-3 text-destructive">
                 <AlertTriangle className="size-5 shrink-0" />
-                <span className="text-sm">{statsError === "403" ? "Access denied — Admin role required." : statsError}</span>
+                <span className="text-sm">{statsError === "403" ? t("accessDenied") : statsError}</span>
               </div>
             )}
             {!stats && !statsError && (
@@ -128,16 +130,16 @@ export default function AdminPage() {
             {stats && (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {[
-                  { label: "Total users",    value: stats.users,      icon: Users,          color: "text-primary" },
-                  { label: "Blocked users",  value: stats.blocked,    icon: ShieldBan,      color: "text-destructive" },
-                  { label: "Projects",       value: stats.projects,   icon: ClipboardList,  color: "text-blue-400" },
-                  { label: "Solutions",      value: stats.solutions,  icon: ShoppingBag,    color: "text-green-400" },
-                  { label: "Forum posts",    value: stats.forumPosts, icon: MessagesSquare, color: "text-yellow-400" },
-                  { label: "Proposals",      value: stats.proposals,  icon: Send,           color: "text-purple-400" },
-                  { label: "Reports",        value: stats.reports,    icon: Flag,           color: "text-orange-400" },
+                  { label: t("totalUsers"),   value: stats.users,      icon: Users,          color: "text-primary" },
+                  { label: t("blockedUsers"), value: stats.blocked,    icon: ShieldBan,      color: "text-destructive" },
+                  { label: t("projects"),     value: stats.projects,   icon: ClipboardList,  color: "text-blue-400" },
+                  { label: t("solutions"),    value: stats.solutions,  icon: ShoppingBag,    color: "text-green-400" },
+                  { label: t("forumPosts"),   value: stats.forumPosts, icon: MessagesSquare, color: "text-yellow-400" },
+                  { label: t("proposals"),    value: stats.proposals,  icon: Send,           color: "text-purple-400" },
+                  { label: t("reports"),      value: stats.reports,    icon: Flag,           color: "text-orange-400" },
                 ].map(({ label, value, icon: Icon, color }) => (
                   <div key={label} className="glass rounded-2xl p-5 flex items-center gap-4">
-                    <div className={`size-10 rounded-xl bg-white/5 border border-border grid place-items-center ${color}`}>
+                    <div className={`size-10 rounded-xl bg-muted/60 border border-border grid place-items-center ${color}`}>
                       <Icon className="size-5" />
                     </div>
                     <div>
@@ -167,15 +169,15 @@ export default function AdminPage() {
                 <input
                   value={usersQ}
                   onChange={(e) => setUsersQ(e.target.value)}
-                  placeholder="Search by email or username…"
-                  className="w-full h-10 pl-9 pr-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition"
+                  placeholder={t("searchPlaceholder")}
+                  className="w-full h-10 pl-9 pr-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition"
                 />
               </div>
               <button
                 type="submit"
                 className="h-10 px-4 rounded-xl bg-gradient-primary text-white text-sm"
               >
-                Search
+                {t("search")}
               </button>
             </form>
 
@@ -188,14 +190,14 @@ export default function AdminPage() {
             ) : (
               <div className="glass rounded-2xl overflow-hidden">
                 <div className="grid grid-cols-[1fr_1fr_auto_auto_auto] gap-x-4 px-4 py-2 border-b border-border text-xs text-muted-foreground font-medium">
-                  <span>User</span>
-                  <span>Email</span>
-                  <span>Role</span>
-                  <span>Joined</span>
-                  <span>Action</span>
+                  <span>{t("user")}</span>
+                  <span>{t("email")}</span>
+                  <span>{t("role")}</span>
+                  <span>{t("joined")}</span>
+                  <span>{t("action")}</span>
                 </div>
                 {users.length === 0 ? (
-                  <p className="text-sm text-muted-foreground px-4 py-8 text-center">No users found.</p>
+                  <p className="text-sm text-muted-foreground px-4 py-8 text-center">{t("noUsers")}</p>
                 ) : (
                   users.map((u) => {
                     const name = [u.profile?.firstName, u.profile?.lastName].filter(Boolean).join(" ") || u.username || "—";
@@ -213,7 +215,7 @@ export default function AdminPage() {
                           <span className="truncate">{name}</span>
                           {u.isBlocked && (
                             <span className="text-[10px] px-1.5 py-0.5 rounded bg-destructive/15 text-destructive border border-destructive/30 shrink-0">
-                              banned
+                              {t("banned")}
                             </span>
                           )}
                         </div>
@@ -223,7 +225,7 @@ export default function AdminPage() {
                             ? "bg-primary/15 text-primary border-primary/30"
                             : u.role === "FREELANCER"
                             ? "bg-blue-500/15 text-blue-400 border-blue-500/30"
-                            : "bg-white/5 text-muted-foreground border-border"
+                            : "bg-muted/60 text-muted-foreground border-border"
                         }`}>
                           {u.role}
                         </span>
@@ -239,7 +241,7 @@ export default function AdminPage() {
                               ? "border border-green-500/40 text-green-400 hover:bg-green-500/10"
                               : "border border-destructive/40 text-destructive hover:bg-destructive/10"
                           }`}
-                          title={u.role === "ADMIN" ? "Cannot ban admin" : ""}
+                          title={u.role === "ADMIN" ? t("cannotBanAdmin") : ""}
                         >
                           {banBusy === u.id ? (
                             <Loader2 className="size-3 animate-spin" />
@@ -248,7 +250,7 @@ export default function AdminPage() {
                           ) : (
                             <ShieldBan className="size-3" />
                           )}
-                          {u.isBlocked ? "Unban" : "Ban"}
+                          {u.isBlocked ? t("unban") : t("ban")}
                         </button>
                       </div>
                     );
@@ -268,7 +270,7 @@ export default function AdminPage() {
                     onClick={() => setUsersPage((p) => p - 1)}
                     className="h-8 px-3 rounded-lg border border-border text-xs disabled:opacity-40 hover:border-primary/40"
                   >
-                    Previous
+                    {t("previous")}
                   </button>
                   <span className="h-8 px-3 grid place-items-center text-xs text-muted-foreground">
                     {usersPage} / {totalUsersPages}
@@ -279,7 +281,7 @@ export default function AdminPage() {
                     onClick={() => setUsersPage((p) => p + 1)}
                     className="h-8 px-3 rounded-lg border border-border text-xs disabled:opacity-40 hover:border-primary/40"
                   >
-                    Next
+                    {t("next")}
                   </button>
                 </div>
               </div>
@@ -298,7 +300,7 @@ export default function AdminPage() {
               </div>
             ) : reports.length === 0 ? (
               <div className="glass rounded-2xl py-16 text-center text-sm text-muted-foreground">
-                No reports yet.
+                {t("noReports")}
               </div>
             ) : (
               <div className="glass rounded-2xl overflow-hidden divide-y divide-border/50">
@@ -312,8 +314,8 @@ export default function AdminPage() {
                         <span className="font-medium text-foreground">
                           {r.reporter.username ?? r.reporter.email}
                         </span>
-                        <span>reported</span>
-                        <span className="px-1.5 py-0.5 rounded bg-white/5 border border-border font-mono">
+                        <span>{t("reported")}</span>
+                        <span className="px-1.5 py-0.5 rounded bg-muted/60 border border-border font-mono">
                           {r.targetType}
                         </span>
                         <span className="font-mono text-[10px]">{r.targetId}</span>
@@ -336,7 +338,7 @@ export default function AdminPage() {
                     onClick={() => setReportsPage((p) => p - 1)}
                     className="h-8 px-3 rounded-lg border border-border text-xs disabled:opacity-40"
                   >
-                    Previous
+                    {t("previous")}
                   </button>
                   <span className="h-8 px-3 grid place-items-center text-xs text-muted-foreground">
                     {reportsPage} / {totalReportsPages}
@@ -347,7 +349,7 @@ export default function AdminPage() {
                     onClick={() => setReportsPage((p) => p + 1)}
                     className="h-8 px-3 rounded-lg border border-border text-xs disabled:opacity-40"
                   >
-                    Next
+                    {t("next")}
                   </button>
                 </div>
               </div>

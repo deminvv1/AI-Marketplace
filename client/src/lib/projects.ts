@@ -41,5 +41,5 @@ export function freelancerDisplayName(p: {
   const last = p.profile?.lastName?.trim();
   if (first || last) return [first, last].filter(Boolean).join(" ");
   if (p.username) return `@${p.username}`;
-  return "Freelancer";
+  return "Specialist";
 }

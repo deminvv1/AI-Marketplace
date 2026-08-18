@@ -7,6 +7,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { createSolution } from "@/app/actions/solutions";
 import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
@@ -15,6 +16,7 @@ import { SOLUTION_FORMATS } from "@/lib/solutions";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 export default function NewSolutionPage() {
+  const tf = useTranslations("forms");
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -71,56 +73,56 @@ export default function NewSolutionPage() {
   }
 
   return (
-    <AppShell title="Publish solution">
+    <AppShell title={tf("publishSolution")}>
       <Link
         href="/solutions"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> Back to catalog
+        <ArrowLeft className="size-4" /> {tf("backToCatalog")}
       </Link>
 
       <form onSubmit={handleSubmit} className="max-w-2xl glass rounded-2xl p-8 space-y-5">
         <div>
-          <label className="text-sm font-medium">Title</label>
+          <label className="text-sm font-medium">{tf("title")}</label>
           <input
             required
             minLength={5}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
-            placeholder="MediScan Pro — radiology triage SaaS"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
+            placeholder={tf("solutionTitleExample")}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium">Short preview</label>
+          <label className="text-sm font-medium">{tf("shortPreview")}</label>
           <input
             value={preview}
             onChange={(e) => setPreview(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
-            placeholder="One-line pitch for the card"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
+            placeholder={tf("pitchHint")}
           />
         </div>
 
         <div>
-          <label className="text-sm font-medium">Description</label>
+          <label className="text-sm font-medium">{tf("description")}</label>
           <textarea
             required
             minLength={20}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={6}
-            className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+            className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
           />
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium">Format</label>
+            <label className="text-sm font-medium">{tf("format")}</label>
             <select
               value={format}
               onChange={(e) => setFormat(e.target.value)}
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
             >
               {SOLUTION_FORMATS.map((f) => (
                 <option key={f} value={f}>
@@ -130,22 +132,22 @@ export default function NewSolutionPage() {
             </select>
           </div>
           <div>
-            <label className="text-sm font-medium">Price</label>
+            <label className="text-sm font-medium">{tf("price")}</label>
             <input
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               placeholder="$499 / mo"
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
             />
           </div>
         </div>
 
         <div>
-          <label className="text-sm font-medium">Industry</label>
+          <label className="text-sm font-medium">{tf("industry")}</label>
           <select
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
           >
             {categories.map((i) => (
               <option key={i.id} value={i.name}>
@@ -157,19 +159,19 @@ export default function NewSolutionPage() {
 
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium">Country</label>
+            <label className="text-sm font-medium">{tf("country")}</label>
             <input
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
             />
           </div>
           <div>
-            <label className="text-sm font-medium">Language</label>
+            <label className="text-sm font-medium">{tf("language")}</label>
             <input
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
             />
           </div>
         </div>

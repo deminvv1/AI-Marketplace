@@ -91,7 +91,7 @@ export function UserSafetyActions({ targetId, targetType, targetLabel }: Props) 
           <select
             value={reportType}
             onChange={(e) => setReportType(e.target.value)}
-            className="w-full h-9 px-3 rounded-lg bg-white/5 border border-border text-sm"
+            className="w-full h-9 px-3 rounded-lg bg-muted/60 border border-border text-sm"
           >
             {REPORT_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -104,7 +104,7 @@ export function UserSafetyActions({ targetId, targetType, targetLabel }: Props) 
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Details (optional)"
             rows={2}
-            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm resize-none"
+            className="w-full px-3 py-2 rounded-lg bg-muted/60 border border-border text-sm resize-none"
           />
           <button
             type="button"

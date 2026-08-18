@@ -52,7 +52,7 @@ export function WelcomeModal() {
         </div>
       </div>
 
-      <div className="mt-4 h-1 rounded-full bg-white/10 overflow-hidden">
+      <div className="mt-4 h-1 rounded-full bg-muted/80 overflow-hidden">
         <div
           className="h-full bg-primary rounded-full transition-none"
           style={{ width: `${progress}%` }}

@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { createForumPost } from "@/app/actions/forum";
 import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
@@ -12,6 +13,7 @@ import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 export default function NewForumTopicPage() {
+  const tf = useTranslations("forms");
   const router = useRouter();
   const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
   const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
@@ -57,42 +59,42 @@ export default function NewForumTopicPage() {
   }
 
   return (
-    <AppShell title="New topic">
+    <AppShell title={tf("newTopic")}>
       <Link
         href="/forum"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> Forum
+        <ArrowLeft className="size-4" /> {tf("forum")}
       </Link>
 
       <form onSubmit={handleSubmit} className="max-w-2xl glass rounded-2xl p-8 space-y-5">
         <div>
-          <label className="text-sm font-medium">Title</label>
+          <label className="text-sm font-medium">{tf("title")}</label>
           <input
             required
             minLength={5}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Content</label>
+          <label className="text-sm font-medium">{tf("content")}</label>
           <textarea
             required
             minLength={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={8}
-            className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+            className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Industry</label>
+          <label className="text-sm font-medium">{tf("industry")}</label>
           <select
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
           >
             {categories.map((i) => (
               <option key={i.id} value={i.name}>
@@ -108,7 +110,7 @@ export default function NewForumTopicPage() {
         <button
           type="submit"
           disabled={submitting}
-          className="h-10 px-6 rounded-xl bg-secondary text-white text-sm font-medium inline-flex items-center gap-2 disabled:opacity-60"
+          className="h-10 px-6 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium inline-flex items-center gap-2 disabled:opacity-60"
         >
           {submitting ? <Loader2 className="size-4 animate-spin" /> : <Check className="size-4" />}
           Post topic

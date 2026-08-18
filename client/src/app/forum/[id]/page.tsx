@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { UserSafetyActions } from "@/components/user-safety-actions";
 import { getMe } from "@/app/actions/me";
@@ -24,7 +25,7 @@ import {
   type ForumCommentItem,
   type ForumPostDetail,
 } from "@/app/actions/forum";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import { forumAuthorName, formatForumTime } from "@/lib/forum";
 import { ArrowLeft, Loader2, Pencil, ThumbsUp, Trash2 } from "lucide-react";
 import { TranslateButton } from "@/components/translate-button";
@@ -77,6 +78,7 @@ function CommentBlock({
   onEdited: (commentId: string, content: string) => void;
   onDeleted: (commentId: string) => void;
 }) {
+  const t = useTranslations("thread");
   const isAuthor = !!(meId && comment.author.id === meId);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(comment.content);
@@ -86,7 +88,7 @@ function CommentBlock({
   const [translatedContent, setTranslatedContent] = useState<string | null>(null);
 
   async function handleDelete() {
-    if (!confirm("Delete this comment and its replies?")) return;
+    if (!confirm(t("confirmDeleteComment"))) return;
     setDeleting(true);
     const result = await deleteForumComment(postId, comment.id);
     setDeleting(false);
@@ -113,7 +115,7 @@ function CommentBlock({
 
   return (
     <div className={comment.parentCommentId ? "ml-6 mt-2" : ""}>
-      <div className="flex gap-2 p-3 rounded-xl bg-white/5 border border-border">
+      <div className="flex gap-2 p-3 rounded-xl bg-muted/60 border border-border">
         <div className="size-8 rounded-full bg-gradient-primary grid place-items-center text-xs font-semibold shrink-0">
           {forumAuthorName(comment.author)[0]?.toUpperCase()}
         </div>
@@ -131,7 +133,7 @@ function CommentBlock({
                 value={draft}
                 onChange={(e) => setDraft(e.target.value)}
                 rows={3}
-                className="w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm resize-none"
+                className="w-full px-3 py-2 rounded-lg bg-muted/60 border border-border text-sm resize-none"
               />
               {editError && <p className="text-xs text-destructive">{editError}</p>}
               <div className="flex gap-2">
@@ -141,7 +143,7 @@ function CommentBlock({
                   onClick={handleSaveEdit}
                   className="h-8 px-3 rounded-lg bg-gradient-primary text-white text-xs disabled:opacity-60"
                 >
-                  {saving ? "Saving…" : "Save"}
+                  {saving ? t("saving") : t("save")}
                 </button>
                 <button
                   type="button"
@@ -153,7 +155,7 @@ function CommentBlock({
                   }}
                   className="h-8 px-3 rounded-lg border border-border text-xs"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
               </div>
             </div>
@@ -163,7 +165,7 @@ function CommentBlock({
                 {translatedContent ?? comment.content}
               </p>
               {translatedContent && (
-                <p className="text-[11px] text-muted-foreground/60 mt-0.5 italic">Translated</p>
+                <p className="text-[11px] text-muted-foreground/60 mt-0.5 italic">{t("translated")}</p>
               )}
             </div>
           )}
@@ -189,7 +191,7 @@ function CommentBlock({
                 onClick={() => onReply(comment.id)}
                 className="text-xs text-primary hover:underline"
               >
-                Reply
+                {t("reply")}
               </button>
             )}
             {!editing && (
@@ -210,7 +212,7 @@ function CommentBlock({
                   className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
                 >
                   <Pencil className="size-3" />
-                  Edit
+                  {t("edit")}
                 </button>
                 <button
                   type="button"
@@ -245,6 +247,7 @@ function CommentBlock({
 }
 
 export default function ForumTopicPage() {
+  const t = useTranslations("thread");
   const params = useParams();
   const router = useRouter();
   const postId = typeof params.id === "string" ? params.id : "";
@@ -350,7 +353,7 @@ export default function ForumTopicPage() {
   }
 
   async function handleDeleteTopic() {
-    if (!confirm("Delete this topic?")) return;
+    if (!confirm(t("confirmDeleteTopic"))) return;
     setDeleting(true);
     const result = await deleteForumPost(postId);
     setDeleting(false);
@@ -364,7 +367,7 @@ export default function ForumTopicPage() {
 
   if (loading) {
     return (
-      <AppShell title="Forum">
+      <AppShell title={t("forum")}>
         <div className="flex justify-center py-24">
           <Loader2 className="size-8 animate-spin" />
         </div>
@@ -374,8 +377,8 @@ export default function ForumTopicPage() {
 
   if (error || !post) {
     return (
-      <AppShell title="Forum">
-        <p className="text-destructive text-sm">{error ?? "Not found"}</p>
+      <AppShell title={t("forum")}>
+        <p className="text-destructive text-sm">{error ?? t("notFound")}</p>
         <Link href="/forum" className="text-primary text-sm mt-4 inline-block">
           ← Forum
         </Link>
@@ -389,7 +392,7 @@ export default function ForumTopicPage() {
         href="/forum"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> All topics
+        <ArrowLeft className="size-4" /> {t("allTopics")}
       </Link>
 
       <article className="glass rounded-2xl p-6 mb-6">
@@ -423,7 +426,7 @@ export default function ForumTopicPage() {
             {translatedPost ?? post.content}
           </p>
           {translatedPost && (
-            <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+            <p className="text-[11px] text-muted-foreground/60 mt-1 italic">{t("translated")}</p>
           )}
           <div className="mt-2">
             <TranslateButton
@@ -455,7 +458,7 @@ export default function ForumTopicPage() {
               className="h-9 px-4 rounded-lg border border-border text-xs inline-flex items-center gap-2 hover:border-primary/40"
             >
               <Pencil className="size-4" />
-              Edit
+              {t("edit")}
             </Link>
             <button
             type="button"
@@ -509,16 +512,16 @@ export default function ForumTopicPage() {
                   setReply("");
                 }}
               >
-                Cancel
+                {t("cancel")}
               </button>
             </p>
           )}
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}
-            placeholder="Write a reply…"
+            placeholder={t("replyPlaceholder")}
             rows={3}
-            className="w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm resize-none"
+            className="w-full px-3 py-2 rounded-lg bg-muted/60 border border-border text-sm resize-none"
           />
           {error && <p className="text-sm text-destructive">{error}</p>}
           <button
@@ -526,7 +529,7 @@ export default function ForumTopicPage() {
             disabled={submitting}
             className="h-9 px-4 rounded-lg bg-gradient-primary text-white text-xs font-medium disabled:opacity-60"
           >
-            {submitting ? "Posting…" : "Post reply"}
+            {submitting ? t("posting") : t("postReply")}
           </button>
         </form>
       </section>

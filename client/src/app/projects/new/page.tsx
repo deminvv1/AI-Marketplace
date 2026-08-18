@@ -7,6 +7,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { createProject } from "@/app/actions/projects";
 import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
@@ -15,6 +16,7 @@ import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { Check, Loader2 } from "lucide-react";
 
 export default function PostProjectPage() {
+  const tf = useTranslations("forms");
   const router = useRouter();
   const [categories, setCategories] = useState<TaxonomyCategory[]>([]);
   const [allSkills, setAllSkills] = useState<TaxonomySkill[]>([]);
@@ -67,18 +69,18 @@ export default function PostProjectPage() {
   }
 
   return (
-    <AppShell title="Post a project">
+    <AppShell title={tf("postProject")}>
       <div className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 space-y-6">
           <div>
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-sm font-medium">{tf("title")}</label>
             <input
               required
               minLength={5}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Medical imaging classifier for radiology clinic"
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary focus:glow-primary transition-all"
+              placeholder={tf("titleExample")}
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary focus:glow-primary transition-all"
             />
           </div>
 
@@ -96,7 +98,7 @@ export default function PostProjectPage() {
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Short description</label>
+              <label className="text-sm font-medium">{tf("shortDescription")}</label>
               <span className="text-xs text-muted-foreground">
                 {shortDescription.length} / 200
               </span>
@@ -106,52 +108,52 @@ export default function PostProjectPage() {
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
               rows={3}
-              placeholder="Brief summary for the project card…"
-              className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
+              placeholder={tf("shortSummaryHint")}
+              className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium">Full description</label>
+            <label className="text-sm font-medium">{tf("fullDescription")}</label>
             <textarea
               required
               minLength={20}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={6}
-              placeholder="Scope, deliverables, compliance requirements…"
-              className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
+              placeholder={tf("scopeHint")}
+              className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
             />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Budget</label>
+              <label className="text-sm font-medium">{tf("budget")}</label>
               <input
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
                 placeholder="$3,500 – $7,000"
-                className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+                className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Deadline</label>
+              <label className="text-sm font-medium">{tf("deadline")}</label>
               <input
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+                className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium">Country</label>
+            <label className="text-sm font-medium">{tf("country")}</label>
             <input
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              placeholder="Germany"
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+              placeholder={tf("countryExample")}
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
             />
           </div>
 
@@ -165,9 +167,9 @@ export default function PostProjectPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="h-10 px-4 rounded-xl bg-white/5 border border-border text-sm"
+              className="h-10 px-4 rounded-xl bg-muted/60 border border-border text-sm"
             >
-              Cancel
+              {tf("cancel")}
             </button>
             <button
               type="submit"

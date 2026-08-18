@@ -43,7 +43,7 @@ export function SkillTagPicker({
               className={`h-8 px-3 rounded-lg text-xs border transition ${
                 on
                   ? "bg-primary/15 border-primary/50 text-primary"
-                  : "bg-white/5 border-border text-muted-foreground hover:border-primary/40"
+                  : "bg-muted/60 border-border text-muted-foreground hover:border-primary/40"
               }`}
             >
               {skillLabel(s.slug, skills)}

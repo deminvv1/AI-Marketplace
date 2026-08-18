@@ -7,8 +7,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import { Search, ArrowRight, Loader2, X, Bell, ClipboardList } from "lucide-react";
 import { EmptyState } from "@/components/empty-state";
 import { createProjectAlert } from "@/app/actions/project-alerts";
@@ -27,6 +28,7 @@ import { useTaxonomy } from "@/lib/use-taxonomy";
 import { skillLabel } from "@/lib/taxonomy";
 
 export default function ProjectsPage() {
+  const t = useTranslations("projects");
   const [projects, setProjects] = useState<ProjectListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export default function ProjectsPage() {
 
   async function saveAsAlert() {
     if (!hasFilters) {
-      setAlertMsg("Set industry, country, or keyword first.");
+      setAlertMsg(t("setFiltersFirst"));
       return;
     }
     setAlertSaving(true);
@@ -54,7 +56,7 @@ export default function ProjectsPage() {
     });
     setAlertSaving(false);
     if ("error" in res && res.error) setAlertMsg(res.error);
-    else setAlertMsg("Alert saved! You will be notified about matching projects.");
+    else setAlertMsg(t("alertSaved"));
   }
 
   useEffect(() => {
@@ -87,21 +89,19 @@ export default function ProjectsPage() {
   const hasFilters = !!(industry || tag || country.trim() || query.trim());
 
   return (
-    <AppShell title="Projects">
+    <AppShell title={t("title")}>
       <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Browse AI Projects</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t("heading")}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {loading
-              ? "Loading…"
-              : `${projects.length} open project${projects.length === 1 ? "" : "s"}`}
+            {loading ? t("loading") : t("openProjects", { count: projects.length })}
           </p>
         </div>
         <Link
           href="/projects/new"
           className="h-9 px-4 rounded-lg bg-gradient-primary text-white text-xs font-medium glow-primary inline-flex items-center"
         >
-          Post a project
+          {t("postProject")}
         </Link>
       </div>
 
@@ -110,17 +110,17 @@ export default function ProjectsPage() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search by keyword, industry, tags…"
+          placeholder={t("searchPlaceholder")}
           className="w-full h-11 pl-10 pr-3 rounded-xl glass border border-border text-sm focus:outline-none focus:border-primary focus:glow-primary transition-all"
         />
       </div>
 
       <div className="mb-6">
-        <label className="text-xs text-muted-foreground">Country filter</label>
+        <label className="text-xs text-muted-foreground">{t("countryFilter")}</label>
         <input
           value={country}
           onChange={(e) => setCountry(e.target.value)}
-          placeholder="e.g. Germany"
+          placeholder={t("countryExample")}
           className="mt-1 w-full max-w-xs h-9 px-3 rounded-lg glass border border-border text-sm"
         />
       </div>
@@ -137,7 +137,7 @@ export default function ProjectsPage() {
             }}
             className="text-xs text-primary inline-flex items-center gap-1 hover:underline"
           >
-            <X className="size-3" /> Clear filters
+            <X className="size-3" /> {t("clearFilters")}
           </button>
         )}
         <button
@@ -147,10 +147,10 @@ export default function ProjectsPage() {
           className="text-xs inline-flex items-center gap-1.5 h-8 px-3 rounded-lg border border-border hover:border-primary/40 disabled:opacity-50"
         >
           <Bell className="size-3.5" />
-          {alertSaving ? "Saving…" : "Save as project alert"}
+          {alertSaving ? t("saving") : t("saveAsAlert")}
         </button>
         <Link href="/project-alerts" className="text-xs text-muted-foreground hover:text-primary">
-          Manage alerts →
+          {t("manageAlerts")}
         </Link>
         {alertMsg && <span className="text-xs text-muted-foreground">{alertMsg}</span>}
       </div>
@@ -186,9 +186,9 @@ export default function ProjectsPage() {
             <div className="glass rounded-2xl">
               <EmptyState
                 icon={ClipboardList}
-                title="No projects found"
-                description="No projects match your filters. Try adjusting them or post a new project."
-                action={{ label: "Post a project", href: "/projects/new" }}
+                title={t("noProjects")}
+                description={t("noProjectsHint")}
+                action={{ label: t("postProject"), href: "/projects/new" }}
               />
             </div>
           )}
@@ -217,13 +217,13 @@ export default function ProjectsPage() {
                   {o.tags?.slice(0, 3).map((t) => (
                     <span
                       key={t}
-                      className="px-2 py-1 rounded-md bg-white/5 border border-border text-muted-foreground"
+                      className="px-2 py-1 rounded-md bg-muted/60 border border-border text-muted-foreground"
                     >
                       {skillLabel(t, skills)}
                     </span>
                   ))}
                   {o.country && (
-                    <span className="px-2 py-1 rounded-md bg-white/5 border border-border text-muted-foreground">
+                    <span className="px-2 py-1 rounded-md bg-muted/60 border border-border text-muted-foreground">
                       {flag(o.country)} {o.country}
                     </span>
                   )}
@@ -231,15 +231,15 @@ export default function ProjectsPage() {
                 <div className="mt-4 grid grid-cols-2 gap-3 text-xs text-muted-foreground border-t border-border pt-4">
                   <div>
                     <div className="text-foreground font-medium">
-                      {o.budget || "Budget TBD"}
+                      {o.budget || t("budgetTbd")}
                     </div>
-                    Budget
+                    {t("budget")}
                   </div>
                   <div>
                     <div className="text-foreground font-medium">
                       {formatDeadline(o.deadline)}
                     </div>
-                    Deadline
+                    {t("deadline")}
                   </div>
                 </div>
                 <div className="mt-4 flex items-center justify-between">
@@ -251,7 +251,7 @@ export default function ProjectsPage() {
                     href={`/projects/${o.id}`}
                     className="h-8 px-3 rounded-lg border border-primary/50 text-primary text-xs font-medium hover:bg-primary/15 transition inline-flex items-center gap-1"
                   >
-                    View & propose <ArrowRight className="size-3" />
+                    {t("viewAndPropose")} <ArrowRight className="size-3" />
                   </Link>
                 </div>
               </article>

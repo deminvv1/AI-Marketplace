@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { getMe } from "@/app/actions/me";
 import { getForumPost, updateForumPost } from "@/app/actions/forum";
@@ -13,6 +14,7 @@ import { SkillTagPicker } from "@/components/skill-tag-picker";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
 export default function EditForumTopicPage() {
+  const tf = useTranslations("forms");
   const params = useParams();
   const router = useRouter();
   const postId = typeof params.id === "string" ? params.id : "";
@@ -89,7 +91,7 @@ export default function EditForumTopicPage() {
 
   if (loading) {
     return (
-      <AppShell title="Edit topic">
+      <AppShell title={tf("editTopic")}>
         <div className="flex justify-center py-24">
           <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
@@ -99,7 +101,7 @@ export default function EditForumTopicPage() {
 
   if (forbidden) {
     return (
-      <AppShell title="Edit topic">
+      <AppShell title={tf("editTopic")}>
         <p className="text-destructive text-sm">{forbidden}</p>
         <Link href={`/forum/${postId}`} className="text-primary text-sm mt-4 inline-block">
           ← Back
@@ -109,31 +111,31 @@ export default function EditForumTopicPage() {
   }
 
   return (
-    <AppShell title="Edit topic">
+    <AppShell title={tf("editTopic")}>
       <Link
         href={`/forum/${postId}`}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> Back to topic
+        <ArrowLeft className="size-4" /> {tf("backToTopic")}
       </Link>
 
       <form onSubmit={handleSubmit} className="max-w-3xl glass rounded-2xl p-8 space-y-5">
         <div>
-          <label className="text-sm font-medium">Title</label>
+          <label className="text-sm font-medium">{tf("title")}</label>
           <input
             required
             minLength={5}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+            className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
           />
         </div>
         <div>
-          <label className="text-sm font-medium">Industry</label>
+          <label className="text-sm font-medium">{tf("industry")}</label>
           <select
             value={industry}
             onChange={(e) => setIndustry(e.target.value)}
-            className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+            className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
           >
             <option value="">—</option>
             {categories.map((i) => (
@@ -144,14 +146,14 @@ export default function EditForumTopicPage() {
           </select>
         </div>
         <div>
-          <label className="text-sm font-medium">Content</label>
+          <label className="text-sm font-medium">{tf("content")}</label>
           <textarea
             required
             minLength={10}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             rows={8}
-            className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+            className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
           />
         </div>
         {allSkills.length > 0 && (

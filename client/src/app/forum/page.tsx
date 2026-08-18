@@ -6,8 +6,9 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import {
   CatalogIndustryList,
   CatalogSkillChips,
@@ -20,6 +21,7 @@ import { Loader2, MessageSquare, MessagesSquare, Plus, Search, ThumbsUp } from "
 import { EmptyState } from "@/components/empty-state";
 
 export default function ForumPage() {
+  const tf = useTranslations("forum");
   const [posts, setPosts] = useState<ForumPostListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export default function ForumPage() {
   }, [query, industry, tag]);
 
   return (
-    <AppShell title="Forum">
+    <AppShell title={tf("title")}>
       <div className="grid grid-cols-12 gap-6">
         <aside className="col-span-12 lg:col-span-3 glass rounded-2xl p-5 h-fit space-y-6">
           {categories.length > 0 && (
@@ -61,8 +63,8 @@ export default function ForumPage() {
               categories={categories}
               value={industry}
               onChange={setIndustry}
-              title="Categories"
-              allLabel="All topics"
+              title={tf("categories")}
+              allLabel={tf("allTopics")}
             />
           )}
           <CatalogSkillChips skills={skills} value={tag} onChange={setTag} />
@@ -72,16 +74,16 @@ export default function ForumPage() {
           <div className="flex items-center gap-3 flex-wrap">
             <Link
               href="/forum/new"
-              className="h-10 px-4 rounded-xl bg-secondary text-white text-sm font-medium glow-secondary inline-flex items-center gap-2"
+              className="h-10 px-4 rounded-xl bg-secondary text-secondary-foreground text-sm font-medium glow-secondary inline-flex items-center gap-2"
             >
-              <Plus className="size-4" /> New topic
+              <Plus className="size-4" /> {tf("newTopic")}
             </Link>
             <div className="relative flex-1 min-w-[200px]">
               <Search className="size-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
               <input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search threads…"
+                placeholder={tf("searchPlaceholder")}
                 className="w-full h-10 pl-9 pr-3 rounded-xl glass border border-border text-sm"
               />
             </div>
@@ -99,9 +101,9 @@ export default function ForumPage() {
             <div className="glass rounded-2xl">
               <EmptyState
                 icon={MessagesSquare}
-                title="No topics yet"
-                description="Be the first to start a discussion in this community."
-                action={{ label: "Start a discussion", href: "/forum/new" }}
+                title={tf("noTopics")}
+                description={tf("noTopicsHint")}
+                action={{ label: tf("startDiscussion"), href: "/forum/new" }}
               />
             </div>
           )}
@@ -132,7 +134,7 @@ export default function ForumPage() {
                     <span>·</span>
                     <span>{formatForumTime(t.createdAt)}</span>
                     {t.isPinned && (
-                      <span className="text-primary font-medium">Pinned</span>
+                      <span className="text-primary font-medium">{tf("pinned")}</span>
                     )}
                   </div>
                   <h4 className="mt-2 font-semibold leading-snug">{t.title}</h4>
@@ -145,7 +147,7 @@ export default function ForumPage() {
                     {t.tags?.slice(0, 4).map((slug) => (
                       <span
                         key={slug}
-                        className="px-2 py-0.5 rounded-md bg-white/5 border border-border text-xs text-muted-foreground"
+                        className="px-2 py-0.5 rounded-md bg-muted/60 border border-border text-xs text-muted-foreground"
                       >
                         {skillLabel(slug, skills)}
                       </span>

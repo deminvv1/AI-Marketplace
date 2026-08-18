@@ -128,7 +128,7 @@ export function PortfolioTab({ items, onChanged }: Props) {
             <select
               value={form.type}
               onChange={(e) => setForm((f) => ({ ...f, type: e.target.value }))}
-              className="mt-1 w-full h-10 px-3 rounded-lg bg-white/5 border border-border text-sm"
+              className="mt-1 w-full h-10 px-3 rounded-lg bg-muted/60 border border-border text-sm"
             >
               {PORTFOLIO_TYPES.map((t) => (
                 <option key={t} value={t}>
@@ -142,7 +142,7 @@ export function PortfolioTab({ items, onChanged }: Props) {
             <input
               value={form.title ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-              className="mt-1 w-full h-10 px-3 rounded-lg bg-white/5 border border-border text-sm"
+              className="mt-1 w-full h-10 px-3 rounded-lg bg-muted/60 border border-border text-sm"
               placeholder="Radiology triage model"
             />
           </div>
@@ -152,7 +152,7 @@ export function PortfolioTab({ items, onChanged }: Props) {
               value={form.content ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, content: e.target.value }))}
               rows={4}
-              className="mt-1 w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm resize-none"
+              className="mt-1 w-full px-3 py-2 rounded-lg bg-muted/60 border border-border text-sm resize-none"
               placeholder="What you built, stack, outcome…"
             />
           </div>
@@ -161,7 +161,7 @@ export function PortfolioTab({ items, onChanged }: Props) {
             <input
               value={form.url ?? ""}
               onChange={(e) => setForm((f) => ({ ...f, url: e.target.value }))}
-              className="mt-1 w-full h-10 px-3 rounded-lg bg-white/5 border border-border text-sm"
+              className="mt-1 w-full h-10 px-3 rounded-lg bg-muted/60 border border-border text-sm"
               placeholder="https://…"
             />
           </div>
@@ -211,7 +211,7 @@ export function PortfolioTab({ items, onChanged }: Props) {
                   <button
                     type="button"
                     onClick={() => openEdit(item)}
-                    className="size-8 grid place-items-center rounded-lg hover:bg-white/10"
+                    className="size-8 grid place-items-center rounded-lg hover:bg-muted/80"
                     title="Edit"
                   >
                     <Pencil className="size-4" />

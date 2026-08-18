@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
 import { SkillTagPicker } from "@/components/skill-tag-picker";
@@ -19,6 +20,7 @@ import {
 import { Bell, Loader2, Plus, Trash2 } from "lucide-react";
 
 export default function ProjectAlertsPage() {
+  const t = useTranslations("alerts");
   const [alerts, setAlerts] = useState<ProjectAlertItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -53,7 +55,7 @@ export default function ProjectAlertsPage() {
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
     if (!industry && !country && !q.trim() && tags.length === 0) {
-      setError("Set at least one filter: industry, country, keyword, or tags.");
+      setError(t("setFilterFirst"));
       return;
     }
     setSubmitting(true);
@@ -86,19 +88,19 @@ export default function ProjectAlertsPage() {
   }
 
   async function remove(id: string) {
-    if (!confirm("Remove this alert?")) return;
+    if (!confirm(t("removeConfirm"))) return;
     await deleteProjectAlert(id);
     await load();
   }
 
   return (
-    <AppShell title="Project alerts">
+    <AppShell title={t("title")}>
       <div className="max-w-3xl mx-auto space-y-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <h2 className="text-2xl font-bold tracking-tight flex items-center gap-2">
               <Bell className="size-6 text-primary" />
-              Project alerts
+              {t("title")}
             </h2>
             <p className="text-sm text-muted-foreground mt-1">
               Get notified when a new open project matches your filters (in-app and email).
@@ -110,27 +112,27 @@ export default function ProjectAlertsPage() {
             className="h-9 px-4 rounded-lg bg-gradient-primary text-white text-sm font-medium inline-flex items-center gap-2"
           >
             <Plus className="size-4" />
-            New alert
+            {t("newAlert")}
           </button>
         </div>
 
         {showForm && (
           <form onSubmit={handleCreate} className="glass rounded-2xl p-6 space-y-4">
             <div>
-              <label className="text-sm font-medium">Label (optional)</label>
+              <label className="text-sm font-medium">{t("labelOptional")}</label>
               <input
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
-                placeholder="e.g. LLM projects in EU"
-                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                placeholder={t("labelExample")}
+                className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Industry</label>
+              <label className="text-sm font-medium">{t("industry")}</label>
               <select
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
-                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               >
                 <option value="">Any</option>
                 {categories.map((i) => (
@@ -141,21 +143,21 @@ export default function ProjectAlertsPage() {
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium">Country</label>
+              <label className="text-sm font-medium">{t("country")}</label>
               <input
                 value={country}
                 onChange={(e) => setCountry(e.target.value)}
-                placeholder="Germany"
-                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                placeholder={t("countryExample")}
+                className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Keyword</label>
+              <label className="text-sm font-medium">{t("keyword")}</label>
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="LLM, NLP, PyTorch…"
-                className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                placeholder={t("keywordExample")}
+                className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               />
             </div>
             {allSkills.length > 0 && (
@@ -167,7 +169,7 @@ export default function ProjectAlertsPage() {
                 checked={notifyByEmail}
                 onChange={(e) => setNotifyByEmail(e.target.checked)}
               />
-              Email me (requires RESEND_API_KEY on server)
+              {t("emailMe")}
             </label>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <button
@@ -175,7 +177,7 @@ export default function ProjectAlertsPage() {
               disabled={submitting}
               className="h-10 px-5 rounded-xl bg-gradient-primary text-white text-sm disabled:opacity-60"
             >
-              {submitting ? "Saving…" : "Create alert"}
+              {submitting ? t("saving") : t("createAlert")}
             </button>
           </form>
         )}
@@ -188,7 +190,7 @@ export default function ProjectAlertsPage() {
           <div className="glass rounded-2xl p-8 text-center text-sm text-muted-foreground">
             No alerts yet.{" "}
             <Link href="/projects" className="text-primary hover:underline">
-              Browse projects
+              {t("browseProjects")}
             </Link>{" "}
             and save filters as an alert.
           </div>
@@ -201,7 +203,7 @@ export default function ProjectAlertsPage() {
               >
                 <div>
                   <div className="font-medium text-sm">
-                    {a.label || "Untitled alert"}
+                    {a.label || t("untitled")}
                     {!a.isActive && (
                       <span className="ml-2 text-xs text-muted-foreground">(paused)</span>
                     )}
@@ -220,7 +222,7 @@ export default function ProjectAlertsPage() {
                     onClick={() => toggleActive(a)}
                     className="h-8 px-3 rounded-lg border border-border text-xs"
                   >
-                    {a.isActive ? "Pause" : "Resume"}
+                    {a.isActive ? t("pause") : t("resume")}
                   </button>
                   <button
                     type="button"

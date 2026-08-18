@@ -18,18 +18,21 @@ import { freelancerDisplayName } from "@/lib/projects";
 import { forumAuthorName } from "@/lib/forum";
 import { useTaxonomy } from "@/lib/use-taxonomy";
 import { Search, Loader2, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
-const TABS: { key: SearchTab; label: string }[] = [
-  { key: "all", label: "All" },
-  { key: "projects", label: "Projects" },
-  { key: "freelancers", label: "Freelancers" },
-  { key: "solutions", label: "Solutions" },
-  { key: "forum", label: "Forum" },
+/** Label is a translation key — the tab list is module-level, t() is not. */
+const TABS: { key: SearchTab; labelKey: string }[] = [
+  { key: "all", labelKey: "tabAll" },
+  { key: "projects", labelKey: "tabProjects" },
+  { key: "freelancers", labelKey: "tabSpecialists" },
+  { key: "solutions", labelKey: "tabSolutions" },
+  { key: "forum", labelKey: "tabForum" },
 ];
 
 const PREVIEW = 5;
 
 function SearchContent() {
+  const t = useTranslations("search");
   const router = useRouter();
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") ?? "";
@@ -126,15 +129,15 @@ function SearchContent() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search projects, freelancers, solutions, forum…"
-          className="w-full h-12 pl-12 pr-28 rounded-2xl bg-white/5 border border-border text-base focus:outline-none focus:border-primary"
+          placeholder={t("placeholder")}
+          className="w-full h-12 pl-12 pr-28 rounded-2xl bg-muted/60 border border-border text-base focus:outline-none focus:border-primary"
           autoFocus
         />
         <button
           type="submit"
           className="absolute right-2 top-1/2 -translate-y-1/2 h-9 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium"
         >
-          Search
+          {t("title")}
         </button>
       </form>
 
@@ -158,28 +161,28 @@ function SearchContent() {
       />
 
       <div className="flex flex-wrap gap-2">
-        {TABS.map((t) => (
+        {TABS.map((tabItem) => (
           <button
-            key={t.key}
+            key={tabItem.key}
             type="button"
             onClick={() => {
-              setTab(t.key);
-              applyUrl(query, t.key, tag, industry);
+              setTab(tabItem.key);
+              applyUrl(query, tabItem.key, tag, industry);
             }}
             className={`h-8 px-3 rounded-lg text-sm border transition ${
-              tab === t.key
+              tab === tabItem.key
                 ? "bg-primary/15 border-primary/50 text-primary"
                 : "border-border text-muted-foreground hover:border-primary/30"
             }`}
           >
-            {t.label}
+            {t(tabItem.labelKey)}
           </button>
         ))}
       </div>
 
       {!hasFilters && (
         <p className="text-sm text-muted-foreground text-center py-12">
-          Enter a keyword or pick a skill / industry to search the marketplace.
+          {t("emptyPrompt")}
         </p>
       )}
 
@@ -191,16 +194,17 @@ function SearchContent() {
 
       {hasFilters && !loading && total === 0 && (
         <p className="text-sm text-muted-foreground text-center py-12">
-          Nothing found{query.trim() ? ` for “${query}”` : ""}
-          {tag ? ` with skill “${tag}”` : ""}
-          {industry ? ` in ${industry}` : ""}.
+          {t("nothingFound")}
+          {query.trim() ? t("forQuery", { query }) : ""}
+          {tag ? t("withSkill", { tag }) : ""}
+          {industry ? t("inIndustry", { industry }) : ""}.
         </p>
       )}
 
       {hasFilters && !loading && showProjects && r.projects.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Projects"
+            title={t("tabProjects")}
             count={r.projects.length}
             showLink={tab === "all"}
             onViewAll={() => {
@@ -216,7 +220,7 @@ function SearchContent() {
             >
               <div className="font-medium">{p.title}</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {p.industry ?? "—"} · {p.budget || "Budget TBD"}
+                {p.industry ?? "—"} · {p.budget || t("budgetTbd")}
               </div>
             </Link>
           ))}
@@ -226,7 +230,7 @@ function SearchContent() {
       {hasFilters && !loading && showFreelancers && r.freelancers.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Freelancers"
+            title={t("tabSpecialists")}
             count={r.freelancers.length}
             showLink={tab === "all"}
             onViewAll={() => {
@@ -237,14 +241,14 @@ function SearchContent() {
           {r.freelancers.slice(0, limit).map((u) => (
             <Link
               key={u.id}
-              href={u.username ? `/freelancers/${u.username}` : "/freelancers"}
+              href={u.username ? `/specialists/${u.username}` : "/specialists"}
               className="block glass rounded-xl p-4 hover:border-primary/40 border border-transparent transition"
             >
               <div className="font-medium">
                 {freelancerDisplayName({ username: u.username, profile: u.profile })}
               </div>
               <div className="text-xs text-muted-foreground mt-1">
-                {u.profile?.specialization ?? "Freelancer"} · ★{" "}
+                {u.profile?.specialization ?? t("specialist")} · ★{" "}
                 {u.profile?.rating?.toFixed(1) ?? "—"}
               </div>
             </Link>
@@ -255,7 +259,7 @@ function SearchContent() {
       {hasFilters && !loading && showSolutions && r.solutions.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Solutions"
+            title={t("tabSolutions")}
             count={r.solutions.length}
             showLink={tab === "all"}
             onViewAll={() => {
@@ -271,7 +275,7 @@ function SearchContent() {
             >
               <div className="font-medium">{s.title}</div>
               <div className="text-xs text-muted-foreground mt-1">
-                {s.industry ?? "—"} · {s.price || "Price on request"}
+                {s.industry ?? "—"} · {s.price || t("priceOnRequest")}
               </div>
             </Link>
           ))}
@@ -281,7 +285,7 @@ function SearchContent() {
       {hasFilters && !loading && showForum && r.forum.length > 0 && (
         <section className="space-y-3">
           <SectionHeader
-            title="Forum"
+            title={t("tabForum")}
             count={r.forum.length}
             showLink={tab === "all"}
             onViewAll={() => {
@@ -318,6 +322,7 @@ function SectionHeader({
   showLink: boolean;
   onViewAll: () => void;
 }) {
+  const t = useTranslations("search");
   return (
     <div className="flex items-center justify-between">
       <h3 className="font-semibold">
@@ -330,7 +335,7 @@ function SectionHeader({
           onClick={onViewAll}
           className="text-xs text-primary inline-flex items-center gap-1 hover:underline"
         >
-          View all <ArrowRight className="size-3" />
+          {t("viewAll")} <ArrowRight className="size-3" />
         </button>
       )}
     </div>
@@ -338,8 +343,9 @@ function SectionHeader({
 }
 
 export default function SearchPage() {
+  const t = useTranslations("search");
   return (
-    <AppShell title="Search">
+    <AppShell title={t("title")}>
       <Suspense
         fallback={
           <div className="flex justify-center py-24">

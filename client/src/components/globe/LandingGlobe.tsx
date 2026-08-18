@@ -240,8 +240,8 @@ export default function LandingGlobe({ selectedCountry }: Props) {
     type Phase = "idle" | "rotating" | "zooming" | "done";
     let phase: Phase = "idle";
     let phaseStart = 0, prevTime = 0;
-    let startQuat  = new THREE.Quaternion();
-    let targetQuat = new THREE.Quaternion();
+    const startQuat  = new THREE.Quaternion();
+    const targetQuat = new THREE.Quaternion();
     let targetSlug = "";
     const ROTATE_DUR = 900, ZOOM_DUR = 2200;
     const CAM_FAR = 3.35, CAM_NEAR = 0.55;
@@ -301,7 +301,7 @@ export default function LandingGlobe({ selectedCountry }: Props) {
       atmoGeo.dispose();
       starGeo.dispose();  starMat.dispose();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);  
 
   return (
     <div ref={containerRef} className="absolute inset-0">

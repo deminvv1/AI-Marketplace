@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { getMyProfile, updateProfile, type MyProfile } from "@/app/actions/profile";
 import {
@@ -10,7 +11,7 @@ import {
 } from "@/app/actions/projects";
 import { getReviewsForUser, type ReviewItem } from "@/app/actions/reviews";
 import { StatusBadge } from "@/components/ui-bits";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import { formatPostedAt, projectStatusForUi } from "@/lib/projects";
 import { getTaxonomy, type TaxonomyCategory } from "@/app/actions/taxonomy";
 import { CategoryMultiPicker } from "@/components/category-picker";
@@ -25,12 +26,13 @@ import {
 
 type Tab = "about" | "portfolio" | "offers" | "completed" | "reviews";
 
-const TABS: { key: Tab; label: string }[] = [
-  { key: "about", label: "About" },
-  { key: "portfolio", label: "Portfolio" },
-  { key: "offers", label: "Solutions" },
-  { key: "completed", label: "Completed Projects" },
-  { key: "reviews", label: "Reviews" },
+/** Label is a translation key — t() is not available at module level. */
+const TABS: { key: Tab; labelKey: string }[] = [
+  { key: "about", labelKey: "about" },
+  { key: "portfolio", labelKey: "tabPortfolio" },
+  { key: "offers", labelKey: "tabSolutions" },
+  { key: "completed", labelKey: "tabCompleted" },
+  { key: "reviews", labelKey: "tabReviews" },
 ];
 
 type CompletedProjectRow = CompletedProjectsMine["asClient"][number];
@@ -57,7 +59,7 @@ function CompletedProjectsSection({
             <Link
               key={p.id}
               href={`/projects/${p.id}`}
-              className="block p-4 rounded-xl bg-white/5 border border-border hover:border-primary/40 transition"
+              className="block p-4 rounded-xl bg-muted/60 border border-border hover:border-primary/40 transition"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
@@ -106,6 +108,7 @@ function formFromData(data: MyProfile) {
 }
 
 export default function ProfilePage() {
+  const t = useTranslations("profile");
   const [data, setData] = useState<MyProfile | null>(null);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -210,7 +213,7 @@ export default function ProfilePage() {
     const result = await updateProfile(form);
     setSaving(false);
     if (!result || !("success" in result) || !result.success) {
-      setError("error" in result && result.error ? result.error : "Failed to save.");
+      setError("error" in result && result.error ? result.error : t("saveFailed"));
       return;
     }
     await reload();
@@ -218,7 +221,7 @@ export default function ProfilePage() {
   }
   if (!data) {
     return (
-      <AppShell title="Profile">
+      <AppShell title={t("title")}>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
@@ -251,19 +254,18 @@ export default function ProfilePage() {
 
         {/* Banner */}
         <div
-          className="h-36 w-full"
-          style={{ background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 30%, #4f46e5 60%, #0ea5e9 100%)" }}
+          className="h-36 w-full bg-gradient-primary"
         />
 
         {/* Profile header */}
-        <div className="px-8 pb-5 border-b border-border/60 bg-background/80 backdrop-blur-xl">
-          <div className="flex items-end gap-5 -mt-12">
+        <div className="px-4 lg:px-8 pb-5 border-b border-border/60 bg-background/80 backdrop-blur-xl">
+          <div className="flex items-end gap-3 lg:gap-5 -mt-12">
 
             {/* Avatar */}
             <div className="relative flex-shrink-0 z-10">
               <div className="size-24 rounded-2xl bg-gradient-primary border-[3px] border-background overflow-hidden grid place-items-center text-2xl font-bold text-white glow-primary select-none">
                 {data.avatarUrl
-                  ? <img src={data.avatarUrl} alt="avatar" className="size-full object-cover" />
+                  ? <img src={data.avatarUrl} alt={t("avatarAlt")} className="size-full object-cover" />
                   : initials
                 }
                 {avatarUploading && (
@@ -291,22 +293,22 @@ export default function ProfilePage() {
             </div>
 
             <div className="flex-1 min-w-0 pb-1">
-              <div className="flex items-start justify-between gap-4">
-                <div>
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-4">
+                <div className="min-w-0">
                   {/* Name */}
                   {editing ? (
-                    <div className="flex gap-2 mt-1">
+                    <div className="flex gap-2 mt-1 flex-wrap">
                       <input
                         value={form.firstName}
                         onChange={(e) => setForm((f) => ({ ...f, firstName: e.target.value }))}
-                        placeholder="First name"
-                        className="w-36 h-9 px-3 rounded-lg bg-white/5 border border-border text-base font-bold focus:outline-none focus:border-primary transition-all"
+                        placeholder={t("firstName")}
+                        className="w-32 sm:w-36 h-9 px-3 rounded-lg bg-muted/60 border border-border text-base font-bold focus:outline-none focus:border-primary transition-all"
                       />
                       <input
                         value={form.lastName}
                         onChange={(e) => setForm((f) => ({ ...f, lastName: e.target.value }))}
-                        placeholder="Last name"
-                        className="w-36 h-9 px-3 rounded-lg bg-white/5 border border-border text-base font-bold focus:outline-none focus:border-primary transition-all"
+                        placeholder={t("lastName")}
+                        className="w-32 sm:w-36 h-9 px-3 rounded-lg bg-muted/60 border border-border text-base font-bold focus:outline-none focus:border-primary transition-all"
                       />
                     </div>
                   ) : (
@@ -319,26 +321,26 @@ export default function ProfilePage() {
                       <>
                         <span className="text-sm text-muted-foreground">@{data.username}</span>
                         <Link
-                          href={`/freelancers/${data.username}`}
+                          href={`/specialists/${data.username}`}
                           className="text-xs text-primary hover:underline"
                         >
-                          Public page →
+                          {t("publicPage")}
                         </Link>
                       </>
                     ) : (
                       <span className="text-xs text-muted-foreground">
-                        Set username in Settings to get a public page
+                        {t("setUsernameHint")}
                       </span>
                     )}
                     {editing ? (
                       <input
                         value={form.country}
                         onChange={(e) => setForm((f) => ({ ...f, country: e.target.value }))}
-                        placeholder="Country"
-                        className="w-24 h-6 px-2 rounded-md bg-white/5 border border-border text-xs focus:outline-none focus:border-primary transition-all"
+                        placeholder={t("country")}
+                        className="w-24 h-6 px-2 rounded-md bg-muted/60 border border-border text-xs focus:outline-none focus:border-primary transition-all"
                       />
                     ) : data.profile?.country ? (
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 border border-border text-muted-foreground">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-muted/80 border border-border text-muted-foreground">
                         {data.profile.country}
                       </span>
                     ) : null}
@@ -364,14 +366,14 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Action buttons */}
-                <div className="flex items-center gap-2 mt-3 flex-shrink-0">
+                <div className="flex items-center gap-2 mt-1 sm:mt-3 flex-shrink-0">
                   {editing ? (
                     <>
                       <button
                         onClick={cancelEdit}
-                        className="h-9 px-4 rounded-lg bg-white/5 border border-border text-sm hover:bg-white/10 transition flex items-center gap-2"
+                        className="h-9 px-4 rounded-lg bg-muted/60 border border-border text-sm hover:bg-muted/80 transition flex items-center gap-2"
                       >
-                        <X className="size-4" /> Cancel
+                        <X className="size-4" /> {t("cancel")}
                       </button>
                       <button
                         onClick={save}
@@ -387,7 +389,7 @@ export default function ProfilePage() {
                       onClick={startEdit}
                       className="h-9 px-4 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2"
                     >
-                      <Edit2 className="size-4" /> Edit Profile
+                      <Edit2 className="size-4" /> {t("edit")}
                     </button>
                   )}
                 </div>
@@ -399,7 +401,7 @@ export default function ProfilePage() {
 
         {/* Tabs */}
         <div className="px-4 lg:px-8 border-b border-border/60 bg-background/60 backdrop-blur-xl flex gap-1 overflow-x-auto">
-          {TABS.map(({ key, label }) => (
+          {TABS.map(({ key, labelKey }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
@@ -409,7 +411,7 @@ export default function ProfilePage() {
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
@@ -424,21 +426,21 @@ export default function ProfilePage() {
             <>
               {/* About card */}
               <div className="glass rounded-2xl p-6 space-y-5">
-                <h3 className="font-semibold">About</h3>
+                <h3 className="font-semibold">{t("about")}</h3>
 
                 {editing ? (
                   <textarea
                     value={form.bio}
                     onChange={(e) => setForm((f) => ({ ...f, bio: e.target.value }))}
-                    placeholder="Tell others about yourself…"
+                    placeholder={t("bioPlaceholder")}
                     rows={4}
-                    className="w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
+                    className="w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
                   />
                 ) : (
                   <p className="text-sm text-muted-foreground leading-relaxed">
                     {data.profile?.bio || (
                       <span className="italic text-muted-foreground/50">
-                        No bio yet — click "Edit Profile" to add one.
+                        {t("noBio")}
                       </span>
                     )}
                   </p>
@@ -447,25 +449,25 @@ export default function ProfilePage() {
                 {/* Specialization */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    Specialization
+                    {t("specialization")}
                   </p>
                   {editing ? (
                     <input
                       value={form.specialization}
                       onChange={(e) => setForm((f) => ({ ...f, specialization: e.target.value }))}
-                      placeholder="e.g. NLP, LLM fine-tuning, RAG systems"
-                      className="w-full h-9 px-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+                      placeholder={t("specializationHint")}
+                      className="w-full h-9 px-3 rounded-lg bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
                     />
                   ) : (
                     <div className="flex flex-wrap gap-2">
                       {specTags.length > 0 ? (
                         specTags.map((tag: string) => (
-                          <span key={tag} className="text-xs px-3 py-1 rounded-full bg-white/5 border border-border">
+                          <span key={tag} className="text-xs px-3 py-1 rounded-full bg-muted/60 border border-border">
                             {tag}
                           </span>
                         ))
                       ) : (
-                        <span className="text-sm italic text-muted-foreground/50">Not specified</span>
+                        <span className="text-sm italic text-muted-foreground/50">{t("notSpecified")}</span>
                       )}
                     </div>
                   )}
@@ -474,19 +476,19 @@ export default function ProfilePage() {
                 {/* Industries */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                    Industries
+                    {t("industries")}
                   </p>
                   <div className="flex flex-wrap gap-2">
                     {industries.map((tag: string) => (
                       <span
                         key={tag}
-                        className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-white/5 border border-border"
+                        className="flex items-center gap-1 text-xs px-3 py-1 rounded-full bg-muted/60 border border-border"
                       >
                         {tag}
                       </span>
                     ))}
                     {industries.length === 0 && !editing && (
-                      <span className="text-sm italic text-muted-foreground/50">Not specified</span>
+                      <span className="text-sm italic text-muted-foreground/50">{t("notSpecified")}</span>
                     )}
                   </div>
                   {editing && categories.length > 0 && (
@@ -504,15 +506,15 @@ export default function ProfilePage() {
                 {(editing || data.profile?.experience) && (
                   <div className="space-y-2">
                     <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-                      Experience
+                      {t("experience")}
                     </p>
                     {editing ? (
                       <textarea
                         value={form.experience}
                         onChange={(e) => setForm((f) => ({ ...f, experience: e.target.value }))}
-                        placeholder="Describe your background…"
+                        placeholder={t("backgroundPlaceholder")}
                         rows={3}
-                        className="w-full px-3 py-2 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
+                        className="w-full px-3 py-2 rounded-lg bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all resize-none"
                       />
                     ) : (
                       <p className="text-sm text-muted-foreground whitespace-pre-line">
@@ -524,13 +526,13 @@ export default function ProfilePage() {
               </div>
 
               <p className="text-xs text-muted-foreground">
-                Portfolio cases are managed in the{" "}
+                {t("portfolioHint")}{" "}
                 <button
                   type="button"
                   onClick={() => setActiveTab("portfolio")}
                   className="text-primary hover:underline"
                 >
-                  Portfolio tab
+                  {t("portfolioTab")}
                 </button>
                 .
               </p>
@@ -547,17 +549,17 @@ export default function ProfilePage() {
           {activeTab === "offers" && (
             <div className="glass rounded-2xl p-10 text-center space-y-4">
               <p className="text-muted-foreground text-sm">
-                Publish and manage your ready-made AI solutions.
+                {t("solutionsHint")}
               </p>
               <div className="flex flex-wrap justify-center gap-3">
                 <Link
                   href="/solutions/new"
                   className="h-10 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium"
                 >
-                  Publish solution
+                  {t("publishSolution")}
                 </Link>
                 <Link href="/solutions" className="h-10 px-5 rounded-xl border border-border text-sm">
-                  Browse catalog
+                  {t("browseCatalog")}
                 </Link>
               </div>
             </div>
@@ -574,13 +576,13 @@ export default function ProfilePage() {
               ) : (
                 <>
                   <CompletedProjectsSection
-                    title="Posted as client"
-                    empty="No completed projects you posted yet."
+                    title={t("postedAsClient")}
+                    empty={t("noCompletedPosted")}
                     projects={completed?.asClient ?? []}
                   />
                   <CompletedProjectsSection
-                    title="Worked as freelancer"
-                    empty="No completed projects you delivered on yet."
+                    title={t("workedAsSpecialist")}
+                    empty={t("noCompletedDelivered")}
                     projects={completed?.asFreelancer ?? []}
                     showFreelancer={false}
                   />
@@ -591,7 +593,7 @@ export default function ProfilePage() {
 
           {activeTab === "reviews" && (
             <div className="glass rounded-2xl p-6">
-              <h2 className="font-semibold mb-4">Reviews about you</h2>
+              <h2 className="font-semibold mb-4">{t("reviewsAboutYou")}</h2>
               {reviewsLoading ? (
                 <div className="flex justify-center py-8">
                   <Loader2 className="size-6 animate-spin text-muted-foreground" />
@@ -599,7 +601,7 @@ export default function ProfilePage() {
               ) : (
                 <ReviewsList
                   reviews={myReviews}
-                  emptyMessage="No reviews yet. Reviews appear after clients rate completed projects."
+                  emptyMessage={t("noReviews")}
                 />
               )}
             </div>
@@ -610,14 +612,14 @@ export default function ProfilePage() {
         <div className="space-y-4">
           {/* Quick stats */}
           <div className="glass rounded-2xl p-5 space-y-3">
-            <h3 className="font-semibold text-sm">Quick stats</h3>
+            <h3 className="font-semibold text-sm">{t("quickStats")}</h3>
             {[
-              { icon: CheckCircle2, label: "Projects completed", value: data.profile?.completedProjectsCount ?? 0, color: "text-green-400" },
-              { icon: Star, label: "Rating", value: (data.profile?.rating ?? 0) > 0 ? `${data.profile!.rating.toFixed(1)} / 5` : "—", color: "text-yellow-400" },
-              { icon: Globe, label: "Languages", value: data.profile?.language || "—", color: "text-primary" },
-              { icon: MessageCircle, label: "Reviews", value: data.profile?.reviewsCount ?? 0, color: "text-blue-400" },
-              { icon: Eye, label: "Profile views", value: data.profile?.viewCount ?? 0, color: "text-primary" },
-              { icon: CalendarDays, label: "Member since", value: memberYear, color: "text-muted-foreground" },
+              { icon: CheckCircle2, label: t("projectsCompleted"), value: data.profile?.completedProjectsCount ?? 0, color: "text-green-400" },
+              { icon: Star, label: t("rating"), value: (data.profile?.rating ?? 0) > 0 ? `${data.profile!.rating.toFixed(1)} / 5` : "—", color: "text-yellow-400" },
+              { icon: Globe, label: t("languages"), value: data.profile?.language || "—", color: "text-primary" },
+              { icon: MessageCircle, label: t("reviews"), value: data.profile?.reviewsCount ?? 0, color: "text-blue-400" },
+              { icon: Eye, label: t("profileViews"), value: data.profile?.viewCount ?? 0, color: "text-primary" },
+              { icon: CalendarDays, label: t("memberSince"), value: memberYear, color: "text-muted-foreground" },
             ].map(({ icon: Icon, label, value, color }) => (
               <div key={label} className="flex items-center justify-between text-sm py-1 border-b border-border/40 last:border-0">
                 <span className="flex items-center gap-2 text-muted-foreground">
@@ -635,8 +637,8 @@ export default function ProfilePage() {
               <Briefcase className="size-4 text-green-400" />
             </div>
             <div>
-              <p className="text-sm font-medium">Open to new projects</p>
-              <p className="text-xs text-muted-foreground mt-0.5">Available now</p>
+              <p className="text-sm font-medium">{t("openToProjects")}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">{t("availableNow")}</p>
             </div>
           </div>
 
@@ -644,13 +646,13 @@ export default function ProfilePage() {
           {editing && (
             <div className="glass rounded-2xl p-5 space-y-2">
               <label className="text-xs text-muted-foreground">
-                Phone <span className="text-muted-foreground/50">(private)</span>
+                {t("phone")} <span className="text-muted-foreground/50">(private)</span>
               </label>
               <input
                 value={form.phone}
                 onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
                 placeholder="+1 234 567 8900"
-                className="w-full h-9 px-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+                className="w-full h-9 px-3 rounded-lg bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
               />
             </div>
           )}

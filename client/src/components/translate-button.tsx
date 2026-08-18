@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { Languages, Loader2, RotateCcw } from "lucide-react";
 import { translateText } from "@/app/actions/translate";
-import { useI18n } from "@/lib/i18n";
+import { useLocale } from "next-intl";
+import type { Locale } from "@/i18n/routing";
 
 interface Props {
   text: string;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function TranslateButton({ text, onTranslated, translated }: Props) {
-  const { locale } = useI18n();
+  const locale = useLocale() as Locale;
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

@@ -3,6 +3,7 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { UserSafetyActions } from "@/components/user-safety-actions";
 import { getMe } from "@/app/actions/me";
@@ -19,6 +20,7 @@ import { useChatSocket } from "@/lib/use-chat-socket";
 import { ArrowLeft, Loader2, Send } from "lucide-react";
 
 function MessagesContent() {
+  const t = useTranslations("messages");
   const router = useRouter();
   const searchParams = useSearchParams();
   const withUserId = searchParams.get("with");
@@ -176,7 +178,7 @@ function MessagesContent() {
         <div className={`w-full md:w-80 lg:w-96 border-r border-border flex-col overflow-y-auto shrink-0 ${activeId ? "hidden md:flex" : "flex"}`}>
           {conversations.length === 0 ? (
             <p className="p-6 text-sm text-muted-foreground">
-              No conversations yet. Open a freelancer profile and click Write.
+              {t("noConversations")}
             </p>
           ) : (
             conversations.map((c) => {
@@ -188,7 +190,7 @@ function MessagesContent() {
                   type="button"
                   onClick={() => openConversation(c.id)}
                   className={`w-full p-4 flex gap-3 border-b border-border/60 text-left transition ${
-                    selected ? "bg-primary/10" : "hover:bg-white/5"
+                    selected ? "bg-primary/10" : "hover:bg-muted/60"
                   }`}
                 >
                   <div className="relative shrink-0">
@@ -210,7 +212,7 @@ function MessagesContent() {
                     </div>
                     <div className="flex items-center justify-between gap-2 mt-0.5">
                       <span className="text-xs text-muted-foreground truncate">
-                        {c.lastMessage?.content ?? "No messages yet"}
+                        {c.lastMessage?.content ?? t("noMessages")}
                       </span>
                       {c.unreadCount > 0 && (
                         <span className="size-5 rounded-full bg-primary text-white text-[10px] grid place-items-center shrink-0">
@@ -229,7 +231,7 @@ function MessagesContent() {
         <div className={`flex-1 flex-col min-w-0 ${activeId ? "flex" : "hidden md:flex"}`}>
           {!active ? (
             <div className="flex-1 grid place-items-center text-sm text-muted-foreground">
-              Select a conversation
+              {t("selectConversation")}
             </div>
           ) : (
             <>
@@ -238,8 +240,8 @@ function MessagesContent() {
                 <button
                   type="button"
                   onClick={() => setActiveId(null)}
-                  className="size-8 grid place-items-center rounded-lg hover:bg-white/5 transition md:hidden shrink-0"
-                  aria-label="Back"
+                  className="size-8 grid place-items-center rounded-lg hover:bg-muted/60 transition md:hidden shrink-0"
+                  aria-label={t("back")}
                 >
                   <ArrowLeft className="size-4" />
                 </button>
@@ -256,7 +258,7 @@ function MessagesContent() {
                     {messageUserName(active.otherUser)}
                   </div>
                   <div className="text-[11px] text-muted-foreground">
-                    {active.otherUser?.profile?.onlineStatus ? "Online" : "Offline"}
+                    {active.otherUser?.profile?.onlineStatus ? t("online") : t("offline")}
                   </div>
                 </div>
                 <div className="ml-auto flex items-center gap-2">
@@ -269,10 +271,10 @@ function MessagesContent() {
                   )}
                   {active.otherUser?.username && (
                     <Link
-                      href={`/freelancers/${active.otherUser.username}`}
+                      href={`/specialists/${active.otherUser.username}`}
                       className="text-xs text-primary hover:underline"
                     >
-                      View profile
+                      {t("viewProfile")}
                     </Link>
                   )}
                 </div>
@@ -285,7 +287,7 @@ function MessagesContent() {
                   </div>
                 ) : messages.length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center">
-                    Say hello — your first message starts the thread.
+                    {t("sayHello")}
                   </p>
                 ) : (
                   messages.map((m) => {
@@ -322,8 +324,8 @@ function MessagesContent() {
                 <input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
-                  placeholder="Write a message…"
-                  className="flex-1 h-10 px-4 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition"
+                  placeholder={t("placeholder")}
+                  className="flex-1 h-10 px-4 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition"
                 />
                 <button
                   type="submit"
@@ -349,8 +351,9 @@ function MessagesContent() {
 }
 
 export default function MessagesPage() {
+  const t = useTranslations("messages");
   return (
-    <AppShell title="Messages">
+    <AppShell title={t("title")}>
       <Suspense
         fallback={
           <div className="flex justify-center py-24">

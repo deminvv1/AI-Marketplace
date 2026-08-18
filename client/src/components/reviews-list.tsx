@@ -28,7 +28,7 @@ export function ReviewsList({
       {reviews.map((r) => (
         <li
           key={r.id}
-          className="p-4 rounded-xl bg-white/5 border border-border"
+          className="p-4 rounded-xl bg-muted/60 border border-border"
         >
           <div className="flex items-start justify-between gap-3">
             <div>

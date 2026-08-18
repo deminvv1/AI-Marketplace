@@ -12,7 +12,7 @@ import {
   type NotificationItem,
 } from "@/app/actions/notifications";
 import { useNotificationsSocket } from "@/lib/use-notifications-socket";
-import { useI18n } from "@/lib/i18n";
+import { useTranslations } from "next-intl";
 
 export function NotificationsBell() {
   const [open, setOpen] = useState(false);
@@ -20,7 +20,7 @@ export function NotificationsBell() {
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [loading, setLoading] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { t } = useI18n();
+  const t = useTranslations("app");
 
   const refresh = useCallback(async () => {
     const c = await getUnreadNotificationCount();
@@ -41,7 +41,7 @@ export function NotificationsBell() {
       setItems((prev) => (prev.length ? [n, ...prev] : prev)); // prepend if panel open
       toast(n.title, {
         description: n.body ?? undefined,
-        action: n.link ? { label: t.notifications.open, onClick: () => window.location.assign(n.link!) } : undefined,
+        action: n.link ? { label: t("notifications.open"), onClick: () => window.location.assign(n.link!) } : undefined,
       });
     },
   });
@@ -77,7 +77,7 @@ export function NotificationsBell() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="relative size-9 grid place-items-center rounded-lg bg-white/5 border border-border hover:border-primary/50 transition"
+        className="relative size-9 grid place-items-center rounded-lg bg-muted/60 border border-border hover:border-primary/50 transition"
         aria-label="Notifications"
       >
         <Bell className="size-4" />
@@ -91,7 +91,7 @@ export function NotificationsBell() {
       {open && (
         <div className="absolute right-0 top-full mt-2 w-80 max-h-[420px] overflow-y-auto rounded-xl border border-border bg-card shadow-xl z-50">
           <div className="flex items-center justify-between px-4 py-3 border-b border-border">
-            <span className="text-sm font-semibold">{t.notifications.title}</span>
+            <span className="text-sm font-semibold">{t("notifications.title")}</span>
             {count > 0 && (
               <button
                 type="button"
@@ -102,7 +102,7 @@ export function NotificationsBell() {
                   setCount(0);
                 }}
               >
-                {t.notifications.mark_all_read}
+                {t("notifications.mark_all_read")}
               </button>
             )}
           </div>
@@ -111,7 +111,7 @@ export function NotificationsBell() {
               <Loader2 className="size-5 animate-spin text-muted-foreground" />
             </div>
           ) : items.length === 0 ? (
-            <p className="text-sm text-muted-foreground px-4 py-6 text-center">{t.notifications.empty}</p>
+            <p className="text-sm text-muted-foreground px-4 py-6 text-center">{t("notifications.empty")}</p>
           ) : (
             <ul>
               {items.map((n) => (
@@ -120,7 +120,7 @@ export function NotificationsBell() {
                     <Link
                       href={n.link}
                       onClick={() => openItem(n)}
-                      className={`block px-4 py-3 hover:bg-white/5 transition-colors ${!n.isRead ? "bg-primary/5" : ""}`}
+                      className={`block px-4 py-3 hover:bg-muted/60 transition-colors ${!n.isRead ? "bg-primary/5" : ""}`}
                     >
                       <NotificationRow n={n} />
                     </Link>
@@ -128,7 +128,7 @@ export function NotificationsBell() {
                     <button
                       type="button"
                       onClick={() => openItem(n)}
-                      className={`w-full text-left px-4 py-3 hover:bg-white/5 transition-colors ${!n.isRead ? "bg-primary/5" : ""}`}
+                      className={`w-full text-left px-4 py-3 hover:bg-muted/60 transition-colors ${!n.isRead ? "bg-primary/5" : ""}`}
                     >
                       <NotificationRow n={n} />
                     </button>

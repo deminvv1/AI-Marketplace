@@ -3,7 +3,6 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "sonner";
 import { useState } from "react";
-import { I18nProvider } from "@/lib/i18n";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient({
@@ -15,12 +14,11 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }));
 
   return (
-    <I18nProvider>
     <QueryClientProvider client={queryClient}>
       {children}
       <Toaster
         position="bottom-right"
-        theme="dark"
+        theme="light"
         richColors
         toastOptions={{
           classNames: {
@@ -29,6 +27,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
         }}
       />
     </QueryClientProvider>
-    </I18nProvider>
   );
 }

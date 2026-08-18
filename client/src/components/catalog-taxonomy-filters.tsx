@@ -32,7 +32,7 @@ export function CatalogIndustryList({
             className={`w-full px-3 py-2 rounded-lg text-sm text-left transition ${
               !value
                 ? "bg-primary/15 text-primary border border-primary/30"
-                : "text-muted-foreground hover:bg-white/5"
+                : "text-muted-foreground hover:bg-muted/60"
             }`}
           >
             {allLabel}
@@ -46,7 +46,7 @@ export function CatalogIndustryList({
               className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition ${
                 value === c.name
                   ? "bg-primary/15 text-primary border border-primary/30"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
               }`}
             >
               <span>{c.icon ?? "🌐"}</span>

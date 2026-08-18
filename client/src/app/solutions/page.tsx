@@ -6,6 +6,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import {
   CatalogIndustryChips,
@@ -29,6 +30,7 @@ const gradients = [
 ];
 
 export default function SolutionsPage() {
+  const t = useTranslations("solutions");
   const [items, setItems] = useState<SolutionListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,19 +66,19 @@ export default function SolutionsPage() {
   }, [query, industry, tag, format]);
 
   return (
-    <AppShell title="Solutions">
+    <AppShell title={t("title")}>
       <div className="flex flex-wrap items-end justify-between gap-4 mb-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">AI Solutions</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{t("heading")}</h2>
           <p className="text-sm text-muted-foreground mt-1">
-            {loading ? "Loading…" : `${items.length} published solution${items.length === 1 ? "" : "s"}`}
+            {loading ? t("loading") : t("publishedCount", { count: items.length })}
           </p>
         </div>
         <Link
           href="/solutions/new"
           className="h-9 px-4 rounded-lg bg-gradient-primary text-white text-xs font-medium glow-primary inline-flex items-center gap-2"
         >
-          <Plus className="size-4" /> Publish solution
+          <Plus className="size-4" /> {t("publishShort")}
         </Link>
       </div>
 
@@ -85,7 +87,7 @@ export default function SolutionsPage() {
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search solutions…"
+          placeholder={t("searchPlaceholder")}
           className="w-full h-11 pl-10 pr-3 rounded-xl glass border border-border text-sm"
         />
       </div>
@@ -96,7 +98,7 @@ export default function SolutionsPage() {
           onClick={() => setFormat(null)}
           className={`h-8 px-3 rounded-lg text-xs border ${!format ? "border-primary/50 text-primary bg-primary/10" : "border-border"}`}
         >
-          All formats
+          {t("allFormats")}
         </button>
         {SOLUTION_FORMATS.map((f) => (
           <button
@@ -139,9 +141,9 @@ export default function SolutionsPage() {
         <div className="glass rounded-2xl">
           <EmptyState
             icon={ShoppingBag}
-            title="No solutions found"
-            description="No solutions match your filters. Be the first to publish an AI solution."
-            action={{ label: "Publish a solution", href: "/solutions/new" }}
+            title={t("noSolutions")}
+            description={t("noSolutionsHint")}
+            action={{ label: t("publish"), href: "/solutions/new" }}
           />
         </div>
       )}
@@ -170,14 +172,14 @@ export default function SolutionsPage() {
                 {o.tags?.slice(0, 3).map((slug) => (
                   <span
                     key={slug}
-                    className="px-2 py-0.5 rounded-md bg-white/5 border border-border text-xs text-muted-foreground"
+                    className="px-2 py-0.5 rounded-md bg-muted/60 border border-border text-xs text-muted-foreground"
                   >
                     {skillLabel(slug, skills)}
                   </span>
                 ))}
               </div>
               <div className="text-base font-bold mt-auto pt-3 border-t border-border">
-                {o.price || "Price on request"}
+                {o.price || t("priceOnRequest")}
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <div className="size-7 rounded-full bg-gradient-primary grid place-items-center text-[10px] font-semibold">

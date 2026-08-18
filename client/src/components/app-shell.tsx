@@ -13,7 +13,7 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { createClient } from "@/lib/supabase/client";
 import { getSocket } from "@/lib/socket";
 import { usePresence } from "@/lib/use-presence";
-import { useI18n } from "@/lib/i18n";
+import { useTranslations } from "next-intl";
 
 type Me = Awaited<ReturnType<typeof getMe>>;
 
@@ -22,7 +22,7 @@ const NAV_ROUTES = [
   { to: "/search",     key: "search"     as const, icon: Search },
   { to: "/projects",   key: "projects"   as const, icon: ClipboardList },
   { to: "/proposals",  key: "proposals"  as const, icon: Send },
-  { to: "/freelancers",key: "freelancers"as const, icon: Users },
+  { to: "/specialists",key: "freelancers"as const, icon: Users },
   { to: "/saved",      key: "saved"      as const, icon: Bookmark },
   { to: "/solutions",  key: "solutions"  as const, icon: ShoppingBag },
   { to: "/forum",      key: "forum"      as const, icon: MessagesSquare },
@@ -37,7 +37,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
   const [me, setMe] = useState<Me>(null);
   const [headerQuery, setHeaderQuery] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { t } = useI18n();
+  const t = useTranslations("app");
 
   useEffect(() => {
     getMe().then(setMe);
@@ -87,17 +87,17 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
             <Link key={to} href={to}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                 active
-                  ? "bg-primary/15 text-foreground border border-primary/40 glow-primary"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                  ? "bg-primary/12 text-primary border border-primary/35 shadow-[0_0_16px_oklch(0.55_0.22_265/0.25)]"
+                  : "text-muted-foreground hover:bg-primary/6 hover:text-foreground"
               }`}>
               <Icon className="size-4 shrink-0" />
-              <span>{t.nav[key]}</span>
+              <span>{t(`nav.${key}`)}</span>
             </Link>
           );
         })}
       </nav>
-      <div className="p-4 border-t border-border/60">
-        <div className="glass rounded-xl p-3 flex items-center gap-3">
+      <div className="p-4 border-t border-border">
+        <div className="rounded-xl border border-border bg-muted/60 p-3 flex items-center gap-3">
           <div className="size-9 rounded-full bg-gradient-primary overflow-hidden grid place-items-center text-sm font-semibold select-none shrink-0">
             {me?.avatarUrl
               ? <img src={me.avatarUrl} alt="avatar" className="size-full object-cover" />
@@ -116,7 +116,7 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
   return (
     <div className="min-h-screen flex">
       {/* Desktop sidebar */}
-      <aside className="w-64 shrink-0 border-r border-border/60 bg-sidebar/60 backdrop-blur-2xl flex-col sticky top-0 h-screen hidden lg:flex">
+      <aside className="w-64 shrink-0 border-r border-border bg-sidebar flex-col sticky top-0 h-screen hidden lg:flex">
         {sidebarContent}
       </aside>
 
@@ -130,14 +130,14 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
 
       {/* Mobile sidebar drawer */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 z-50 bg-sidebar border-r border-border/60 flex flex-col transition-transform duration-300 lg:hidden ${
+        className={`fixed top-0 left-0 h-full w-72 z-50 bg-sidebar border-r border-border flex flex-col transition-transform duration-300 lg:hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <button
           type="button"
           onClick={() => setSidebarOpen(false)}
-          className="absolute top-4 right-4 size-8 grid place-items-center rounded-lg bg-white/5 hover:bg-white/10 transition"
+          className="absolute top-4 right-4 size-8 grid place-items-center rounded-lg bg-black/5 hover:bg-black/10 transition"
           aria-label="Close menu"
         >
           <X className="size-4" />
@@ -147,12 +147,12 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
 
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
-        <header className="h-14 lg:h-16 border-b border-border/60 px-4 lg:px-8 flex items-center gap-3 sticky top-0 z-30 bg-background/60 backdrop-blur-xl">
+        <header className="h-14 lg:h-16 border-b border-border px-4 lg:px-8 flex items-center gap-3 sticky top-0 z-30 bg-background/80 backdrop-blur-xl">
           {/* Hamburger — mobile only */}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="size-9 grid place-items-center rounded-lg bg-white/5 border border-border hover:border-primary/50 transition lg:hidden shrink-0"
+            className="size-9 grid place-items-center rounded-lg bg-muted border border-border hover:border-primary/50 transition lg:hidden shrink-0"
             aria-label="Open menu"
           >
             <Menu className="size-4" />
@@ -172,8 +172,8 @@ export function AppShell({ children, title }: { children: ReactNode; title?: str
             <input
               value={headerQuery}
               onChange={(e) => setHeaderQuery(e.target.value)}
-              placeholder={t.header.search_placeholder}
-              className="w-full h-9 pl-9 pr-3 rounded-lg bg-white/5 border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:glow-primary transition-all"
+              placeholder={t("header.search_placeholder")}
+              className="w-full h-9 pl-9 pr-3 rounded-lg bg-muted border border-border text-sm placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-all"
             />
           </form>
           <LanguageSwitcher />

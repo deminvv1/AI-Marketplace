@@ -28,7 +28,7 @@ export function CategoryPicker({
             className={`aspect-square rounded-xl border flex flex-col items-center justify-center gap-2 transition ${
               value === c.name
                 ? "bg-primary/15 border-primary/50 glow-primary"
-                : "bg-white/5 border-border hover:border-primary/40"
+                : "bg-muted/60 border-border hover:border-primary/40"
             }`}
           >
             <span className="text-xl">{c.icon ?? "🌐"}</span>
@@ -77,7 +77,7 @@ export function CategoryMultiPicker({
               className={`h-8 px-3 rounded-lg text-xs border inline-flex items-center gap-1.5 ${
                 on
                   ? "bg-primary/15 border-primary/50 text-primary"
-                  : "bg-white/5 border-border text-muted-foreground"
+                  : "bg-muted/60 border-border text-muted-foreground"
               }`}
             >
               <span>{c.icon}</span>

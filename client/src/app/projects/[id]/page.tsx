@@ -9,6 +9,7 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/ui-bits";
 import { getMe } from "@/app/actions/me";
@@ -26,7 +27,7 @@ import {
   rejectProposal,
   type ProposalItem,
 } from "@/app/actions/proposals";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import { useTaxonomy } from "@/lib/use-taxonomy";
 import { skillLabel } from "@/lib/taxonomy";
 import { normalizeRole } from "@/lib/roles";
@@ -49,6 +50,7 @@ import { ArrowLeft, Loader2, Pencil, Send, Star, Trash2 } from "lucide-react";
 import { TranslateButton } from "@/components/translate-button";
 
 export default function ProjectDetailPage() {
+  const t = useTranslations("projectDetail");
   const params = useParams();
   const router = useRouter();
   const projectId = typeof params.id === "string" ? params.id : "";
@@ -92,7 +94,7 @@ export default function ProjectDetailPage() {
       return;
     }
     if (!("id" in projResult)) {
-      setError("Project not found");
+      setError(t("projectNotFound"));
       return;
     }
 
@@ -153,8 +155,8 @@ export default function ProjectDetailPage() {
     if (!projectId) return;
     const msg =
       project?.status === "IN_PROGRESS"
-        ? "Delete this project? The assigned freelancer and all proposals will be removed."
-        : "Delete this project permanently? All proposals will be removed.";
+        ? t("confirmDeleteAssigned")
+        : t("confirmDelete");
     if (!confirm(msg)) return;
 
     setDeleting(true);
@@ -228,7 +230,7 @@ export default function ProjectDetailPage() {
 
   if (loading) {
     return (
-      <AppShell title="Project">
+      <AppShell title={t("project")}>
         <div className="flex justify-center py-24 text-muted-foreground">
           <Loader2 className="size-8 animate-spin" />
         </div>
@@ -238,8 +240,8 @@ export default function ProjectDetailPage() {
 
   if (error || !project) {
     return (
-      <AppShell title="Project">
-        <p className="text-destructive">{error ?? "Not found"}</p>
+      <AppShell title={t("project")}>
+        <p className="text-destructive">{error ?? t("notFound")}</p>
         <Link href="/projects" className="text-primary text-sm mt-4 inline-block">
           ← Back to projects
         </Link>
@@ -253,7 +255,7 @@ export default function ProjectDetailPage() {
         href="/projects"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> All projects
+        <ArrowLeft className="size-4" /> {t("allProjects")}
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -268,7 +270,7 @@ export default function ProjectDetailPage() {
                   className="h-9 px-3 rounded-lg border border-border text-sm inline-flex items-center gap-2 hover:border-primary/40"
                 >
                   <Pencil className="size-4" />
-                  Edit
+                  {t("edit")}
                 </Link>
               )}
               {!isOwner && meId && (
@@ -289,7 +291,7 @@ export default function ProjectDetailPage() {
           <div className="glass rounded-2xl p-6 text-sm leading-relaxed">
             <p className="whitespace-pre-wrap">{translatedDesc ?? project.description}</p>
             {translatedDesc && (
-              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">{t("translated")}</p>
             )}
             <div className="mt-3">
               <TranslateButton
@@ -307,14 +309,14 @@ export default function ProjectDetailPage() {
               </span>
             )}
             {project.country && (
-              <span className="px-3 py-1 rounded-lg bg-white/5 border border-border text-sm text-muted-foreground">
+              <span className="px-3 py-1 rounded-lg bg-muted/60 border border-border text-sm text-muted-foreground">
                 {flag(project.country)} {project.country}
               </span>
             )}
             {project.tags.map((t) => (
               <span
                 key={t}
-                className="px-3 py-1 rounded-lg bg-white/5 border border-border text-xs text-muted-foreground"
+                className="px-3 py-1 rounded-lg bg-muted/60 border border-border text-xs text-muted-foreground"
               >
                 {skillLabel(t, skills)}
               </span>
@@ -323,15 +325,15 @@ export default function ProjectDetailPage() {
 
           <div className="grid sm:grid-cols-3 gap-4 text-sm">
             <div className="glass rounded-xl p-4">
-              <div className="text-muted-foreground">Budget</div>
+              <div className="text-muted-foreground">{t("budget")}</div>
               <div className="font-semibold mt-1">{project.budget || "TBD"}</div>
             </div>
             <div className="glass rounded-xl p-4">
-              <div className="text-muted-foreground">Deadline</div>
+              <div className="text-muted-foreground">{t("deadline")}</div>
               <div className="font-semibold mt-1">{formatDeadline(project.deadline)}</div>
             </div>
             <div className="glass rounded-xl p-4">
-              <div className="text-muted-foreground">Posted</div>
+              <div className="text-muted-foreground">{t("posted")}</div>
               <div className="font-semibold mt-1">{formatPostedAt(project.createdAt)}</div>
             </div>
           </div>
@@ -344,9 +346,9 @@ export default function ProjectDetailPage() {
 
           {project.freelancer?.username && (
             <p className="text-sm mt-4">
-              Assigned freelancer:{" "}
+              Assigned specialist:{" "}
               <Link
-                href={`/freelancers/${project.freelancer.username}`}
+                href={`/specialists/${project.freelancer.username}`}
                 className="text-primary hover:underline"
               >
                 @{project.freelancer.username}
@@ -363,9 +365,9 @@ export default function ProjectDetailPage() {
 
           {isOwner && project.status === "IN_PROGRESS" && (
             <div className="glass rounded-2xl p-6 border border-success/30">
-              <h2 className="font-semibold text-sm">Work in progress</h2>
+              <h2 className="font-semibold text-sm">{t("workInProgress")}</h2>
               <p className="text-xs text-muted-foreground mt-1 mb-4">
-                Mark as completed when the freelancer has delivered. The project will leave the
+                Mark as completed when the specialist has delivered. The project will leave the
                 open catalog.
               </p>
               <button
@@ -374,26 +376,26 @@ export default function ProjectDetailPage() {
                 onClick={handleCompleteProject}
                 className="w-full h-10 rounded-xl bg-success/20 text-success border border-success/40 text-sm font-medium hover:bg-success/30 disabled:opacity-60"
               >
-                {completing ? "Saving…" : "Mark project completed"}
+                {completing ? t("saving") : t("markCompleted")}
               </button>
             </div>
           )}
 
           {isOwner && project.status === "COMPLETED" && (
             <div className="glass rounded-2xl p-6 space-y-4">
-              <h2 className="font-semibold text-sm">Project completed</h2>
+              <h2 className="font-semibold text-sm">{t("projectCompleted")}</h2>
               {projectReview ? (
                 <div>
-                  <p className="text-xs text-muted-foreground mb-2">Your review</p>
+                  <p className="text-xs text-muted-foreground mb-2">{t("yourReview")}</p>
                   <ReviewsList reviews={[projectReview]} />
                 </div>
               ) : project.freelancerId ? (
                 <form onSubmit={handleReviewSubmit} className="space-y-3">
                   <p className="text-xs text-muted-foreground">
-                    Rate the freelancer for this project (one review per project).
+                    {t("rateHint")}
                   </p>
                   <div>
-                    <label className="text-sm font-medium">Rating</label>
+                    <label className="text-sm font-medium">{t("rating")}</label>
                     <div className="mt-2 flex gap-1">
                       {[1, 2, 3, 4, 5].map((n) => (
                         <button
@@ -414,13 +416,13 @@ export default function ProjectDetailPage() {
                     </div>
                   </div>
                   <div>
-                    <label className="text-sm font-medium">Comment (optional)</label>
+                    <label className="text-sm font-medium">{t("commentOptional")}</label>
                     <textarea
                       value={reviewText}
                       onChange={(e) => setReviewText(e.target.value)}
                       rows={3}
-                      className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
-                      placeholder="How was the collaboration?"
+                      className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
+                      placeholder={t("howWasIt")}
                     />
                   </div>
                   <button
@@ -428,12 +430,12 @@ export default function ProjectDetailPage() {
                     disabled={reviewSubmitting}
                     className="w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium disabled:opacity-60"
                   >
-                    {reviewSubmitting ? "Submitting…" : "Submit review"}
+                    {reviewSubmitting ? t("submitting") : t("submitReview")}
                   </button>
                 </form>
               ) : (
                 <p className="text-xs text-muted-foreground">
-                  No freelancer was assigned to this project.
+                  {t("noSpecialist")}
                 </p>
               )}
             </div>
@@ -451,18 +453,18 @@ export default function ProjectDetailPage() {
                 Proposals ({proposals.length})
               </h2>
               {proposals.length === 0 ? (
-                <p className="text-sm text-muted-foreground">No proposals yet.</p>
+                <p className="text-sm text-muted-foreground">{t("noProposals")}</p>
               ) : (
                 <ul className="space-y-4">
                   {proposals.map((p) => (
                     <li
                       key={p.id}
-                      className="p-4 rounded-xl bg-white/5 border border-border"
+                      className="p-4 rounded-xl bg-muted/60 border border-border"
                     >
                       <div className="flex items-start justify-between gap-2">
                         {p.freelancer.username ? (
                           <Link
-                            href={`/freelancers/${p.freelancer.username}`}
+                            href={`/specialists/${p.freelancer.username}`}
                             className="font-medium text-sm text-primary hover:underline"
                           >
                             {freelancerDisplayName(p.freelancer)}
@@ -496,7 +498,7 @@ export default function ProjectDetailPage() {
                             onClick={() => handleAccept(p.id)}
                             className="h-8 px-3 rounded-lg bg-gradient-primary text-white text-xs font-medium disabled:opacity-60"
                           >
-                            {proposalActionId === p.id ? "…" : "Accept"}
+                            {proposalActionId === p.id ? "…" : t("accept")}
                           </button>
                           <button
                             type="button"
@@ -504,7 +506,7 @@ export default function ProjectDetailPage() {
                             onClick={() => handleReject(p.id)}
                             className="h-8 px-3 rounded-lg border border-border text-xs hover:border-destructive/50"
                           >
-                            Reject
+                            {t("reject")}
                           </button>
                         </div>
                       )}
@@ -517,37 +519,37 @@ export default function ProjectDetailPage() {
 
           {canPropose && !myProposal && (
             <form onSubmit={handleProposalSubmit} className="glass rounded-2xl p-6 space-y-4">
-              <h2 className="font-semibold">Send proposal</h2>
+              <h2 className="font-semibold">{t("sendProposal")}</h2>
               <div>
-                <label className="text-sm font-medium">Cover letter</label>
+                <label className="text-sm font-medium">{t("coverLetter")}</label>
                 <textarea
                   required
                   minLength={10}
                   value={coverLetter}
                   onChange={(e) => setCoverLetter(e.target.value)}
                   rows={5}
-                  placeholder="Why you're a fit, approach, relevant experience…"
-                  className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+                  placeholder={t("coverLetterHint")}
+                  className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Your budget</label>
+                <label className="text-sm font-medium">{t("yourBudget")}</label>
                 <input
                   value={proposedBudget}
                   onChange={(e) => setProposedBudget(e.target.value)}
                   placeholder="$4,000"
-                  className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                  className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Estimated days</label>
+                <label className="text-sm font-medium">{t("estimatedDays")}</label>
                 <input
                   type="number"
                   min={1}
                   max={3650}
                   value={estimatedDays}
                   onChange={(e) => setEstimatedDays(e.target.value)}
-                  className="mt-2 w-full h-10 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                  className="mt-2 w-full h-10 px-3 rounded-xl bg-muted/60 border border-border text-sm"
                 />
               </div>
               {submitError && (
@@ -563,14 +565,14 @@ export default function ProjectDetailPage() {
                 ) : (
                   <Send className="size-4" />
                 )}
-                Submit proposal
+                {t("sendProposal")}
               </button>
             </form>
           )}
 
           {myProposal && (
             <div className="glass rounded-2xl p-6 border border-primary/30">
-              <h2 className="font-semibold text-primary">Proposal sent</h2>
+              <h2 className="font-semibold text-primary">{t("proposalSent")}</h2>
               <p className="text-sm text-muted-foreground mt-2 line-clamp-6">
                 {myProposal.coverLetter}
               </p>
@@ -582,16 +584,16 @@ export default function ProjectDetailPage() {
 
           {!isOwner && !canPropose && !myProposal && project.status === "OPEN" && (
             <p className="text-sm text-muted-foreground glass rounded-2xl p-6">
-              Sign in as a freelancer to send a proposal. Users with role BOTH can switch
+              Sign in as a specialist to send a proposal. Users with role BOTH can switch
               mode in the header.
             </p>
           )}
 
           {isOwner && (
             <div className="glass rounded-2xl p-6 border border-destructive/20">
-              <h2 className="font-semibold text-sm text-destructive">Danger zone</h2>
+              <h2 className="font-semibold text-sm text-destructive">{t("dangerZone")}</h2>
               <p className="text-xs text-muted-foreground mt-1 mb-4">
-                Permanently remove this project and all proposals. Cannot be undone.
+                {t("deleteHint")}
               </p>
               <button
                 type="button"

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { getMe } from "@/app/actions/me";
 import {
@@ -19,6 +20,7 @@ import { ArrowLeft, Loader2, Trash2 } from "lucide-react";
 import { TranslateButton } from "@/components/translate-button";
 
 export default function SolutionDetailPage() {
+  const tf = useTranslations("forms");
   const params = useParams();
   const router = useRouter();
   const id = typeof params.id === "string" ? params.id : "";
@@ -75,7 +77,7 @@ export default function SolutionDetailPage() {
 
   if (loading) {
     return (
-      <AppShell title="Solution">
+      <AppShell title={tf("solution")}>
         <div className="flex justify-center py-24">
           <Loader2 className="size-8 animate-spin" />
         </div>
@@ -85,8 +87,8 @@ export default function SolutionDetailPage() {
 
   if (error || !item) {
     return (
-      <AppShell title="Solution">
-        <p className="text-destructive text-sm">{error ?? "Not found"}</p>
+      <AppShell title={tf("solution")}>
+        <p className="text-destructive text-sm">{error ?? tf("notFound")}</p>
         <Link href="/solutions" className="text-primary text-sm mt-4 inline-block">
           ← Catalog
         </Link>
@@ -100,7 +102,7 @@ export default function SolutionDetailPage() {
         href="/solutions"
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> All solutions
+        <ArrowLeft className="size-4" /> {tf("allSolutions")}
       </Link>
 
       <div className="grid lg:grid-cols-3 gap-8">
@@ -121,7 +123,7 @@ export default function SolutionDetailPage() {
           <div className="glass rounded-2xl p-6 text-sm leading-relaxed">
             <p className="whitespace-pre-wrap">{translatedDesc ?? item.description}</p>
             {translatedDesc && (
-              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">Translated</p>
+              <p className="text-[11px] text-muted-foreground/60 mt-1 italic">{tf("translated")}</p>
             )}
             <div className="mt-3">
               <TranslateButton
@@ -138,26 +140,26 @@ export default function SolutionDetailPage() {
               </span>
             )}
             {item.industry && (
-              <span className="px-3 py-1 rounded-lg bg-white/5 border border-border text-sm">
+              <span className="px-3 py-1 rounded-lg bg-muted/60 border border-border text-sm">
                 {item.industry}
               </span>
             )}
             {item.tags.map((t) => (
-              <span key={t} className="px-2 py-1 rounded-md text-xs bg-white/5 border border-border">
+              <span key={t} className="px-2 py-1 rounded-md text-xs bg-muted/60 border border-border">
                 {t}
               </span>
             ))}
           </div>
-          <p className="text-2xl font-bold">{item.price || "Price on request"}</p>
+          <p className="text-2xl font-bold">{item.price || tf("priceOnRequest")}</p>
           <p className="text-xs text-muted-foreground">{item.viewsCount} views</p>
         </div>
 
         <aside className="space-y-4">
           <div className="glass rounded-2xl p-6">
-            <h2 className="font-semibold text-sm mb-3">Author</h2>
+            <h2 className="font-semibold text-sm mb-3">{tf("author")}</h2>
             {item.freelancer.username ? (
               <Link
-                href={`/freelancers/${item.freelancer.username}`}
+                href={`/specialists/${item.freelancer.username}`}
                 className="text-primary hover:underline font-medium"
               >
                 {solutionAuthorName(item.freelancer)}
@@ -176,7 +178,7 @@ export default function SolutionDetailPage() {
                 href={`/messages?with=${item.freelancer.id}`}
                 className="w-full h-10 rounded-xl bg-gradient-primary text-white text-sm font-medium grid place-items-center"
               >
-                Contact
+                {tf("contact")}
               </Link>
               {!isOwner && (
                 <FavoriteButton targetId={item.id} targetType="solution" className="w-full justify-center" />

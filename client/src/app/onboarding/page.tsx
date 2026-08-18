@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Loader2, Sparkles } from "lucide-react";
@@ -8,6 +10,7 @@ import { getMe } from "@/app/actions/me";
 import { normalizeRole, type AppRole } from "@/lib/roles";
 
 export default function OnboardingPage() {
+  const t = useTranslations("onboarding");
   const [username, setUsername] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -56,9 +59,9 @@ export default function OnboardingPage() {
           <span className="font-bold tracking-tight">AI Marketplace</span>
         </div>
 
-        <h1 className="text-3xl font-bold tracking-tight">Choose a username</h1>
+        <h1 className="text-3xl font-bold tracking-tight">{t("chooseUsername")}</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          This is how others will find you on the platform.
+          {t("usernameHint")}
         </p>
 
         <div className="mt-8 space-y-4">
@@ -68,13 +71,13 @@ export default function OnboardingPage() {
             </span>
             <input
               type="text"
-              placeholder="yourname"
+              placeholder={t("placeholder")}
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);
                 setError("");
               }}
-              onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
+              onKeyDown={(e) => e.key === t("enter") && handleSubmit()}
               className="w-full h-11 pl-7 pr-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
               autoFocus
             />
@@ -91,7 +94,7 @@ export default function OnboardingPage() {
               <Loader2 className="size-4 animate-spin" />
             ) : (
               <>
-                Go to Dashboard <ArrowRight className="size-4" />
+                {t("goToDashboard")} <ArrowRight className="size-4" />
               </>
             )}
           </button>

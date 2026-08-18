@@ -76,7 +76,7 @@ export function AvatarUploadModal({ onClose, onUpload }: Props) {
           <h2 className="font-semibold text-base">Profile photo</h2>
           <button
             onClick={onClose}
-            className="size-8 rounded-lg bg-white/5 border border-border grid place-items-center hover:bg-white/10 transition"
+            className="size-8 rounded-lg bg-muted/60 border border-border grid place-items-center hover:bg-muted/80 transition"
           >
             <X className="size-4" />
           </button>
@@ -99,7 +99,7 @@ export function AvatarUploadModal({ onClose, onUpload }: Props) {
               <button
                 onClick={() => { setPreview(null); setFile(null); }}
                 disabled={uploading}
-                className="flex-1 h-10 rounded-xl bg-white/5 border border-border text-sm font-medium hover:bg-white/10 transition disabled:opacity-50"
+                className="flex-1 h-10 rounded-xl bg-muted/60 border border-border text-sm font-medium hover:bg-muted/80 transition disabled:opacity-50"
               >
                 Choose another
               </button>
@@ -125,12 +125,12 @@ export function AvatarUploadModal({ onClose, onUpload }: Props) {
               className={`relative flex flex-col items-center justify-center gap-3 h-48 rounded-xl border-2 border-dashed transition-all cursor-pointer ${
                 dragging
                   ? "border-primary bg-primary/10"
-                  : "border-border/60 bg-white/3 hover:border-primary/50 hover:bg-white/5"
+                  : "border-border/60 bg-muted/40 hover:border-primary/50 hover:bg-muted/60"
               }`}
               onClick={() => inputRef.current?.click()}
             >
               <div className={`size-12 rounded-xl grid place-items-center transition-colors ${
-                dragging ? "bg-primary/20 border border-primary/40" : "bg-white/5 border border-border"
+                dragging ? "bg-primary/20 border border-primary/40" : "bg-muted/60 border border-border"
               }`}>
                 <ImagePlus className={`size-6 transition-colors ${dragging ? "text-primary" : "text-muted-foreground"}`} />
               </div>
@@ -150,7 +150,7 @@ export function AvatarUploadModal({ onClose, onUpload }: Props) {
                 { label: "Recommended", value: "Square image" },
                 { label: "Min resolution", value: "256 × 256 px" },
               ].map(({ label, value }) => (
-                <div key={label} className="bg-white/3 border border-border/50 rounded-lg px-3 py-2">
+                <div key={label} className="bg-muted/60 border border-border/50 rounded-lg px-3 py-2">
                   <p className="text-[10px] uppercase tracking-widest text-muted-foreground">{label}</p>
                   <p className="text-xs font-medium mt-0.5">{value}</p>
                 </div>

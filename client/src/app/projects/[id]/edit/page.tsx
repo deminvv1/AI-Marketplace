@@ -8,6 +8,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { getProject, updateProject } from "@/app/actions/projects";
 import { getTaxonomy, type TaxonomyCategory, type TaxonomySkill } from "@/app/actions/taxonomy";
@@ -23,6 +24,7 @@ function deadlineInputValue(iso: string | null): string {
 }
 
 export default function EditProjectPage() {
+  const tf = useTranslations("forms");
   const params = useParams();
   const router = useRouter();
   const projectId = typeof params.id === "string" ? params.id : "";
@@ -111,7 +113,7 @@ export default function EditProjectPage() {
 
   if (loading) {
     return (
-      <AppShell title="Edit project">
+      <AppShell title={tf("editProject")}>
         <div className="flex justify-center py-24">
           <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
@@ -121,37 +123,37 @@ export default function EditProjectPage() {
 
   if (forbidden) {
     return (
-      <AppShell title="Edit project">
+      <AppShell title={tf("editProject")}>
         <p className="text-destructive text-sm">{forbidden}</p>
         <Link
           href={`/projects/${projectId}`}
           className="text-primary text-sm mt-4 inline-block"
         >
-          ← Back to project
+          ← {tf("backToProject")}
         </Link>
       </AppShell>
     );
   }
 
   return (
-    <AppShell title="Edit project">
+    <AppShell title={tf("editProject")}>
       <Link
         href={`/projects/${projectId}`}
         className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary mb-6"
       >
-        <ArrowLeft className="size-4" /> Back to project
+        <ArrowLeft className="size-4" /> {tf("backToProject")}
       </Link>
 
       <div className="max-w-4xl mx-auto">
         <form onSubmit={handleSubmit} className="glass rounded-2xl p-8 space-y-6">
           <div>
-            <label className="text-sm font-medium">Title</label>
+            <label className="text-sm font-medium">{tf("title")}</label>
             <input
               required
               minLength={5}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
             />
           </div>
 
@@ -168,7 +170,7 @@ export default function EditProjectPage() {
 
           <div>
             <div className="flex items-center justify-between">
-              <label className="text-sm font-medium">Short description</label>
+              <label className="text-sm font-medium">{tf("shortDescription")}</label>
               <span className="text-xs text-muted-foreground">
                 {shortDescription.length} / 200
               </span>
@@ -178,48 +180,48 @@ export default function EditProjectPage() {
               value={shortDescription}
               onChange={(e) => setShortDescription(e.target.value)}
               rows={3}
-              className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+              className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium">Full description</label>
+            <label className="text-sm font-medium">{tf("fullDescription")}</label>
             <textarea
               required
               minLength={20}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={6}
-              className="mt-2 w-full px-3 py-2 rounded-xl bg-white/5 border border-border text-sm resize-none"
+              className="mt-2 w-full px-3 py-2 rounded-xl bg-muted/60 border border-border text-sm resize-none"
             />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-sm font-medium">Budget</label>
+              <label className="text-sm font-medium">{tf("budget")}</label>
               <input
                 value={budget}
                 onChange={(e) => setBudget(e.target.value)}
-                className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Deadline</label>
+              <label className="text-sm font-medium">{tf("deadline")}</label>
               <input
                 type="date"
                 value={deadline}
                 onChange={(e) => setDeadline(e.target.value)}
-                className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+                className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-sm font-medium">Country</label>
+            <label className="text-sm font-medium">{tf("country")}</label>
             <input
               value={country}
               onChange={(e) => setCountry(e.target.value)}
-              className="mt-2 w-full h-11 px-3 rounded-xl bg-white/5 border border-border text-sm"
+              className="mt-2 w-full h-11 px-3 rounded-xl bg-muted/60 border border-border text-sm"
             />
           </div>
 
@@ -232,9 +234,9 @@ export default function EditProjectPage() {
           <div className="flex items-center justify-between pt-4 border-t border-border">
             <Link
               href={`/projects/${projectId}`}
-              className="h-10 px-4 rounded-xl bg-white/5 border border-border text-sm inline-flex items-center"
+              className="h-10 px-4 rounded-xl bg-muted/60 border border-border text-sm inline-flex items-center"
             >
-              Cancel
+              {tf("cancel")}
             </Link>
             <button
               type="submit"

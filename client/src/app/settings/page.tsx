@@ -6,6 +6,7 @@ import {
   Loader2, Save, User, Shield, AlertTriangle,
   Mail, AtSign, Briefcase, Eye, Clock, Phone, CheckCircle2, LogOut, ToggleLeft,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import {
   getSettings, updateAccount, updatePrivacy, deleteAccount,
@@ -18,14 +19,16 @@ import { normalizeRole } from "@/lib/roles";
 
 type Role = "CLIENT" | "FREELANCER" | "BOTH";
 const ROLES: Role[] = ["CLIENT", "FREELANCER", "BOTH"];
+/** Values are translation keys — t() is not available at module level. */
+const ROLE_KEYS: Record<Role, string> = { CLIENT: "roleClient", FREELANCER: "roleSpecialist", BOTH: "roleBoth" };
 
 type Settings = Awaited<ReturnType<typeof getSettings>>;
 type Tab = "account" | "privacy" | "danger";
 
-const TABS: { key: Tab; label: string; icon: React.ElementType }[] = [
-  { key: "account", label: "Account", icon: User },
-  { key: "privacy", label: "Privacy", icon: Shield },
-  { key: "danger", label: "Danger Zone", icon: AlertTriangle },
+const TABS: { key: Tab; labelKey: string; icon: React.ElementType }[] = [
+  { key: "account", labelKey: "tabAccount", icon: User },
+  { key: "privacy", labelKey: "tabPrivacy", icon: Shield },
+  { key: "danger", labelKey: "tabDanger", icon: AlertTriangle },
 ];
 
 /* ── Toggle ─────────────────────────────────────── */
@@ -34,7 +37,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
     <button
       onClick={() => onChange(!checked)}
       className={`relative w-11 h-6 rounded-full transition-colors duration-200 ${
-        checked ? "bg-primary" : "bg-white/10 border border-border"
+        checked ? "bg-primary" : "bg-muted/80 border border-border"
       }`}
     >
       <div
@@ -102,6 +105,7 @@ function Field({
 
 /* ── Page ────────────────────────────────────────── */
 export default function SettingsPage() {
+  const t = useTranslations("settings");
   const router = useRouter();
   const [data, setData] = useState<Settings | null>(null);
   const [activeTab, setActiveTab] = useState<Tab>("account");
@@ -190,7 +194,7 @@ export default function SettingsPage() {
     if ("error" in result) {
       setAccountMsg({ ok: false, text: result.error });
     } else {
-      setAccountMsg({ ok: true, text: "Account settings saved." });
+      setAccountMsg({ ok: true, text: t("accountSaved") });
       setData((prev: any) => prev ? { ...prev, username, role } : null);
       window.dispatchEvent(new Event("user-updated"));
     }
@@ -202,8 +206,8 @@ export default function SettingsPage() {
     const result = await updatePrivacy(privacy);
     setPrivacySaving(false);
     setPrivacyMsg("success" in result
-      ? { ok: true, text: "Privacy settings saved." }
-      : { ok: false, text: "Failed to save." }
+      ? { ok: true, text: t("privacySaved") }
+      : { ok: false, text: t("saveFailed") }
     );
   }
 
@@ -225,7 +229,7 @@ export default function SettingsPage() {
 
   if (!data) {
     return (
-      <AppShell title="Settings">
+      <AppShell title={t("title")}>
         <div className="flex items-center justify-center h-64">
           <Loader2 className="size-8 animate-spin text-muted-foreground" />
         </div>
@@ -234,49 +238,49 @@ export default function SettingsPage() {
   }
 
   return (
-    <AppShell title="Settings">
+    <AppShell title={t("title")}>
       <div className="max-w-2xl space-y-5">
 
         {/* Tabs */}
         <div className="flex gap-1 glass rounded-xl p-1">
-          {TABS.map(({ key, label, icon: Icon }) => (
+          {TABS.map(({ key, labelKey, icon: Icon }) => (
             <button
               key={key}
               onClick={() => setActiveTab(key)}
               className={`flex-1 flex items-center justify-center gap-2 h-9 rounded-lg text-sm font-medium transition-all ${
                 activeTab === key
                   ? "bg-primary/20 border border-primary/40 text-primary"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                  : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
               }`}
             >
               <Icon className="size-4" />
-              {label}
+              {t(labelKey)}
             </button>
           ))}
         </div>
 
         {/* Account */}
         {activeTab === "account" && (
-          <Section icon={User} title="Account" description="Manage your login details and role on the platform.">
-            <Field icon={Mail} label="Email" hint="Managed by your auth provider">
-              <span className="text-sm text-muted-foreground bg-white/5 border border-border px-3 py-1.5 rounded-lg">
+          <Section icon={User} title={t("tabAccount")} description={t("accountDesc")}>
+            <Field icon={Mail} label={t("email")} hint={t("emailManaged")}>
+              <span className="text-sm text-muted-foreground bg-muted/60 border border-border px-3 py-1.5 rounded-lg">
                 {data.authEmail}
               </span>
             </Field>
 
-            <Field icon={AtSign} label="Username" hint="Visible to other users">
+            <Field icon={AtSign} label={t("username")} hint={t("showPhoneHint")}>
               <div className="relative">
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm select-none">@</span>
                 <input
                   value={username}
                   onChange={(e) => { setUsername(e.target.value); setAccountMsg(null); }}
-                  placeholder="yourname"
-                  className="w-48 h-9 pl-7 pr-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-primary transition-all"
+                  placeholder={t("usernamePlaceholder")}
+                  className="w-48 h-9 pl-7 pr-3 rounded-lg bg-muted/60 border border-border text-sm focus:outline-none focus:border-primary transition-all"
                 />
               </div>
             </Field>
 
-            <Field icon={Briefcase} label="Role" hint="You can switch at any time">
+            <Field icon={Briefcase} label={t("role")} hint={t("roleSwitchHint")}>
               <div className="flex gap-2">
                 {ROLES.map((r) => (
                   <button
@@ -285,17 +289,17 @@ export default function SettingsPage() {
                     className={`h-8 px-3 rounded-lg text-xs font-medium transition-all ${
                       role === r
                         ? "bg-primary/20 border border-primary/50 text-primary"
-                        : "bg-white/5 border border-border text-muted-foreground hover:bg-white/10"
+                        : "bg-muted/60 border border-border text-muted-foreground hover:bg-muted/80"
                     }`}
                   >
-                    {r.charAt(0) + r.slice(1).toLowerCase()}
+                    {t(ROLE_KEYS[r])}
                   </button>
                 ))}
               </div>
             </Field>
 
             {modeMounted && data.role === "BOTH" && (
-              <Field icon={ToggleLeft} label="Active mode" hint="Which role you act as right now">
+              <Field icon={ToggleLeft} label={t("activeMode")} hint={t("activeModeHint")}>
                 <div className="flex gap-2">
                   {(["CLIENT", "FREELANCER"] as const).map((m) => (
                     <button
@@ -304,10 +308,10 @@ export default function SettingsPage() {
                       className={`h-8 px-3 rounded-lg text-xs font-medium transition-all ${
                         mode === m
                           ? "bg-primary/20 border border-primary/50 text-primary"
-                          : "bg-white/5 border border-border text-muted-foreground hover:bg-white/10"
+                          : "bg-muted/60 border border-border text-muted-foreground hover:bg-muted/80"
                       }`}
                     >
-                      {m.charAt(0) + m.slice(1).toLowerCase()}
+                      {t(ROLE_KEYS[m])}
                     </button>
                   ))}
                 </div>
@@ -328,14 +332,14 @@ export default function SettingsPage() {
                   className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
                 >
                   {accountSaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-                  Save changes
+                  {t("saveChanges")}
                 </button>
                 <button
                   onClick={cancelAccount}
                   disabled={accountSaving}
-                  className="h-9 px-4 rounded-xl bg-white/5 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/10 transition disabled:opacity-50"
+                  className="h-9 px-4 rounded-xl bg-muted/60 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition disabled:opacity-50"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
               </div>
 
@@ -353,13 +357,13 @@ export default function SettingsPage() {
 
         {/* Privacy */}
         {activeTab === "privacy" && (
-          <Section icon={Shield} title="Privacy" description="Control what other users can see on your profile.">
+          <Section icon={Shield} title={t("tabPrivacy")} description={t("privacyDesc")}>
             {([
-              { key: "profileVisible", icon: Eye, label: "Profile visible to others", hint: "Other users can find and view your profile" },
-              { key: "onlineVisible", icon: CheckCircle2, label: "Show online status", hint: "Others see when you're active" },
-              { key: "lastSeenVisible", icon: Clock, label: "Show last seen", hint: "Others see when you were last online" },
-              { key: "emailVisible", icon: Mail, label: "Show email publicly", hint: "Visible on your public profile" },
-              { key: "phoneVisible", icon: Phone, label: "Show phone publicly", hint: "Visible on your public profile" },
+              { key: "profileVisible", icon: Eye, label: t("profileVisible"), hint: t("profileVisibleHint") },
+              { key: "onlineVisible", icon: CheckCircle2, label: t("showOnline"), hint: t("showOnlineHint") },
+              { key: "lastSeenVisible", icon: Clock, label: t("showLastSeen"), hint: t("showLastSeenHint") },
+              { key: "emailVisible", icon: Mail, label: t("showEmail"), hint: t("showEmailHint") },
+              { key: "phoneVisible", icon: Phone, label: t("showPhone"), hint: t("showPhoneHint") },
             ] as const).map(({ key, icon, label, hint }) => (
               <Field key={key} icon={icon} label={label} hint={hint}>
                 <Toggle
@@ -382,32 +386,32 @@ export default function SettingsPage() {
                 className="h-9 px-5 rounded-xl bg-gradient-primary text-white text-sm font-medium glow-primary hover:opacity-90 transition flex items-center gap-2 disabled:opacity-50"
               >
                 {privacySaving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-                Save changes
+                {t("saveChanges")}
               </button>
               <button
                 onClick={cancelPrivacy}
                 disabled={privacySaving}
-                className="h-9 px-4 rounded-xl bg-white/5 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-white/10 transition disabled:opacity-50"
+                className="h-9 px-4 rounded-xl bg-muted/60 border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/80 transition disabled:opacity-50"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </div>
 
             <div className="border-t border-border/60 pt-5 space-y-3">
-              <p className="text-sm font-medium">Blocked users</p>
+              <p className="text-sm font-medium">{t("blockedUsers")}</p>
               <p className="text-xs text-muted-foreground">
-                Blocked users cannot start or continue conversations with you.
+                {t("blockedHint")}
               </p>
               {blockedLoading ? (
                 <Loader2 className="size-5 animate-spin text-muted-foreground" />
               ) : blocked.length === 0 ? (
-                <p className="text-xs text-muted-foreground">No blocked users.</p>
+                <p className="text-xs text-muted-foreground">{t("noBlocked")}</p>
               ) : (
                 <ul className="space-y-2">
                   {blocked.map((row) => (
                     <li
                       key={row.id}
-                      className="flex items-center justify-between gap-3 p-3 rounded-lg bg-white/5 border border-border text-sm"
+                      className="flex items-center justify-between gap-3 p-3 rounded-lg bg-muted/60 border border-border text-sm"
                     >
                       <span>{messageUserName(row.blocked)}</span>
                       <button
@@ -425,7 +429,7 @@ export default function SettingsPage() {
                         }}
                         className="text-xs text-primary hover:underline disabled:opacity-50"
                       >
-                        Unblock
+                        {t("unblock")}
                       </button>
                     </li>
                   ))}
@@ -443,14 +447,14 @@ export default function SettingsPage() {
                 <AlertTriangle className="size-4 text-destructive" />
               </div>
               <div>
-                <h2 className="font-semibold text-destructive">Danger Zone</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">Permanent actions — cannot be undone.</p>
+                <h2 className="font-semibold text-destructive">{t("tabDanger")}</h2>
+                <p className="text-xs text-muted-foreground mt-0.5">{t("dangerDesc")}</p>
               </div>
             </div>
 
             <div className="border-t border-border/60 pt-5 space-y-4">
               <div>
-                <p className="text-sm font-medium">Delete account</p>
+                <p className="text-sm font-medium">{t("deleteAccount")}</p>
                 <p className="text-xs text-muted-foreground mt-1">
                   All your data, orders, messages, and offers will be permanently deleted.
                   Type your username{" "}
@@ -463,7 +467,7 @@ export default function SettingsPage() {
                 value={deleteInput}
                 onChange={(e) => setDeleteInput(e.target.value)}
                 placeholder={data.username ?? "username"}
-                className="w-full h-9 px-3 rounded-lg bg-white/5 border border-border text-sm focus:outline-none focus:border-destructive transition-all"
+                className="w-full h-9 px-3 rounded-lg bg-muted/60 border border-border text-sm focus:outline-none focus:border-destructive transition-all"
               />
 
               <button

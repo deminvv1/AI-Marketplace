@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -14,7 +16,7 @@ import {
   ArrowRight,
   LayoutDashboard,
 } from "lucide-react";
-import { COUNTRIES, flag } from "@/lib/mock-data";
+import { COUNTRIES, flag } from "@/lib/countries";
 import { createClient } from "@/lib/supabase/client";
 import { getCountryCoords } from "@/lib/country-coords";
 
@@ -35,6 +37,7 @@ export default function WelcomePage({
 }: {
   params: Promise<{ country: string }>;
 }) {
+  const t = useTranslations("welcome");
   const { country: slug } = use(params);
   const raw = fromSlug(slug);
   const country =
@@ -84,13 +87,13 @@ export default function WelcomePage({
         </span>
 
         <h1 className="mt-8 text-5xl md:text-6xl font-extrabold tracking-tight leading-[1.05]">
-          {"You've arrived at the first"}
+          {t("arrivedAt")}
           <br />
-          <span className="text-gradient">international platform</span>
+          <span className="text-gradient">{t("internationalPlatform")}</span>
           <br />
-          uniting AI specialists and clients
+          {t("uniting")}
           <br />
-          from around the world.
+          {t("fromAround")}
         </h1>
         <p className="mt-6 text-muted-foreground text-lg max-w-2xl mx-auto">
           Join us — build, hire, learn and ship the next generation of AI
@@ -110,9 +113,9 @@ export default function WelcomePage({
                   <LayoutDashboard className="size-7 text-primary" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold">Go to Dashboard</h3>
+                  <h3 className="text-2xl font-bold">{t("goToDashboard")}</h3>
                   <p className="mt-1 text-sm text-muted-foreground">
-                    You're already signed in.
+                    {t("alreadySignedIn")}
                   </p>
                   <span className="mt-4 inline-flex items-center gap-2 text-primary text-sm font-medium">
                     Open Dashboard{" "}
@@ -130,9 +133,9 @@ export default function WelcomePage({
                 <div className="size-14 rounded-2xl bg-primary/15 border border-primary/40 grid place-items-center glow-primary">
                   <Briefcase className="size-7 text-primary" />
                 </div>
-                <h3 className="mt-6 text-2xl font-bold">I'm a Client</h3>
+                <h3 className="mt-6 text-2xl font-bold">{t("imClient")}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
-                  Post AI projects, browse solutions, and hire freelancers
+                  Post AI projects, browse solutions, and hire specialists
                   from 62 countries.
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-primary text-sm font-medium">
@@ -148,13 +151,13 @@ export default function WelcomePage({
                 <div className="size-14 rounded-2xl bg-secondary/15 border border-secondary/40 grid place-items-center glow-secondary">
                   <Code2 className="size-7 text-secondary" />
                 </div>
-                <h3 className="mt-6 text-2xl font-bold">I'm a Freelancer</h3>
+                <h3 className="mt-6 text-2xl font-bold">{t("imSpecialist")}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">
                   Offer your AI expertise, sell ready solutions, and find
                   projects worldwide.
                 </p>
                 <span className="mt-6 inline-flex items-center gap-2 text-secondary text-sm font-medium">
-                  Continue as Freelancer{" "}
+                  Continue as Specialist{" "}
                   <ArrowRight className="size-4 group-hover:translate-x-1 transition" />
                 </span>
               </button>
@@ -164,29 +167,29 @@ export default function WelcomePage({
 
         <div className="mt-20">
           <h2 className="text-sm uppercase tracking-[0.4em] text-muted-foreground">
-            Platform sections
+            {t("sections")}
           </h2>
           <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
             {[
               {
                 icon: MessagesSquare,
-                label: "Forum",
-                desc: "Discuss AI topics globally",
+                label: t("forum"),
+                desc: t("forumDesc"),
               },
               {
                 icon: ShoppingBag,
-                label: "Solutions",
-                desc: "Browse ready-made AI products",
+                label: t("solutions"),
+                desc: t("solutionsDesc"),
               },
               {
                 icon: ClipboardList,
-                label: "Projects",
-                desc: "Post or find AI projects",
+                label: t("projects"),
+                desc: t("projectsDesc"),
               },
               {
                 icon: Users,
-                label: "Freelancers",
-                desc: "Find AI specialists worldwide",
+                label: t("specialists"),
+                desc: t("specialistsDesc"),
               },
             ].map(({ icon: Icon, label, desc }) => (
               <div key={label} className="glass glass-hover rounded-2xl p-6 text-left">
