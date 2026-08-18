@@ -1,7 +1,12 @@
 import type { Metadata, Viewport } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { cookies } from "next/headers";
 import { Providers } from "./providers";
+import { ConsentProvider } from "@/components/consent/consent-context";
+import { CookieBanner } from "@/components/consent/cookie-banner";
+import { Analytics } from "@/components/consent/analytics";
+import { CONSENT_COOKIE, parseConsent } from "@/lib/consent";
 import "@/styles.css";
 
 const RTL_LOCALES = new Set(["ar"]);
@@ -38,6 +43,9 @@ export default async function RootLayout({
   // Provided here rather than only under [locale] so that the signed-in app,
   // which lives outside the locale segment, is translated as well.
   const messages = await getMessages();
+  // Read on the server so a visitor who already answered never sees the banner
+  // flash on load.
+  const consent = parseConsent((await cookies()).get(CONSENT_COOKIE)?.value);
 
   return (
     <html
@@ -47,7 +55,11 @@ export default async function RootLayout({
     >
       <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          <Providers>{children}</Providers>
+          <ConsentProvider initial={consent}>
+            <Providers>{children}</Providers>
+            <CookieBanner />
+            <Analytics />
+          </ConsentProvider>
         </NextIntlClientProvider>
       </body>
     </html>

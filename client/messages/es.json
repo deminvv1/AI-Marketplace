@@ -146,7 +146,7 @@
     "termsTitle": "Términos de Servicio",
     "privacyTitle": "Política de Privacidad",
     "lastUpdated": "Última actualización",
-    "englishOnly": "Este documento está disponible en inglés. La traducción oficial estará disponible próximamente.",
+    "englishOnly": "Este documento está disponible en inglés y ruso. Está leyendo la versión en inglés.",
     "backHome": "Volver al inicio"
   },
   "auth": {
@@ -1190,5 +1190,21 @@
     "solutionTitleExample": "MediScan Pro — SaaS de triaje radiológico",
     "pitchHint": "Una línea para la tarjeta",
     "shortPreview": "Vista previa breve"
+  },
+  "consent": {
+    "title": "Cookies en AI Marketplace",
+    "text": "Algunas cookies son necesarias para que el sitio funcione: mantienen tu sesión y recuerdan tu idioma. También nos gustaría medir cómo se usa el sitio, pero solo si nos das permiso.",
+    "necessaryTitle": "Estrictamente necesarias",
+    "necessaryText": "Sesión de acceso e idioma elegido. Sin ellas el sitio no funciona, por eso no se pueden desactivar.",
+    "analyticsTitle": "Analítica",
+    "analyticsText": "Estadísticas anónimas sobre qué páginas se visitan, para mejorar el sitio. No se carga nada hasta que aceptes.",
+    "acceptAll": "Aceptar todas",
+    "rejectAll": "Rechazar todas",
+    "customise": "Personalizar",
+    "save": "Guardar elección",
+    "alwaysOn": "Siempre activas",
+    "more": "Política de privacidad",
+    "settings": "Preferencias de cookies",
+    "close": "Cerrar"
   }
 }

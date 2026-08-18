@@ -146,7 +146,7 @@
     "termsTitle": "Ketentuan Layanan",
     "privacyTitle": "Kebijakan Privasi",
     "lastUpdated": "Terakhir diperbarui",
-    "englishOnly": "Dokumen ini tersedia dalam bahasa Inggris. Terjemahan resmi akan segera disediakan.",
+    "englishOnly": "Dokumen ini tersedia dalam bahasa Inggris dan Rusia. Anda sedang membaca versi Inggris.",
     "backHome": "Kembali ke beranda"
   },
   "auth": {
@@ -1190,5 +1190,21 @@
     "solutionTitleExample": "MediScan Pro — SaaS triase radiologi",
     "pitchHint": "Satu baris untuk kartu",
     "shortPreview": "Pratinjau singkat"
+  },
+  "consent": {
+    "title": "Cookie di AI Marketplace",
+    "text": "Sebagian cookie diperlukan agar situs berfungsi: menjaga Anda tetap masuk dan mengingat bahasa pilihan. Kami juga ingin mengukur cara situs digunakan, tetapi hanya bila Anda izinkan.",
+    "necessaryTitle": "Wajib",
+    "necessaryText": "Sesi masuk dan pilihan bahasa. Tanpa ini situs tidak berfungsi, jadi tidak bisa dimatikan.",
+    "analyticsTitle": "Analitik",
+    "analyticsText": "Statistik anonim tentang halaman yang dikunjungi, agar kami bisa memperbaiki situs. Tidak ada yang dimuat sebelum Anda setuju.",
+    "acceptAll": "Terima semua",
+    "rejectAll": "Tolak semua",
+    "customise": "Atur sendiri",
+    "save": "Simpan pilihan",
+    "alwaysOn": "Selalu aktif",
+    "more": "Kebijakan Privasi",
+    "settings": "Pengaturan cookie",
+    "close": "Tutup"
   }
 }

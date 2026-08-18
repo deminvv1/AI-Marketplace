@@ -146,7 +146,7 @@
     "termsTitle": "Conditions d'utilisation",
     "privacyTitle": "Politique de confidentialité",
     "lastUpdated": "Dernière mise à jour",
-    "englishOnly": "Ce document est disponible en anglais. Une traduction officielle sera fournie prochainement.",
+    "englishOnly": "Ce document existe en anglais et en russe. Vous lisez la version anglaise.",
     "backHome": "Retour à l'accueil"
   },
   "auth": {
@@ -1190,5 +1190,21 @@
     "solutionTitleExample": "MediScan Pro — SaaS de triage radiologique",
     "pitchHint": "Une phrase pour la carte",
     "shortPreview": "Aperçu court"
+  },
+  "consent": {
+    "title": "Cookies sur AI Marketplace",
+    "text": "Certains cookies sont indispensables au fonctionnement du site : ils vous gardent connecté et mémorisent votre langue. Nous aimerions aussi mesurer l'usage du site, mais seulement avec votre accord.",
+    "necessaryTitle": "Strictement nécessaires",
+    "necessaryText": "Session de connexion et choix de la langue. Le site ne peut pas fonctionner sans eux, ils ne sont donc pas désactivables.",
+    "analyticsTitle": "Mesure d'audience",
+    "analyticsText": "Statistiques anonymes sur les pages consultées, pour améliorer le site. Rien n'est chargé avant votre accord.",
+    "acceptAll": "Tout accepter",
+    "rejectAll": "Tout refuser",
+    "customise": "Personnaliser",
+    "save": "Enregistrer",
+    "alwaysOn": "Toujours actifs",
+    "more": "Politique de confidentialité",
+    "settings": "Préférences cookies",
+    "close": "Fermer"
   }
 }

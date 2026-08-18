@@ -146,7 +146,7 @@
     "termsTitle": "利用規約",
     "privacyTitle": "プライバシーポリシー",
     "lastUpdated": "最終更新日",
-    "englishOnly": "このドキュメントは英語で提供されています。公式翻訳は近日中に提供予定です。",
+    "englishOnly": "本書は英語とロシア語で提供しています。ご覧いただいているのは英語版です。",
     "backHome": "ホームページに戻る"
   },
   "auth": {
@@ -1190,5 +1190,21 @@
     "solutionTitleExample": "MediScan Pro — 読影トリアージSaaS",
     "pitchHint": "カード用の一文",
     "shortPreview": "短い紹介"
+  },
+  "consent": {
+    "title": "AI Marketplace の Cookie",
+    "text": "一部の Cookie はサイトの動作に必要です。ログイン状態を保ち、選んだ言語を記憶します。加えて利用状況を把握したいのですが、こちらは同意をいただいた場合だけです。",
+    "necessaryTitle": "必須",
+    "necessaryText": "ログインセッションと言語設定。これらがないとサイトは動作しないため、無効にはできません。",
+    "analyticsTitle": "アクセス解析",
+    "analyticsText": "どのページが見られているかの匿名の統計です。サイト改善に使います。同意まで何も読み込みません。",
+    "acceptAll": "すべて許可",
+    "rejectAll": "すべて拒否",
+    "customise": "設定する",
+    "save": "選択を保存",
+    "alwaysOn": "常に有効",
+    "more": "プライバシーポリシー",
+    "settings": "Cookie 設定",
+    "close": "閉じる"
   }
 }

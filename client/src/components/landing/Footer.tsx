@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { CookieSettingsLink } from "@/components/consent/cookie-banner";
 import { useTranslations, useLocale } from "next-intl";
 
 // ── Inline SVG brand icons ────────────────────────────────────────────────────
@@ -103,6 +104,9 @@ export function Footer() {
         .footer-link:hover { color: #fff; }
         .footer-link:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; border-radius: 2px; }
         .footer-social:hover { color: #fff !important; }
+        .footer-cookie-settings { font-size: 0.74rem; color: #8b93a7; }
+        .footer-cookie-settings:hover { color: #fff; }
+        .footer-cookie-settings:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; border-radius: 2px; }
         .footer-grid {
           display: grid;
           grid-template-columns: 1.7fr repeat(4, minmax(0, 1fr));
@@ -179,6 +183,10 @@ export function Footer() {
                   <Link href={href} style={{ fontSize: "0.74rem", color: "#8b93a7", textDecoration: "none" }}>{label}</Link>
                 </li>
               ))}
+              {/* Withdrawing consent has to be as easy as giving it. */}
+              <li>
+                <CookieSettingsLink className="footer-cookie-settings" />
+              </li>
             </ul>
           </div>
         </div>

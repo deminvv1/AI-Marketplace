@@ -146,7 +146,7 @@
     "termsTitle": "Hizmet Şartları",
     "privacyTitle": "Gizlilik Politikası",
     "lastUpdated": "Son güncelleme",
-    "englishOnly": "Bu belge İngilizce olarak mevcuttur. Resmi çeviri yakında sunulacaktır.",
+    "englishOnly": "Bu belge İngilizce ve Rusça olarak mevcuttur. İngilizce sürümünü okuyorsunuz.",
     "backHome": "Ana sayfaya dön"
   },
   "auth": {
@@ -1190,5 +1190,21 @@
     "solutionTitleExample": "MediScan Pro — radyoloji triyaj SaaS",
     "pitchHint": "Kart için tek cümle",
     "shortPreview": "Kısa önizleme"
+  },
+  "consent": {
+    "title": "AI Marketplace'te çerezler",
+    "text": "Bazı çerezler sitenin çalışması için gerekli: oturumunuzu açık tutar ve dil tercihinizi hatırlar. Ayrıca sitenin nasıl kullanıldığını ölçmek isteriz, ama yalnızca izin verirseniz.",
+    "necessaryTitle": "Zorunlu",
+    "necessaryText": "Oturum ve dil tercihi. Bunlar olmadan site çalışmaz, bu yüzden kapatılamaz.",
+    "analyticsTitle": "Analitik",
+    "analyticsText": "Hangi sayfaların görüntülendiğine dair anonim istatistik; siteyi geliştirmek için. Onay vermeden hiçbir şey yüklenmez.",
+    "acceptAll": "Tümünü kabul et",
+    "rejectAll": "Tümünü reddet",
+    "customise": "Özelleştir",
+    "save": "Seçimi kaydet",
+    "alwaysOn": "Her zaman açık",
+    "more": "Gizlilik Politikası",
+    "settings": "Çerez ayarları",
+    "close": "Kapat"
   }
 }
