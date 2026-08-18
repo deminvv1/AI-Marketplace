@@ -2,14 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { LOCALES, useI18n, type Locale } from "@/lib/i18n";
+import { useLocale } from "next-intl";
+import { usePathname, useRouter } from "@/i18n/navigation";
+import { LOCALE_OPTIONS, type Locale } from "@/i18n/locales";
 
 export function LanguageSwitcher() {
-  const { locale, setLocale } = useI18n();
+  const locale = useLocale();
+  const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const current = LOCALES.find((l) => l.code === locale) ?? LOCALES[0];
+  const current = LOCALE_OPTIONS.find((l) => l.code === locale) ?? LOCALE_OPTIONS[0];
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -20,8 +24,9 @@ export function LanguageSwitcher() {
   }, []);
 
   function pick(code: Locale) {
-    setLocale(code);
     setOpen(false);
+    // next-intl stores the choice in its own cookie and keeps the current path.
+    router.replace(pathname, { locale: code });
   }
 
   return (
@@ -34,7 +39,7 @@ export function LanguageSwitcher() {
           transition-all duration-200 select-none
           ${open
             ? "bg-primary/15 border-primary/50 text-foreground"
-            : "bg-white/5 border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+            : "bg-muted/60 border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
           }
         `}
         aria-label="Change language"
@@ -56,7 +61,7 @@ export function LanguageSwitcher() {
           }}
         >
           <div className="p-1.5 space-y-0.5">
-            {LOCALES.map((l) => {
+            {LOCALE_OPTIONS.map((l) => {
               const active = locale === l.code;
               return (
                 <button

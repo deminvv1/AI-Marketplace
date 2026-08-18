@@ -1,9 +1,13 @@
 import type { Metadata, Viewport } from "next";
-import { Providers } from "./providers"; // Сейчас создадим этот файл для React Query
-import "@/styles.css"; // Прямой импорт твоих глобальных стилей
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
+import { Providers } from "./providers";
+import "@/styles.css";
+
+const RTL_LOCALES = new Set(["ar"]);
 
 export const viewport: Viewport = {
-  themeColor: "#000000",
+  themeColor: "#f8f8ff",
   width: "device-width",
   initialScale: 1,
 };
@@ -11,7 +15,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "AI Marketplace — Connect with AI specialists worldwide",
   description: "The first international platform uniting AI specialists and clients from around the world.",
-  authors: [{ name: "Lovable" }],
+  authors: [{ name: "AI Marketplace" }],
   openGraph: {
     title: "AI Marketplace",
     description: "Connect with AI specialists and clients worldwide.",
@@ -19,19 +23,32 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    site: "@Lovable",
+    site: "@aimarketplace",
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // The <html> tag lives above the [locale] segment, so the locale comes from
+  // the request (URL prefix or NEXT_LOCALE cookie) rather than route params.
+  const locale = await getLocale();
+  // Provided here rather than only under [locale] so that the signed-in app,
+  // which lives outside the locale segment, is translated as well.
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className="dark">
+    <html
+      lang={locale}
+      dir={RTL_LOCALES.has(locale) ? "rtl" : "ltr"}
+      suppressHydrationWarning
+    >
       <body>
-        <Providers>{children}</Providers>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <Providers>{children}</Providers>
+        </NextIntlClientProvider>
       </body>
     </html>
   );
