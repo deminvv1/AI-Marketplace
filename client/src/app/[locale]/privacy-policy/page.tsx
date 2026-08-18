@@ -11,11 +11,11 @@ const SECTIONS = [
   },
   {
     title: "2. What Data We Collect",
-    body: `We collect: (a) Account data — name, email address, profile photo, country, and role (client or specialist); (b) Profile data — skills, work history, portfolio, and bio that you voluntarily provide; (c) Project data — project briefs, proposals, budgets stated by users, and project status; (d) Communication data — messages exchanged between users on the Platform; (e) Technical data — IP address, browser type, device identifiers, and usage logs collected automatically; (f) Verification data — identity documents submitted for account verification (where applicable).`,
+    body: `We collect: (a) Account data — name, email address, profile photo, country, and role (client or specialist); (b) Profile data — skills, work history, portfolio, and bio that you voluntarily provide; (c) Project data — project briefs, proposals, budgets stated by users, and project status; (d) Communication data — messages exchanged between users on the Platform; (e) Technical data — IP address, browser type, device identifiers, and usage logs collected automatically. We do not ask for identity documents and do not collect payment card or bank details, because settlement does not pass through the Platform.`,
   },
   {
     title: "3. How We Use Your Data",
-    body: `We use your data to: (a) Create and maintain your account; (b) Match clients with suitable specialists; (c) Operate the Platform: publish projects and proposals, and deliver messages between users; (d) Send service emails (project updates, new proposals, security alerts); (e) Improve Platform features through aggregated, anonymised analytics; (f) Comply with legal obligations and prevent fraud; (g) Send optional marketing communications (only with your explicit consent, which you can withdraw at any time).`,
+    body: `We use your data to: (a) Create and maintain your account; (b) Match clients with suitable specialists; (c) Operate the Platform: publish projects and proposals, and deliver messages between users; (d) Send service emails (project updates, new proposals, security alerts); (e) Comply with legal obligations and prevent fraud; (f) Send optional marketing communications (only with your explicit consent, which you can withdraw at any time).`,
   },
   {
     title: "4. Legal Basis for Processing (GDPR)",
@@ -23,19 +23,19 @@ const SECTIONS = [
   },
   {
     title: "5. Data Sharing",
-    body: `We do not sell your personal data. We share data only with: (a) Other users — your public profile is visible to all Platform users; messages are visible only to the conversation participants; (b) Email delivery providers — to send the service emails described above; (c) Cloud infrastructure providers — to host and operate the Platform; (d) Law enforcement — when required by law or to protect the rights and safety of users. All third-party processors are bound by data processing agreements.`,
+    body: `We do not sell your personal data. We share data only with: (a) Other users — your public profile is visible to all Platform users; messages are visible only to the conversation participants; (b) Service providers who operate the Platform on our behalf: Supabase (accounts, authentication and database), Vercel (website hosting), Render (application server) and Resend (delivery of service emails); (c) Law enforcement — when required by law or to protect the rights and safety of users. All third-party processors are bound by data processing agreements.`,
   },
   {
     title: "6. Data Retention",
-    body: `We retain your data for as long as your account is active. After account deletion, we retain minimal data required for legal compliance (transaction records, legal disputes) for up to 7 years. You may request deletion of other data at any time — see Section 9.`,
+    body: `We retain your data for as long as your account is active. After account deletion, we retain minimal data required for legal compliance (records of reports, blocks and legal claims) for up to 3 years. We hold no payment or transaction records, because settlement does not pass through the Platform. You may request deletion of other data at any time — see Section 9.`,
   },
   {
     title: "7. Cookies",
-    body: `We use essential cookies required for the Platform to function (authentication sessions, security tokens). We use analytics cookies only with your consent. You can manage cookie preferences in your browser settings or via our cookie banner. We do not use third-party advertising cookies.`,
+    body: `We use only cookies that are strictly necessary for the Platform to work: your sign-in session and the cookie that remembers your chosen interface language. We run no analytics, tracking or advertising cookies, and we embed no third-party tracking scripts. Because only essential cookies are used, no consent banner is required; you can still clear or block cookies in your browser settings, though sign-in will stop working if you do.`,
   },
   {
     title: "8. Security",
-    body: `We implement industry-standard security measures including: encrypted data transmission (TLS), hashed password storage, access controls limiting who can view sensitive data, and regular security audits. No system is perfectly secure — if you suspect a breach, contact us immediately at security@aimarketplace.io.`,
+    body: `We implement industry-standard security measures including: encrypted data transmission (TLS), hashed password storage, and access controls limiting who can view sensitive data. No system is perfectly secure — if you suspect a breach, contact us immediately at security@aimarketplace.io.`,
   },
   {
     title: "9. Your Rights",

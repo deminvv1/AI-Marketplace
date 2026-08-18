@@ -27,7 +27,9 @@ const SECTIONS = [
   },
   {
     title: "6. Specialist Obligations",
-    body: `Specialists agree to: (a) deliver work as described and agreed in project contracts; (b) maintain accurate profiles reflecting their genuine skills and experience; (c) communicate professionally and respond to clients in a timely manner; (d) not solicit clients to transact outside the Platform during active engagements.`,
+    body: `Specialists agree to: (a) deliver work as described and agreed in project contracts; (b) maintain accurate profiles reflecting their genuine skills and experience; (c) communicate professionally and respond to clients in a timely manner; (d) not use client contact details obtained on the Platform for unsolicited advertising.
+
+Because the Platform takes no commission and processes no payments, agreeing and settling directly with a client is expected, not a violation.`,
   },
   {
     title: "7. Client Obligations",
