@@ -40,3 +40,6 @@ Thumbs.db
 *.sw?
 
 /src/generated/prisma
+
+# Build artifacts
+*.tsbuildinfo
