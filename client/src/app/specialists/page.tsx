@@ -2,19 +2,21 @@
 
 /**
  * Каталог фрилансеров: GET /api/freelancers
- * Карточка ведёт на визитку /freelancers/[username]
+ * Карточка ведёт на визитку /specialists/[username]
  */
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AppShell } from "@/components/app-shell";
 import { listFreelancers, type FreelancerListItem } from "@/app/actions/freelancers";
-import { flag } from "@/lib/mock-data";
+import { flag } from "@/lib/countries";
 import { freelancerDisplayName } from "@/lib/projects";
 import { Stars } from "@/components/ui-bits";
 import { Loader2, ArrowRight } from "lucide-react";
 
 export default function FreelancersCatalogPage() {
+  const tf = useTranslations("forms");
   const [items, setItems] = useState<FreelancerListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -29,11 +31,11 @@ export default function FreelancersCatalogPage() {
   }, []);
 
   return (
-    <AppShell title="Freelancers">
+    <AppShell title={tf("specialists")}>
       <div className="mb-6">
-        <h2 className="text-3xl font-bold tracking-tight">Find AI specialists</h2>
+        <h2 className="text-3xl font-bold tracking-tight">{tf("findSpecialists")}</h2>
         <p className="text-sm text-muted-foreground mt-1">
-          Profiles visible to registered users · click to open a full page
+          {tf("profilesHint")}
         </p>
       </div>
 
@@ -47,7 +49,7 @@ export default function FreelancersCatalogPage() {
 
       {!loading && !error && items.length === 0 && (
         <p className="text-sm text-muted-foreground glass rounded-2xl p-6">
-          No freelancer profiles yet. Complete onboarding as FREELANCER and set a username.
+          No specialist profiles yet. Complete onboarding as FREELANCER and set a username.
         </p>
       )}
 
@@ -62,7 +64,7 @@ export default function FreelancersCatalogPage() {
           return (
             <Link
               key={u.id}
-              href={`/freelancers/${slug}`}
+              href={`/specialists/${slug}`}
               className="glass glass-hover rounded-2xl p-5 flex flex-col gap-3"
             >
               <div className="flex items-center gap-3">
@@ -74,7 +76,7 @@ export default function FreelancersCatalogPage() {
                   <div className="text-xs text-muted-foreground">@{slug}</div>
                 </div>
                 {u.profile?.onlineStatus && (
-                  <span className="ml-auto size-2.5 rounded-full bg-success" title="Online" />
+                  <span className="ml-auto size-2.5 rounded-full bg-success" title={tf("online")} />
                 )}
               </div>
               {u.profile?.specialization && (
@@ -94,7 +96,7 @@ export default function FreelancersCatalogPage() {
                 )}
               </div>
               <span className="text-xs text-primary inline-flex items-center gap-1">
-                View profile <ArrowRight className="size-3" />
+                {tf("viewProfile")} <ArrowRight className="size-3" />
               </span>
             </Link>
           );

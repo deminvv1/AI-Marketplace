@@ -9,6 +9,8 @@ export type FreelancerListItem = {
   id: string;
   username: string | null;
   avatarUrl: string | null;
+  /** True when the viewer is a guest: name, avatar and @username are withheld. */
+  anonymous?: boolean;
   profile: {
     firstName: string | null;
     lastName: string | null;

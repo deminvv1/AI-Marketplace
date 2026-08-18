@@ -81,10 +81,17 @@ export class FreelancersService {
   }
 
   /**
-   * Каталог исполнителей (для /freelancers).
+   * Каталог исполнителей.
    * Только пользователи с username и profileVisible, роль FREELANCER/BOTH.
+   *
+   * Гостям (без токена) карточка отдаётся обезличенной: видны специализация,
+   * страна, рейтинг и число отзывов, но не имя, аватар и @username. Так каталог
+   * индексируется поисковиками, а контакты остаются за регистрацией.
    */
-  async list(query: ListFreelancersQueryDto = {}) {
+  async list(
+    query: ListFreelancersQueryDto = {},
+    opts: { anonymous?: boolean } = {},
+  ) {
     const q = query.q?.trim();
     const where: Prisma.UserWhereInput = {
       username: { not: null },
@@ -117,7 +124,26 @@ export class FreelancersService {
       take: 50,
       select: listItemSelect,
     });
-    return users;
+
+    if (!opts.anonymous) return users.map((u) => ({ ...u, anonymous: false }));
+
+    return users.map((u) => ({
+      id: u.id,
+      username: null,
+      avatarUrl: null,
+      anonymous: true,
+      profile: u.profile
+        ? {
+            firstName: null,
+            lastName: null,
+            specialization: u.profile.specialization,
+            country: u.profile.country,
+            rating: u.profile.rating,
+            reviewsCount: u.profile.reviewsCount,
+            onlineStatus: u.profile.onlineStatus,
+          }
+        : null,
+    }));
   }
 
   /**
