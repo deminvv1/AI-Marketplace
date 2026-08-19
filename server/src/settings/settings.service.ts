@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Role } from '@prisma/client';
+import { isSelfAssignableRole } from '../common/roles';
+import { UpdateAccountDto } from './dto/update-account.dto';
 import { createClient } from '@supabase/supabase-js';
 
 @Injectable()
@@ -14,8 +15,24 @@ export class SettingsService {
     });
   }
 
-  async updateAccount(userId: string, dto: { username: string; role: Role }) {
+  async updateAccount(userId: string, dto: UpdateAccountDto) {
     const username = dto.username.trim().toLowerCase();
+
+    // Проверка повторяется здесь намеренно: если завтра этот метод вызовут в
+    // обход контроллера с его DTO, повышение прав всё равно не пройдёт.
+    if (!isSelfAssignableRole(dto.role)) {
+      throw new BadRequestException('This role cannot be set.');
+    }
+
+    // Администратора нельзя понизить через обычные настройки — иначе учётную
+    // запись можно было бы лишить прав случайным сохранением формы.
+    const current = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (current?.role === 'ADMIN') {
+      throw new BadRequestException('An administrator account cannot change its own role here.');
+    }
 
     if (!/^[a-z0-9_]{3,30}$/.test(username)) {
       throw new BadRequestException('Username must be 3–30 characters: letters, numbers, underscores only.');

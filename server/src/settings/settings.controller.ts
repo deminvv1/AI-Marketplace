@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Patch, UseGuards } from '@nestjs/common'
 import { SettingsService } from './settings.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CurrentUser } from '../auth/user.decorator';
+import { UpdateAccountDto } from './dto/update-account.dto';
 
 @Controller('settings')
 @UseGuards(AuthGuard)
@@ -14,7 +15,7 @@ export class SettingsController {
   }
 
   @Patch('account')
-  updateAccount(@CurrentUser() user: any, @Body() body: any) {
+  updateAccount(@CurrentUser() user: any, @Body() body: UpdateAccountDto) {
     return this.settings.updateAccount(user.id, body);
   }
 
