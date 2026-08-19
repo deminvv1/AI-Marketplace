@@ -242,7 +242,9 @@
     "termsTitle": "Terms of Service | AI Marketplace",
     "termsDesc": "The terms of using AI Marketplace for clients and specialists — the platform's role, settlement between the parties, intellectual property and rules of conduct.",
     "privacyTitle": "Privacy Policy | AI Marketplace",
-    "privacyDesc": "What personal data AI Marketplace collects, why, how long it is kept, and the rights you have over it."
+    "privacyDesc": "What personal data AI Marketplace collects, why, how long it is kept, and the rights you have over it.",
+    "browseTitle": "Browse AI specialists — 26 categories | AI Marketplace",
+    "browseDesc": "Machine learning engineers, AI developers, data scientists and automation experts. Browse profiles and write to them directly, with no commission."
   },
   "why": {
     "badge": "0% commission · direct contact",

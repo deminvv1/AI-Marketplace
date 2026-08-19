@@ -242,7 +242,9 @@
     "termsTitle": "利用規約 | AI Marketplace",
     "termsDesc": "クライアントとスペシャリストのためのAI Marketplace利用条件 — プラットフォームの役割、当事者間の支払い、知的財産、行動規範について。",
     "privacyTitle": "プライバシーポリシー | AI Marketplace",
-    "privacyDesc": "AI Marketplaceが収集する個人データ、その目的、保存期間、そしてお客様の権利について。"
+    "privacyDesc": "AI Marketplaceが収集する個人データ、その目的、保存期間、そしてお客様の権利について。",
+    "browseTitle": "AI スペシャリスト一覧 | AI Marketplace",
+    "browseDesc": "機械学習エンジニア、AI 開発者、データサイエンティスト、自動化の専門家。プロフィールを見て直接ご連絡いただけます。手数料はありません。"
   },
   "why": {
     "badge": "手数料 0% ・ 直接やり取り",

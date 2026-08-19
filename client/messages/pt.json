@@ -242,7 +242,9 @@
     "termsTitle": "Termos de Serviço | AI Marketplace",
     "termsDesc": "Condições de uso para clientes e especialistas: o papel da plataforma, o pagamento entre as partes, propriedade intelectual e regras.",
     "privacyTitle": "Política de Privacidade | AI Marketplace",
-    "privacyDesc": "Quais dados pessoais o AI Marketplace coleta, por quê, por quanto tempo os guarda e quais direitos você tem sobre eles."
+    "privacyDesc": "Quais dados pessoais o AI Marketplace coleta, por quê, por quanto tempo os guarda e quais direitos você tem sobre eles.",
+    "browseTitle": "Catálogo de especialistas em IA | AI Marketplace",
+    "browseDesc": "Engenheiros de ML, programadores de IA, cientistas de dados e especialistas em automação. Veja os perfis e escreva diretamente, sem comissão."
   },
   "why": {
     "badge": "0% de comissão · contacto direto",

@@ -242,7 +242,9 @@
     "termsTitle": "服务条款 | AI Marketplace",
     "termsDesc": "客户与专家使用 AI Marketplace 的条款：平台的角色、双方之间的结算、知识产权与行为规范。",
     "privacyTitle": "隐私政策 | AI Marketplace",
-    "privacyDesc": "AI Marketplace 收集哪些个人数据、为何收集、保存多久，以及你对这些数据享有的权利。"
+    "privacyDesc": "AI Marketplace 收集哪些个人数据、为何收集、保存多久，以及你对这些数据享有的权利。",
+    "browseTitle": "AI 专家目录 — 26 个类别 | AI Marketplace",
+    "browseDesc": "机器学习工程师、AI 开发者、数据科学家与自动化专家。浏览资料并直接联系，平台不抽成。"
   },
   "why": {
     "badge": "0% 抽成 · 直接联系",

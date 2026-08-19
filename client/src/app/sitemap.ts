@@ -18,17 +18,6 @@ const PUBLIC_PATHS: { path: string; priority: number; changeFrequency: MetadataR
 ];
 
 /** Catalogue categories — each is a real, indexable listing page. */
-const BROWSE_CATEGORIES = [
-  "AI & Automation", "Programming & Tech", "Data Science & ML", "Design & Creative",
-  "Marketing & Growth", "Writing & Content", "Video & Animation", "Business & Support",
-  "Music & Audio", "Industry Solutions", "Healthcare AI", "FinTech & Finance AI",
-  "Manufacturing & Industry 4.0", "Legal AI & LegalTech", "Agriculture & Precision Farming AI",
-  "Energy & Environment AI", "Logistics & Transportation AI", "Real Estate PropTech AI",
-  "Retail & E-Commerce AI", "EdTech & E-Learning AI", "Research & Science AI",
-  "HR & Recruitment AI", "Cybersecurity AI", "Photography & Image AI",
-  "End-to-End Projects", "Service Catalog",
-];
-
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
   const entries: MetadataRoute.Sitemap = [];
@@ -53,21 +42,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  for (const category of BROWSE_CATEGORIES) {
-    const suffix = `/browse?category=${encodeURIComponent(category)}`;
-    const languages: Record<string, string> = {};
-    for (const locale of locales) languages[locale] = localeUrl(locale, suffix);
-    languages["x-default"] = localeUrl(routing.defaultLocale, suffix);
-    for (const locale of locales) {
-      entries.push({
-        url: localeUrl(locale, suffix),
-        lastModified,
-        changeFrequency: "weekly",
-        priority: 0.6,
-        alternates: { languages },
-      });
-    }
-  }
+  // Адреса вида /browse?category=… в карту НЕ попадают.
+  //
+  // Фильтр по категории применяется в браузере, поэтому все 312 таких адресов
+  // отдают одну и ту же разметку и один и тот же заголовок — для поисковика
+  // это 312 копий каталога. Заявлять их в карте сайта значит просить
+  // проиндексировать дубликаты.
+  //
+  // Правильное решение — настоящие страницы категорий по адресам вида
+  // /browse/ai-developers, каждая со своим содержимым, заголовком и canonical.
+  // Когда они появятся, вернуть их сюда.
 
   return entries;
 }

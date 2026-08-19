@@ -242,7 +242,9 @@
     "termsTitle": "Nutzungsbedingungen | AI Marketplace",
     "termsDesc": "Nutzungsbedingungen für Auftraggeber und Spezialisten: Rolle der Plattform, Abrechnung zwischen den Parteien, Rechte am Ergebnis, Verhaltensregeln.",
     "privacyTitle": "Datenschutzerklärung | AI Marketplace",
-    "privacyDesc": "Welche personenbezogenen Daten AI Marketplace erhebt, warum, wie lange sie gespeichert werden und welche Rechte Sie haben."
+    "privacyDesc": "Welche personenbezogenen Daten AI Marketplace erhebt, warum, wie lange sie gespeichert werden und welche Rechte Sie haben.",
+    "browseTitle": "Katalog der KI-Spezialisten | AI Marketplace",
+    "browseDesc": "ML-Ingenieure, KI-Entwickler, Data Scientists und Automatisierungsprofis. Profile ansehen und direkt schreiben — ohne Provision."
   },
   "why": {
     "badge": "0 % Provision · direkter Kontakt",

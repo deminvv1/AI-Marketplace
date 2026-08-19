@@ -242,7 +242,9 @@
     "termsTitle": "Kullanım Koşulları | AI Marketplace",
     "termsDesc": "İşveren ve uzmanlar için AI Marketplace kullanım koşulları: platformun rolü, taraflar arası ödeme, fikri mülkiyet ve davranış kuralları.",
     "privacyTitle": "Gizlilik Politikası | AI Marketplace",
-    "privacyDesc": "AI Marketplace hangi kişisel verileri toplar, neden, ne kadar süre saklar ve bu veriler üzerinde hangi haklarınız var."
+    "privacyDesc": "AI Marketplace hangi kişisel verileri toplar, neden, ne kadar süre saklar ve bu veriler üzerinde hangi haklarınız var.",
+    "browseTitle": "Yapay zekâ uzmanları kataloğu | AI Marketplace",
+    "browseDesc": "ML mühendisleri, YZ geliştiricileri, veri bilimciler ve otomasyon uzmanları. Profillere bakın ve doğrudan yazın — komisyonsuz."
   },
   "why": {
     "badge": "%0 komisyon · doğrudan iletişim",
