@@ -706,7 +706,18 @@
     "apiDownText": "We could not load the list of specialists. Please try again in a few minutes.",
     "noSpecialists": "No specialists found",
     "adjustFilters": "Try changing your search or filters",
-    "clearFilters": "Clear filters"
+    "clearFilters": "Clear filters",
+    "heading": "All AI specialists",
+    "count": "{count, plural, one {# specialist} other {# specialists}}",
+    "filters": "Filters",
+    "anyBudget": "Any budget",
+    "under25": "Under $25/hr",
+    "b2550": "$25–$50/hr",
+    "b50100": "$50–$100/hr",
+    "b100": "$100+/hr",
+    "sortMatch": "Best match",
+    "sortRating": "Top rated",
+    "sortReviews": "Most reviews"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Privacy Policy",
     "settings": "Cookie settings",
     "close": "Close"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "Specialists working in {category} on AI Marketplace. The platform charges no commission and takes no part in payment: you agree the terms with the person directly and settle between yourselves.",
+    "rolesTitle": "Roles in this field",
+    "rolesHint": "Pick a role to see the people who do it.",
+    "peopleTitle": "Specialists in this field",
+    "empty": "No one has joined this field yet — the platform has only just opened. Post your project and specialists will reach out, or be the first to create a profile here.",
+    "allCategories": "All fields",
+    "metaTitle": "{category} — hire specialists | AI Marketplace",
+    "metaDesc": "Specialists in {category}: browse profiles and write directly. No commission, no intermediary."
   }
 }

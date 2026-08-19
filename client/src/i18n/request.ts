@@ -7,17 +7,21 @@ function isSupported(value?: string | null): value is (typeof routing.locales)[n
 }
 
 export default getRequestConfig(async ({ requestLocale }) => {
-  // Under /[locale] the segment decides. The signed-in app lives outside that
-  // segment, so there we fall back to the cookie the language switcher writes —
-  // otherwise every app page would render in English regardless of the choice.
+  // Под /[locale] язык задаёт сам адрес. Личный кабинет живёт вне этого
+  // сегмента, поэтому там язык берётся из cookie, которую пишет переключатель, —
+  // иначе внутренние страницы всегда открывались бы по-английски.
   const fromSegment = await requestLocale;
-  const fromCookie = (await cookies()).get("NEXT_LOCALE")?.value;
 
-  const locale = isSupported(fromSegment)
-    ? fromSegment
-    : isSupported(fromCookie)
-      ? fromCookie
-      : routing.defaultLocale;
+  // cookies() читаем ТОЛЬКО когда язык не удалось взять из адреса: само
+  // обращение к cookie делает страницу динамической, и заранее собрать её уже
+  // нельзя — сборка падает с DYNAMIC_SERVER_USAGE.
+  let locale: string = routing.defaultLocale;
+  if (isSupported(fromSegment)) {
+    locale = fromSegment;
+  } else {
+    const fromCookie = (await cookies()).get("NEXT_LOCALE")?.value;
+    if (isSupported(fromCookie)) locale = fromCookie;
+  }
 
   return {
     locale,

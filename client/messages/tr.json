@@ -706,7 +706,18 @@
     "apiDownText": "Uzman listesi yüklenemedi. Birkaç dakika sonra tekrar deneyin.",
     "noSpecialists": "Uzman bulunamadı",
     "adjustFilters": "Aramayı veya filtreleri değiştirin",
-    "clearFilters": "Filtreleri temizle"
+    "clearFilters": "Filtreleri temizle",
+    "heading": "Tüm yapay zekâ uzmanları",
+    "count": "{count, plural, one {# uzman} other {# uzman}}",
+    "filters": "Filtreler",
+    "anyBudget": "Her bütçe",
+    "under25": "25 $/saat altı",
+    "b2550": "25–50 $/saat",
+    "b50100": "50–100 $/saat",
+    "b100": "100 $/saat üstü",
+    "sortMatch": "En uygun",
+    "sortRating": "En yüksek puan",
+    "sortReviews": "En çok değerlendirme"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Gizlilik Politikası",
     "settings": "Çerez ayarları",
     "close": "Kapat"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "AI Marketplace'te {category} alanında çalışan uzmanlar. Platform komisyon almaz ve ödemeye karışmaz: koşulları doğrudan kişiyle konuşur, aranızda ödeşirsiniz.",
+    "rolesTitle": "Bu alandaki roller",
+    "rolesHint": "Bir rol seçin, o işi yapanları görün.",
+    "peopleTitle": "Bu alandaki uzmanlar",
+    "empty": "Bu alanda henüz kimse yok — platform yeni açıldı. Projenizi yayınlayın, uzmanlar size yazsın; ya da burada ilk profili siz oluşturun.",
+    "allCategories": "Tüm alanlar",
+    "metaTitle": "{category} — uzman bulun | AI Marketplace",
+    "metaDesc": "{category} alanındaki uzmanlar: profillere bakın, doğrudan yazın. Komisyon yok, aracı yok."
   }
 }

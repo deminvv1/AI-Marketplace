@@ -706,7 +706,18 @@
     "apiDownText": "Não conseguimos carregar a lista de especialistas. Tente de novo em alguns minutos.",
     "noSpecialists": "Nenhum especialista encontrado",
     "adjustFilters": "Mude a busca ou os filtros",
-    "clearFilters": "Limpar filtros"
+    "clearFilters": "Limpar filtros",
+    "heading": "Todos os especialistas em IA",
+    "count": "{count, plural, one {# especialista} other {# especialistas}}",
+    "filters": "Filtros",
+    "anyBudget": "Qualquer orçamento",
+    "under25": "Abaixo de 25 $/h",
+    "b2550": "25–50 $/h",
+    "b50100": "50–100 $/h",
+    "b100": "Acima de 100 $/h",
+    "sortMatch": "Melhor correspondência",
+    "sortRating": "Melhor avaliados",
+    "sortReviews": "Mais avaliações"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Política de Privacidade",
     "settings": "Preferências de cookies",
     "close": "Fechar"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "Especialistas na área de {category} no AI Marketplace. A plataforma não cobra comissão e não participa no pagamento: combina as condições diretamente com a pessoa e acertam entre si.",
+    "rolesTitle": "Funções desta área",
+    "rolesHint": "Escolha uma função para ver quem a exerce.",
+    "peopleTitle": "Especialistas desta área",
+    "empty": "Ainda não há ninguém nesta área — a plataforma acabou de abrir. Publique o seu projeto e os especialistas entrarão em contacto, ou seja o primeiro a criar um perfil.",
+    "allCategories": "Todas as áreas",
+    "metaTitle": "{category} — contratar especialistas | AI Marketplace",
+    "metaDesc": "Especialistas em {category}: veja os perfis e escreva diretamente. Sem comissão e sem intermediário."
   }
 }

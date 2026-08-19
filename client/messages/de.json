@@ -706,7 +706,18 @@
     "apiDownText": "Die Spezialistenliste konnte nicht geladen werden. Bitte versuchen Sie es in einigen Minuten erneut.",
     "noSpecialists": "Keine Spezialisten gefunden",
     "adjustFilters": "Ändern Sie Suche oder Filter",
-    "clearFilters": "Filter zurücksetzen"
+    "clearFilters": "Filter zurücksetzen",
+    "heading": "Alle KI-Spezialisten",
+    "count": "{count, plural, one {# Spezialist} other {# Spezialisten}}",
+    "filters": "Filter",
+    "anyBudget": "Beliebiges Budget",
+    "under25": "Unter 25 $/Std.",
+    "b2550": "25–50 $/Std.",
+    "b50100": "50–100 $/Std.",
+    "b100": "Ab 100 $/Std.",
+    "sortMatch": "Beste Übereinstimmung",
+    "sortRating": "Bestbewertet",
+    "sortReviews": "Meiste Bewertungen"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Datenschutzerklärung",
     "settings": "Cookie-Einstellungen",
     "close": "Schließen"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "Spezialisten im Bereich {category} auf AI Marketplace. Die Plattform nimmt keine Provision und ist an der Bezahlung nicht beteiligt: Sie vereinbaren die Bedingungen direkt und rechnen untereinander ab.",
+    "rolesTitle": "Rollen in diesem Bereich",
+    "rolesHint": "Wählen Sie eine Rolle, um passende Personen zu sehen.",
+    "peopleTitle": "Spezialisten in diesem Bereich",
+    "empty": "In diesem Bereich ist noch niemand dabei — die Plattform hat gerade erst geöffnet. Stellen Sie Ihr Projekt ein, oder legen Sie als Erste® hier ein Profil an.",
+    "allCategories": "Alle Bereiche",
+    "metaTitle": "{category} — Spezialisten finden | AI Marketplace",
+    "metaDesc": "Spezialisten im Bereich {category}: Profile ansehen und direkt schreiben. Keine Provision, kein Vermittler."
   }
 }

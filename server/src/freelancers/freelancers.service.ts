@@ -6,6 +6,7 @@ import {
 import { Prisma, Role } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { ProfileService } from '../profile/profile.service';
+import { CATEGORY_SKILLS } from './categories';
 import { ListFreelancersQueryDto } from './dto/list-freelancers-query.dto';
 
 /** Поля визитки фрилансера для GET /api/freelancers/:username */
@@ -93,10 +94,17 @@ export class FreelancersService {
     opts: { anonymous?: boolean } = {},
   ) {
     const q = query.q?.trim();
+    // Фильтр по категории: специализация человека должна совпасть с одной из
+    // ролей категории. Считается на сервере, а не в браузере, — иначе на
+    // странице категории поисковик увидел бы весь каталог.
+    const categorySkills = query.category ? CATEGORY_SKILLS[query.category] : undefined;
     const where: Prisma.UserWhereInput = {
       username: { not: null },
       role: { in: [Role.FREELANCER, Role.BOTH] },
       privacy: { profileVisible: true },
+      ...(categorySkills
+        ? { profile: { is: { specialization: { in: categorySkills } } } }
+        : {}),
       ...(q
         ? {
             OR: [

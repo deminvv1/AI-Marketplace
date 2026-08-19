@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { locales, routing } from "@/i18n/routing";
 import { SITE_URL, localeUrl } from "@/lib/seo";
+import { CATEGORIES } from "@/lib/categories";
 
 /** Locale-independent public paths. "" is the home page. Auth pages are noindex. */
 const PUBLIC_PATHS: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
@@ -42,16 +43,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Адреса вида /browse?category=… в карту НЕ попадают.
-  //
-  // Фильтр по категории применяется в браузере, поэтому все 312 таких адресов
-  // отдают одну и ту же разметку и один и тот же заголовок — для поисковика
-  // это 312 копий каталога. Заявлять их в карте сайта значит просить
-  // проиндексировать дубликаты.
-  //
-  // Правильное решение — настоящие страницы категорий по адресам вида
-  // /browse/ai-developers, каждая со своим содержимым, заголовком и canonical.
-  // Когда они появятся, вернуть их сюда.
+  // Страницы направлений: у каждой свой адрес, заголовок и содержимое.
+  // Прежние /browse?category=… в карту не попадали намеренно — все они
+  // отдавали одну и ту же разметку, то есть были копиями каталога.
+  for (const { slug } of CATEGORIES) {
+    const suffix = `/browse/${slug}`;
+    const languages: Record<string, string> = {};
+    for (const locale of locales) languages[locale] = localeUrl(locale, suffix);
+    languages["x-default"] = localeUrl(routing.defaultLocale, suffix);
+    for (const locale of locales) {
+      entries.push({
+        url: localeUrl(locale, suffix),
+        lastModified,
+        changeFrequency: "weekly",
+        priority: 0.8,
+        alternates: { languages },
+      });
+    }
+  }
 
   return entries;
 }

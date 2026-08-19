@@ -706,7 +706,18 @@
     "apiDownText": "没能加载专家列表，请过几分钟再试。",
     "noSpecialists": "没有找到专家",
     "adjustFilters": "换个关键词或筛选条件",
-    "clearFilters": "清除筛选"
+    "clearFilters": "清除筛选",
+    "heading": "全部 AI 专家",
+    "count": "{count, plural, other {# 位专家}}",
+    "filters": "筛选",
+    "anyBudget": "不限预算",
+    "under25": "低于 $25/小时",
+    "b2550": "$25–$50/小时",
+    "b50100": "$50–$100/小时",
+    "b100": "$100/小时以上",
+    "sortMatch": "最匹配",
+    "sortRating": "评分最高",
+    "sortReviews": "评价最多"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "隐私政策",
     "settings": "Cookie 设置",
     "close": "关闭"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "AI Marketplace 上从事「{category}」的专家。平台不抽成，也不经手款项：条件由你与对方直接商定，费用彼此结算。",
+    "rolesTitle": "这个方向有哪些角色",
+    "rolesHint": "选择一个角色，查看从事该工作的人。",
+    "peopleTitle": "该方向的专家",
+    "empty": "这个方向还没有人加入 — 平台刚刚开放。发布你的项目，专家会来联系你；也可以成为第一个在这里建立资料的人。",
+    "allCategories": "全部方向",
+    "metaTitle": "{category} — 聘请专家 | AI Marketplace",
+    "metaDesc": "「{category}」方向的专家：浏览资料，直接联系。不抽成，无中间人。"
   }
 }

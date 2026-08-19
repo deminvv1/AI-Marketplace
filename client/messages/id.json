@@ -706,7 +706,18 @@
     "apiDownText": "Daftar spesialis gagal dimuat. Coba lagi beberapa menit lagi.",
     "noSpecialists": "Spesialis tidak ditemukan",
     "adjustFilters": "Ubah pencarian atau filter",
-    "clearFilters": "Hapus filter"
+    "clearFilters": "Hapus filter",
+    "heading": "Semua spesialis AI",
+    "count": "{count, plural, other {# spesialis}}",
+    "filters": "Filter",
+    "anyBudget": "Semua anggaran",
+    "under25": "Di bawah $25/jam",
+    "b2550": "$25–$50/jam",
+    "b50100": "$50–$100/jam",
+    "b100": "Di atas $100/jam",
+    "sortMatch": "Paling sesuai",
+    "sortRating": "Peringkat tertinggi",
+    "sortReviews": "Ulasan terbanyak"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Kebijakan Privasi",
     "settings": "Pengaturan cookie",
     "close": "Tutup"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "Spesialis di bidang {category} di AI Marketplace. Platform tidak memungut komisi dan tidak ikut campur dalam pembayaran: syaratnya Anda sepakati langsung dan pembayaran dilakukan antarpihak.",
+    "rolesTitle": "Peran di bidang ini",
+    "rolesHint": "Pilih satu peran untuk melihat orang yang mengerjakannya.",
+    "peopleTitle": "Spesialis di bidang ini",
+    "empty": "Belum ada siapa pun di bidang ini — platform baru saja dibuka. Pasang proyek Anda dan spesialis akan menghubungi, atau jadilah yang pertama membuat profil di sini.",
+    "allCategories": "Semua bidang",
+    "metaTitle": "{category} — rekrut spesialis | AI Marketplace",
+    "metaDesc": "Spesialis {category}: lihat profil dan hubungi langsung. Tanpa komisi, tanpa perantara."
   }
 }

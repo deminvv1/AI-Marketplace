@@ -7,33 +7,22 @@ import { Search, SlidersHorizontal, Star, X, ChevronDown, Loader2, Lock } from "
 import { useTranslations, useLocale } from "next-intl";
 import { Header } from "@/components/landing/Header";
 import { listFreelancers, type FreelancerListItem } from "@/app/actions/freelancers";
+import { CATEGORIES } from "@/lib/categories";
 
-const CATEGORIES = [
-  "All categories",
-  "AI & Automation",
-  "Programming & Tech",
-  "Data Science & ML",
-  "Design & Creative",
-  "Marketing & Growth",
-  "Writing & Content",
-  "Video & Animation",
-  "Industry Solutions",
-  "Business & Support",
-  "Music & Audio",
-];
 
+// Подписи переводятся, значения остаются английскими — они уходят в запрос.
 const BUDGETS = [
-  { label: "Any budget", value: "" },
-  { label: "Under $25/hr", value: "under25" },
-  { label: "$25–$50/hr", value: "25-50" },
-  { label: "$50–$100/hr", value: "50-100" },
-  { label: "$100+/hr", value: "100plus" },
+  { key: "anyBudget", value: "" },
+  { key: "under25",   value: "under25" },
+  { key: "b2550",     value: "25-50" },
+  { key: "b50100",    value: "50-100" },
+  { key: "b100",      value: "100plus" },
 ];
 
 const SORT_OPTIONS = [
-  { label: "Best match", value: "match" },
-  { label: "Top rated", value: "rating" },
-  { label: "Most reviews", value: "reviews" },
+  { key: "sortMatch",   value: "match" },
+  { key: "sortRating",  value: "rating" },
+  { key: "sortReviews", value: "reviews" },
 ];
 
 function displayName(item: FreelancerListItem): string {
@@ -119,9 +108,12 @@ function SpecialistCard({ item, registerHref, lockedLabel }: {
 function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerListItem[]; apiError: string | null }) {
   const searchParams = useSearchParams();
   const t = useTranslations("browse");
+  const tHire = useTranslations("hire");
+  const tCatalog = useTranslations("catalog");
   const locale = useLocale();
   const isRtl = locale === "ar";
-  const registerHref = `${locale === "en" ? "" : `/${locale}`}/register`;
+  const p = locale === "en" ? "" : `/${locale}`;
+  const registerHref = `${p}/register`;
 
   const [items, setItems] = useState<FreelancerListItem[]>(initialItems);
   const [loading, setLoading] = useState(false);
@@ -131,7 +123,6 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
 
   const [query, setQuery]       = useState(searchParams.get("q") ?? "");
   const [debouncedQ, setDebouncedQ] = useState(query);
-  const [category, setCategory] = useState(searchParams.get("category") ?? "All categories");
   const [budget, setBudget]     = useState("");
   const [sort, setSort]         = useState("match");
   const [showFilters, setShowFilters] = useState(false);
@@ -189,10 +180,10 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
       <div style={{ background: "#fff", borderBottom: "1px solid #e5e7eb", padding: "32px 24px 24px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
           <h1 style={{ fontSize: "clamp(1.4rem,3vw,2rem)", fontWeight: 700, color: "#111827", marginBottom: "1rem", letterSpacing: "-0.02em" }}>
-            {category === "All categories" ? "All AI Specialists" : category}
+            {t("heading")}
             {!loading && (
               <span style={{ fontSize: "0.95rem", fontWeight: 400, color: "#6b7280", marginLeft: 12 }}>
-                {sorted.length} specialists
+                {t("count", { count: sorted.length })}
               </span>
             )}
           </h1>
@@ -222,7 +213,7 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
                 fontWeight: 500, fontSize: "0.88rem", cursor: "pointer",
               }}
             >
-              <SlidersHorizontal size={15} /> Filters
+              <SlidersHorizontal size={15} /> {t("filters")}
             </button>
           </div>
 
@@ -235,7 +226,7 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
                   onChange={e => setBudget(e.target.value)}
                   style={{ appearance: "none", padding: "8px 32px 8px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.85rem", color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit" }}
                 >
-                  {BUDGETS.map(b => <option key={b.value} value={b.value}>{b.label}</option>)}
+                  {BUDGETS.map(b => <option key={b.value} value={b.value}>{t(b.key)}</option>)}
                 </select>
                 <ChevronDown size={13} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af" }} />
               </div>
@@ -246,7 +237,7 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
                   onChange={e => setSort(e.target.value)}
                   style={{ appearance: "none", padding: "8px 32px 8px 12px", border: "1px solid #d1d5db", borderRadius: 8, fontSize: "0.85rem", color: "#374151", background: "#fff", cursor: "pointer", fontFamily: "inherit" }}
                 >
-                  {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                  {SORT_OPTIONS.map(o => <option key={o.value} value={o.value}>{t(o.key)}</option>)}
                 </select>
                 <ChevronDown size={13} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", pointerEvents: "none", color: "#9ca3af" }} />
               </div>
@@ -255,25 +246,32 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
         </div>
       </div>
 
-      {/* Category chips */}
+      {/* Направления. Раньше это были кнопки, которые меняли только заголовок и
+          ничего не фильтровали. Теперь каждая ведёт на свою страницу — с
+          отфильтрованным списком, своим текстом и своим адресом. */}
       <div style={{ background: "#fff", borderBottom: "1px solid #f0f0f0", overflowX: "auto" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", gap: 8, padding: "12px 24px", whiteSpace: "nowrap" }}>
-          {CATEGORIES.map(c => (
-            <button
-              key={c}
-              onClick={() => setCategory(c)}
+          <span
+            style={{
+              padding: "6px 14px", borderRadius: 20, border: "1px solid #6366f1",
+              background: "#ede9fe", color: "#4338ca", fontSize: "0.82rem",
+              fontWeight: 600, whiteSpace: "nowrap",
+            }}
+          >
+            {tCatalog("allCategories")}
+          </span>
+          {CATEGORIES.map((c) => (
+            <Link
+              key={c.slug}
+              href={`${p}/browse/${c.slug}`}
               style={{
-                padding: "6px 14px", borderRadius: 20, border: "1px solid",
-                borderColor: category === c ? "#6366f1" : "#e5e7eb",
-                background: category === c ? "#ede9fe" : "#fff",
-                color: category === c ? "#4338ca" : "#6b7280",
-                fontSize: "0.82rem", fontWeight: category === c ? 600 : 400,
-                cursor: "pointer", transition: "all 0.15s", whiteSpace: "nowrap",
-                fontFamily: "inherit",
+                padding: "6px 14px", borderRadius: 20, border: "1px solid #e5e7eb",
+                background: "#fff", color: "#6b7280", fontSize: "0.82rem",
+                whiteSpace: "nowrap", textDecoration: "none",
               }}
             >
-              {c}
-            </button>
+              {tHire(c.nameKey)}
+            </Link>
           ))}
         </div>
       </div>
@@ -301,7 +299,7 @@ function BrowseContent({ initialItems, apiError }: { initialItems: FreelancerLis
             <div style={{ fontSize: "2.5rem", marginBottom: 16 }}>🔍</div>
             <div style={{ fontSize: "1.1rem", fontWeight: 600, color: "#111827", marginBottom: 8 }}>{t("noSpecialists")}</div>
             <div style={{ color: "#6b7280", fontSize: "0.9rem" }}>{t("adjustFilters")}</div>
-            <button onClick={() => { setQuery(""); setCategory("All categories"); }} style={{ marginTop: 20, padding: "10px 24px", borderRadius: 8, background: "#6366f1", color: "#fff", border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.9rem" }}>
+            <button onClick={() => setQuery("")} style={{ marginTop: 20, padding: "10px 24px", borderRadius: 8, background: "#6366f1", color: "#fff", border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.9rem" }}>
               {t("clearFilters")}
             </button>
           </div>

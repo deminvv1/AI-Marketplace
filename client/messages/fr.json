@@ -706,7 +706,18 @@
     "apiDownText": "Impossible de charger la liste des spécialistes. Réessayez dans quelques minutes.",
     "noSpecialists": "Aucun spécialiste trouvé",
     "adjustFilters": "Modifiez la recherche ou les filtres",
-    "clearFilters": "Effacer les filtres"
+    "clearFilters": "Effacer les filtres",
+    "heading": "Tous les spécialistes de l'IA",
+    "count": "{count, plural, one {# spécialiste} other {# spécialistes}}",
+    "filters": "Filtres",
+    "anyBudget": "Tout budget",
+    "under25": "Moins de 25 $/h",
+    "b2550": "25–50 $/h",
+    "b50100": "50–100 $/h",
+    "b100": "Plus de 100 $/h",
+    "sortMatch": "Pertinence",
+    "sortRating": "Mieux notés",
+    "sortReviews": "Plus d'avis"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "Politique de confidentialité",
     "settings": "Préférences cookies",
     "close": "Fermer"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "Spécialistes du domaine {category} sur AI Marketplace. La plateforme ne prend aucune commission et n'intervient pas dans le paiement : vous fixez les conditions directement et vous réglez entre vous.",
+    "rolesTitle": "Les métiers du domaine",
+    "rolesHint": "Choisissez un métier pour voir les personnes qui l'exercent.",
+    "peopleTitle": "Spécialistes du domaine",
+    "empty": "Personne n'est encore présent dans ce domaine : la plateforme vient d'ouvrir. Publiez votre projet, ou soyez le premier à créer un profil ici.",
+    "allCategories": "Tous les domaines",
+    "metaTitle": "{category} — recruter des spécialistes | AI Marketplace",
+    "metaDesc": "Spécialistes du domaine {category} : consultez les profils et écrivez directement. Sans commission ni intermédiaire."
   }
 }

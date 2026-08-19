@@ -706,7 +706,18 @@
     "apiDownText": "スペシャリストの一覧を読み込めませんでした。数分後にもう一度お試しください。",
     "noSpecialists": "スペシャリストが見つかりません",
     "adjustFilters": "検索語や絞り込みを変えてみてください",
-    "clearFilters": "条件をクリア"
+    "clearFilters": "条件をクリア",
+    "heading": "すべての AI スペシャリスト",
+    "count": "{count, plural, other {# 名のスペシャリスト}}",
+    "filters": "絞り込み",
+    "anyBudget": "予算は問わない",
+    "under25": "$25/時 未満",
+    "b2550": "$25〜$50/時",
+    "b50100": "$50〜$100/時",
+    "b100": "$100/時 以上",
+    "sortMatch": "おすすめ順",
+    "sortRating": "評価が高い順",
+    "sortReviews": "レビューが多い順"
   },
   "app": {
     "nav": {
@@ -1191,5 +1202,16 @@
     "more": "プライバシーポリシー",
     "settings": "Cookie 設定",
     "close": "閉じる"
+  },
+  "catalog": {
+    "heading": "{category}",
+    "intro": "AI Marketplace で「{category}」に取り組むスペシャリストです。プラットフォームは手数料を取らず、支払いにも関与しません。条件は本人と直接決め、当事者どうしで精算します。",
+    "rolesTitle": "この分野の職種",
+    "rolesHint": "職種を選ぶと、その仕事をしている人が表示されます。",
+    "peopleTitle": "この分野のスペシャリスト",
+    "empty": "この分野にはまだ誰もいません。開設したばかりです。案件を掲載すればスペシャリストから連絡が届きます。最初の一人として登録することもできます。",
+    "allCategories": "すべての分野",
+    "metaTitle": "{category} — スペシャリストを探す | AI Marketplace",
+    "metaDesc": "「{category}」のスペシャリスト。プロフィールを見て直接ご連絡いただけます。手数料も仲介もありません。"
   }
 }

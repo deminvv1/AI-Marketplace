@@ -29,10 +29,25 @@ const SOCIAL = [
   { icon: SocialFacebook, label: "Facebook",  href: "#" },
 ];
 
+/**
+ * Девять первых пунктов — настоящие направления со своими страницами; их
+ * подписи переводятся, а адрес ведёт на /browse/<slug>. Остальные — узкие
+ * отрасли, у которых своей страницы нет: они ведут в поиск по каталогу.
+ */
+const CATEGORY_PAGES: { key: string; slug: string }[] = [
+  { key: "c1", slug: "ai-automation" },
+  { key: "c2", slug: "programming" },
+  { key: "c3", slug: "data-science" },
+  { key: "c4", slug: "design" },
+  { key: "c6", slug: "marketing" },
+  { key: "c5", slug: "content" },
+  { key: "c7", slug: "video-audio" },
+  { key: "c9", slug: "business" },
+  { key: "c8", slug: "industry" },
+];
+
 const CATEGORIES = [
-  "AI & Automation", "Programming & Tech", "Data Science & ML", "Design & Creative",
-  "Marketing & Growth", "Writing & Content", "Video & Animation", "Business & Support",
-  "Music & Audio", "Industry Solutions", "Healthcare AI", "FinTech & Finance AI",
+  "Music & Audio", "Healthcare AI", "FinTech & Finance AI",
   "Manufacturing & Industry 4.0", "Legal AI & LegalTech", "Agriculture & Precision Farming AI",
   "Energy & Environment AI", "Logistics & Transportation AI", "Real Estate PropTech AI",
   "Retail & E-Commerce AI", "EdTech & E-Learning AI", "Research & Science AI",
@@ -61,6 +76,8 @@ function FooterCol({ heading, links }: { heading: string; links: FooterLink[] })
 
 export function Footer() {
   const t = useTranslations("footer");
+  // Названия направлений живут в разделе hire — там они уже переведены.
+  const tHire = useTranslations("hire");
   const locale = useLocale();
 
   // Public pages live under /[locale] and need the prefix. App routes (/search,
@@ -149,9 +166,14 @@ export function Footer() {
             {t("categories")}
           </h2>
           <ul className="footer-cats">
+            {CATEGORY_PAGES.map(({ key, slug }) => (
+              <li key={slug}>
+                <Link href={`${p}/browse/${slug}`} className="footer-link">{tHire(key)}</Link>
+              </li>
+            ))}
             {CATEGORIES.map((c) => (
               <li key={c}>
-                <Link href={`${p}/browse?category=${encodeURIComponent(c)}`} className="footer-link">{c}</Link>
+                <Link href={`${p}/browse?q=${encodeURIComponent(c)}`} className="footer-link">{c}</Link>
               </li>
             ))}
           </ul>
