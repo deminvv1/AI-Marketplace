@@ -107,23 +107,33 @@ export function Footer() {
         .footer-cookie-settings { font-size: 0.74rem; color: #8b93a7; }
         .footer-cookie-settings:hover { color: #fff; }
         .footer-cookie-settings:focus-visible { outline: 2px solid #a78bfa; outline-offset: 3px; border-radius: 2px; }
+        /* Четыре равные колонки: раньше первая была шире остальных под
+           длинный список категорий, и колонки не выравнивались между собой. */
         .footer-grid {
           display: grid;
-          grid-template-columns: 1.7fr repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 2.5rem 2rem;
         }
-        @media (max-width: 1023px) {
-          .footer-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-          .footer-col-categories { grid-column: 1 / -1; }
-          .footer-cats-list {
-            display: grid !important;
-            grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr));
-            gap: 0.7rem 1.5rem;
-          }
+        /* Категории лентой над колонками — ровными столбцами, а не рваным
+           потоком: так глаз читает список сверху вниз, как в колонке. */
+        .footer-cats {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(min(100%, 210px), 1fr));
+          gap: 0.75rem 2rem;
+          list-style: none;
+          margin: 0;
+          padding: 0;
         }
         @media (max-width: 767px) {
-          .footer-grid { grid-template-columns: 1fr 1fr; gap: 2.25rem 1.5rem; }
-          .footer-col-categories { display: none; }
+          .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2.25rem 1.5rem; }
+          /* Двадцать шесть категорий в один столбец растягивают футер почти на
+             тысячу пикселей. Скрывать их нельзя — при мобильной индексации
+             ссылки со скрытых блоков весят меньше, поэтому просто ужимаем. */
+          .footer-cats {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.6rem 1.1rem;
+            font-size: 0.78rem;
+          }
         }
         @media (max-width: 419px) {
           .footer-grid { grid-template-columns: 1fr; }
@@ -131,20 +141,26 @@ export function Footer() {
       `}</style>
 
       <div style={{ maxWidth: 1220, margin: "0 auto", padding: "64px 24px 0" }}>
-        <div className="footer-grid" style={{ paddingBottom: "3rem" }}>
-          <div className="footer-col-categories">
-            <h2 style={{ fontSize: "0.7rem", color: "#8b93a7", fontWeight: 600, letterSpacing: "0.11em", textTransform: "uppercase", marginBottom: "1.15rem" }}>
-              {t("categories")}
-            </h2>
-            <ul className="footer-cats-list" style={{ listStyle: "none", margin: 0, padding: 0, display: "flex", flexDirection: "column", gap: "0.7rem" }}>
-              {CATEGORIES.map((c) => (
-                <li key={c}>
-                  <Link href={`${p}/browse?category=${encodeURIComponent(c)}`} className="footer-link">{c}</Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {/* Категории — лентой во всю ширину над колонками. Раньше они жили
+            одной левой колонкой в 26 строк, из-за чего футер выглядел
+            перекошенным. */}
+        <div style={{ paddingBottom: "2.5rem" }}>
+          <h2 style={{ fontSize: "0.7rem", color: "#8b93a7", fontWeight: 600, letterSpacing: "0.11em", textTransform: "uppercase", marginBottom: "1.15rem" }}>
+            {t("categories")}
+          </h2>
+          <ul className="footer-cats">
+            {CATEGORIES.map((c) => (
+              <li key={c}>
+                <Link href={`${p}/browse?category=${encodeURIComponent(c)}`} className="footer-link">{c}</Link>
+              </li>
+            ))}
+          </ul>
+        </div>
 
+        <div
+          className="footer-grid"
+          style={{ paddingBottom: "3rem", paddingTop: "2.5rem", borderTop: "1px solid rgba(255,255,255,0.07)" }}
+        >
           <FooterCol heading={t("forClients")}     links={FOR_CLIENTS} />
           <FooterCol heading={t("forSpecialists")} links={FOR_SPECIALISTS} />
           <FooterCol heading={t("community")}      links={COMMUNITY} />
