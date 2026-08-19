@@ -1,0 +1,61 @@
+# Дополнения к стандартной сборке Supabase.
+#
+# Базовый docker-compose.yml берётся из официального репозитория (см. README),
+# он не копируется сюда намеренно: свой форк пришлось бы обновлять вручную и он
+# разошёлся бы с оригиналом. Здесь только то, чего в нём нет.
+#
+# Запуск:  docker compose -f docker-compose.yml -f docker-compose.override.yml up -d
+
+services:
+  # ── Keycloak: посредник для входа через Яндекс и VK ────────────────────────
+  # Supabase таких провайдеров не поддерживает и поддерживать не будет.
+  # Keycloak умеет их через плагин, а для Supabase выглядит как один провайдер.
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: ai-keycloak
+    restart: unless-stopped
+    command: start --optimized
+    environment:
+      KC_DB: postgres
+      # Отдельная база в том же Postgres — лишний сервер не нужен.
+      KC_DB_URL: jdbc:postgresql://db:5432/keycloak
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KC_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KC_HTTP_ENABLED: "true"
+      # Nginx завершает TLS и передаёт заголовки — без этого Keycloak
+      # строит ссылки на http и вход по кругу возвращается на форму.
+      KC_PROXY_HEADERS: xforwarded
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    volumes:
+      # Плагин русских провайдеров: Яндекс, VK, Mail.ru, OK.
+      # Скачивается скриптом scripts/fetch-keycloak-plugin.sh
+      - ./keycloak/providers:/opt/keycloak/providers:ro
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ── Наш сервер приложений, переезжает с Render ─────────────────────────────
+  api:
+    build:
+      context: ../server
+      dockerfile: Dockerfile
+    container_name: ai-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      DIRECT_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres
+      # Внутри сети обращаемся к Kong напрямую, минуя интернет.
+      SUPABASE_URL: http://kong:8000
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SECRET_KEY}
+      CLIENT_URL: ${CLIENT_URL}
+    ports:
+      - "127.0.0.1:4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy

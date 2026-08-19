@@ -43,3 +43,8 @@ Thumbs.db
 
 # Build artifacts
 *.tsbuildinfo
+
+# Секреты сервера — только на сервере
+infra/.env
+infra/keycloak/providers/
+infra/dump-*/
