@@ -13,7 +13,6 @@
     "headline1": "KI‑Experten finden,",
     "headline2": "die wirklich liefern",
     "searchPlaceholder": "Nach Diensten oder Experten suchen...",
-    "onlineLabel": "Experten online",
     "chips": [
       "KI‑Entwicklung",
       "Healthcare KI",
@@ -146,7 +145,7 @@
     "haveAccount": "Sie haben schon ein Konto?",
     "logIn": "Anmelden",
     "createTitle": "Konto erstellen",
-    "createSubtitle": "Werden Sie Teil von 12.840 KI-Spezialisten und Auftraggebern weltweit.",
+    "createSubtitle": "Die Registrierung ist kostenlos — die Plattform nimmt keine Provision.",
     "signInTitle": "Anmelden",
     "signInSubtitle": "Melden Sie sich bei Ihrem Konto an.",
     "welcomeBackTitle": "Willkommen zurück",
@@ -196,7 +195,8 @@
     "newPasswordCta": "Passwort speichern",
     "passwordUpdated": "Passwort geändert. Sie werden angemeldet…",
     "backToSignIn": "Zurück zur Anmeldung",
-    "resetLinkInvalid": "Dieser Link ist abgelaufen oder wurde bereits benutzt. Fordern Sie einen neuen an."
+    "resetLinkInvalid": "Dieser Link ist abgelaufen oder wurde bereits benutzt. Fordern Sie einen neuen an.",
+    "linkHint": "Wir schicken Ihnen einen Anmeldelink per E-Mail — anklicken und Sie sind drin. Kein Passwort zu merken, keines, das gestohlen werden kann."
   },
   "careers": {
     "title": "Karriere",
@@ -229,8 +229,8 @@
     "hireDesc": "KI-Entwickler, ML-Ingenieure, Data Scientists und Automatisierungsprofis nach Kategorie. Keine Provision, direkter Kontakt.",
     "workTitle": "KI-Aufträge und Projekte finden | AI Marketplace",
     "workDesc": "Offene KI-Projekte nach Kategorie: Machine Learning, Computer Vision, Automatisierung, Daten. Sie behalten 100 % Ihres Honorars.",
-    "helpTitle": "Hilfe-Center — Antworten für Auftraggeber und Spezialisten | AI Marketplace",
-    "helpDesc": "Wie man ein Projekt einstellt, wie die Parteien untereinander abrechnen, wie ein Profil Auftraggeber anzieht und was bei einem Konflikt zu tun ist. Antworten auf die häufigsten Fragen.",
+    "helpTitle": "Hilfe-Center — Fragen und Antworten | AI Marketplace",
+    "helpDesc": "Wie man ein Projekt einstellt, wie die Parteien abrechnen, wie ein Profil Auftraggeber anzieht und was bei einem Konflikt zu tun ist.",
     "whyTitle": "Warum AI Marketplace — 0 % Provision | AI Marketplace",
     "whyDesc": "Wir nehmen nichts vom Honorar der Spezialisten, weil die Zahlung direkt zwischen den Parteien läuft. Vergleichen Sie, was hier und anderswo bleibt.",
     "aboutTitle": "Über uns — so funktioniert AI Marketplace | AI Marketplace",
@@ -240,7 +240,7 @@
     "pressTitle": "Presse und Medienanfragen | AI Marketplace",
     "pressDesc": "Pressemappe, Logos, Gründerbiografien und Plattformzahlen. Medienanfragen beantworten wir innerhalb eines Werktags.",
     "termsTitle": "Nutzungsbedingungen | AI Marketplace",
-    "termsDesc": "Die Nutzungsbedingungen von AI Marketplace für Auftraggeber und Spezialisten — die Rolle der Plattform, die Abrechnung zwischen den Parteien, Rechte am Ergebnis und Verhaltensregeln.",
+    "termsDesc": "Nutzungsbedingungen für Auftraggeber und Spezialisten: Rolle der Plattform, Abrechnung zwischen den Parteien, Rechte am Ergebnis, Verhaltensregeln.",
     "privacyTitle": "Datenschutzerklärung | AI Marketplace",
     "privacyDesc": "Welche personenbezogenen Daten AI Marketplace erhebt, warum, wie lange sie gespeichert werden und welche Rechte Sie haben."
   },

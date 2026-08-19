@@ -13,7 +13,6 @@
     "headline1": "Encontre especialistas em IA",
     "headline2": "que realmente entregam resultados",
     "searchPlaceholder": "Buscar serviço ou especialista...",
-    "onlineLabel": "Especialistas online",
     "chips": [
       "Desenvolvimento IA",
       "Saúde e IA",
@@ -146,7 +145,7 @@
     "haveAccount": "Já tem uma conta?",
     "logIn": "Entrar",
     "createTitle": "Criar conta",
-    "createSubtitle": "Junte-se a 12.840 especialistas em IA e clientes no mundo inteiro.",
+    "createSubtitle": "O registo é gratuito — a plataforma não cobra comissão.",
     "signInTitle": "Entrar",
     "signInSubtitle": "Entre na sua conta.",
     "welcomeBackTitle": "Bem-vindo de volta",
@@ -196,7 +195,8 @@
     "newPasswordCta": "Salvar senha",
     "passwordUpdated": "Senha atualizada. Entrando…",
     "backToSignIn": "Voltar para o login",
-    "resetLinkInvalid": "Este link expirou ou já foi usado. Solicite um novo."
+    "resetLinkInvalid": "Este link expirou ou já foi usado. Solicite um novo.",
+    "linkHint": "Enviamos um link de acesso para o seu e-mail: abre-o e já está dentro. Nada para memorizar, nada que possa vazar."
   },
   "careers": {
     "title": "Carreiras",
@@ -225,12 +225,12 @@
     "description": "A plataforma internacional que liga especialistas em IA a clientes em todo o mundo. Sem comissão sobre os ganhos dos especialistas.",
     "ogTitle": "AI Marketplace",
     "ogDescription": "Contrate especialistas em IA ou encontre trabalho em IA. Sem comissão, contacto direto.",
-    "hireTitle": "Contratar especialistas em IA — 9 categorias | AI Marketplace",
+    "hireTitle": "Contratar especialistas em IA | AI Marketplace",
     "hireDesc": "Programadores de IA, engenheiros de ML, cientistas de dados e especialistas em automação, por categoria. Sem comissão, contacto direto.",
     "workTitle": "Encontrar trabalho e projetos de IA | AI Marketplace",
     "workDesc": "Projetos de IA abertos por categoria: aprendizado de máquina, visão computacional, automação, dados. Você fica com 100% do que ganha.",
-    "helpTitle": "Central de ajuda — respostas para clientes e especialistas | AI Marketplace",
-    "helpDesc": "Como publicar um projeto, como as partes acertam entre si, como montar um perfil que atrai clientes e o que fazer diante de um conflito. Respostas às dúvidas mais comuns.",
+    "helpTitle": "Central de ajuda — perguntas frequentes | AI Marketplace",
+    "helpDesc": "Como publicar um projeto, como as partes acertam entre si, como montar um perfil que atrai clientes e o que fazer num conflito.",
     "whyTitle": "Por que o AI Marketplace — 0% de comissão | AI Marketplace",
     "whyDesc": "Não ficamos com nada dos ganhos do especialista, porque o pagamento é direto entre as partes. Compare o que sobra para você aqui e em outras plataformas.",
     "aboutTitle": "Sobre nós — como funciona o AI Marketplace | AI Marketplace",
@@ -240,7 +240,7 @@
     "pressTitle": "Imprensa e contato para mídia | AI Marketplace",
     "pressDesc": "Kit de imprensa, logotipos, biografias dos fundadores e estatísticas. Respondemos à imprensa em um dia útil.",
     "termsTitle": "Termos de Serviço | AI Marketplace",
-    "termsDesc": "As condições de uso do AI Marketplace para clientes e especialistas: o papel da plataforma, o pagamento entre as partes, propriedade intelectual e regras de conduta.",
+    "termsDesc": "Condições de uso para clientes e especialistas: o papel da plataforma, o pagamento entre as partes, propriedade intelectual e regras.",
     "privacyTitle": "Política de Privacidade | AI Marketplace",
     "privacyDesc": "Quais dados pessoais o AI Marketplace coleta, por quê, por quanto tempo os guarda e quais direitos você tem sobre eles."
   },

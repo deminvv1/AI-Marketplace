@@ -155,7 +155,10 @@ function RegisterForm() {
   const [mode, setMode] = useState<Mode>(
     signedOut || authRequired || skipRole ? "signin" : "signup"
   );
-  const [method, setMethod] = useState<Method>("password");
+  // Вход по ссылке на почту — способ по умолчанию: нечего придумывать,
+  // нечего забывать и нечему утекать. Пароль остаётся рядом как запасной путь,
+  // потому что письмо может задержаться или попасть в спам.
+  const [method, setMethod] = useState<Method>("link");
   const [role, setRole] = useState<Role>("CLIENT");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -435,6 +438,10 @@ function RegisterForm() {
                   <>{mode === "signin" ? t("signInCta") : t("signUpCta")} <ArrowRight className="size-4" /></>
                 )}
               </button>
+
+              {method === "link" && (
+                <p className="text-xs text-muted-foreground leading-relaxed px-1">{t("linkHint")}</p>
+              )}
 
               <div className="flex items-center justify-between gap-3 pt-1">
                 <button

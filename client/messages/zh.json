@@ -13,7 +13,6 @@
     "headline1": "找到真正能交付成果的",
     "headline2": "AI 专家",
     "searchPlaceholder": "搜索服务或专家...",
-    "onlineLabel": "专家在线",
     "chips": [
       "AI 开发",
       "医疗 AI",
@@ -146,7 +145,7 @@
     "haveAccount": "已有账号？",
     "logIn": "登录",
     "createTitle": "创建账号",
-    "createSubtitle": "加入全球 12,840 位 AI 专家与客户。",
+    "createSubtitle": "注册免费 — 平台不收取任何抽成。",
     "signInTitle": "登录",
     "signInSubtitle": "登录您的账号。",
     "welcomeBackTitle": "欢迎回来",
@@ -196,7 +195,8 @@
     "newPasswordCta": "保存密码",
     "passwordUpdated": "密码已更新，正在登录…",
     "backToSignIn": "返回登录",
-    "resetLinkInvalid": "此链接已过期或已被使用，请重新获取。"
+    "resetLinkInvalid": "此链接已过期或已被使用，请重新获取。",
+    "linkHint": "我们会把登录链接发到你的邮箱，点开即可进入。无需记住密码，也就没有密码会泄露。"
   },
   "careers": {
     "title": "加入我们",

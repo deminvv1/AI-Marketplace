@@ -1,4 +1,4 @@
-import { localeUrl } from "@/lib/seo";
+import { SITE_URL, localeUrl } from "@/lib/seo";
 
 /**
  * Разметка для Google и Яндекса — описание сайта на языке, который понимают
@@ -34,8 +34,7 @@ export function OrganizationSchema({
         name: "AI Marketplace",
         url: localeUrl(locale, ""),
         description,
-        // logo не указываем: файла логотипа в проекте нет, а битая ссылка в
-        // разметке хуже её отсутствия. Добавить, когда появится /logo.png.
+        logo: `${SITE_URL}/logo.png`,
       }}
     />
   );

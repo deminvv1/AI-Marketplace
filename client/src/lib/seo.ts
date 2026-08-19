@@ -39,10 +39,25 @@ export function pageAlternates(locale: string, path = ""): Metadata["alternates"
   };
 }
 
-/** Metadata for a public page: correct canonical, hreflang and OG url. */
+/**
+ * Картинка предпросмотра при отправке ссылки в мессенджер или соцсеть.
+ *
+ * Указывается явно, а не через файловое соглашение Next: страницы объявляют
+ * свой блок openGraph, и он перекрывает автоматически найденный файл — ссылка
+ * уходит без картинки.
+ */
+export const OG_IMAGE = {
+  url: `${SITE_URL}/opengraph-image.png`,
+  width: 1200,
+  height: 630,
+  alt: "AI Marketplace",
+};
+
+/** Metadata for a public page: correct canonical, hreflang, OG url and image. */
 export function publicPageMetadata(locale: string, path = ""): Metadata {
   return {
     alternates: pageAlternates(locale, path),
-    openGraph: { url: localeUrl(locale, path) },
+    openGraph: { url: localeUrl(locale, path), images: [OG_IMAGE] },
+    twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
   };
 }

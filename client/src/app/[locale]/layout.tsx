@@ -2,7 +2,7 @@ import { hasLocale } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { SITE_URL, pageAlternates, localeUrl } from "@/lib/seo";
+import { SITE_URL, pageAlternates, localeUrl, OG_IMAGE } from "@/lib/seo";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -26,7 +26,9 @@ export async function generateMetadata({
       type: "website",
       locale,
       url: localeUrl(locale, ""),
+      images: [OG_IMAGE],
     },
+    twitter: { card: "summary_large_image", images: [OG_IMAGE.url] },
   };
 }
 

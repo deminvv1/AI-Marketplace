@@ -13,7 +13,6 @@
     "headline1": "Sonuç üreten",
     "headline2": "AI uzmanlarını bulun",
     "searchPlaceholder": "Hizmet veya uzman ara...",
-    "onlineLabel": "Uzman Çevrimiçi",
     "chips": [
       "AI Geliştirme",
       "Sağlık AI",
@@ -146,7 +145,7 @@
     "haveAccount": "Hesabınız var mı?",
     "logIn": "Giriş yap",
     "createTitle": "Hesap oluştur",
-    "createSubtitle": "Dünya genelinde 12.840 yapay zekâ uzmanı ve işverene katılın.",
+    "createSubtitle": "Kayıt ücretsizdir — platform komisyon almaz.",
     "signInTitle": "Giriş yap",
     "signInSubtitle": "Hesabınıza giriş yapın.",
     "welcomeBackTitle": "Tekrar hoş geldiniz",
@@ -196,7 +195,8 @@
     "newPasswordCta": "Parolayı kaydet",
     "passwordUpdated": "Parola güncellendi. Giriş yapılıyor…",
     "backToSignIn": "Girişe dön",
-    "resetLinkInvalid": "Bu bağlantının süresi doldu veya kullanıldı. Yenisini isteyin."
+    "resetLinkInvalid": "Bu bağlantının süresi doldu veya kullanıldı. Yenisini isteyin.",
+    "linkHint": "Giriş bağlantısını e-postanıza göndeririz — açtığınızda içeridesiniz. Hatırlanacak parola yok, sızacak parola da yok."
   },
   "careers": {
     "title": "Kariyer",

@@ -13,7 +13,6 @@
     "headline1": "Temukan ahli AI",
     "headline2": "yang benar-benar memberikan hasil",
     "searchPlaceholder": "Cari layanan atau ahli...",
-    "onlineLabel": "Ahli Online",
     "chips": [
       "Pengembangan AI",
       "AI Kesehatan",
@@ -146,7 +145,7 @@
     "haveAccount": "Sudah punya akun?",
     "logIn": "Masuk",
     "createTitle": "Buat akun",
-    "createSubtitle": "Bergabung dengan 12.840 spesialis AI dan klien di seluruh dunia.",
+    "createSubtitle": "Pendaftaran gratis — platform tidak memungut komisi.",
     "signInTitle": "Masuk",
     "signInSubtitle": "Masuk ke akun Anda.",
     "welcomeBackTitle": "Selamat datang kembali",
@@ -196,7 +195,8 @@
     "newPasswordCta": "Simpan kata sandi",
     "passwordUpdated": "Kata sandi diperbarui. Sedang masuk…",
     "backToSignIn": "Kembali ke halaman masuk",
-    "resetLinkInvalid": "Tautan ini kedaluwarsa atau sudah dipakai. Minta yang baru."
+    "resetLinkInvalid": "Tautan ini kedaluwarsa atau sudah dipakai. Minta yang baru.",
+    "linkHint": "Kami kirimkan tautan masuk ke email Anda — buka, dan Anda sudah di dalam. Tak ada kata sandi untuk diingat, tak ada yang bisa bocor."
   },
   "careers": {
     "title": "Karier",
@@ -229,10 +229,10 @@
     "hireDesc": "Pengembang AI, insinyur ML, ilmuwan data, dan ahli otomasi menurut kategori. Tanpa komisi, kontak langsung.",
     "workTitle": "Cari pekerjaan dan proyek AI | AI Marketplace",
     "workDesc": "Proyek AI terbuka per kategori: machine learning, computer vision, otomasi, data. Penghasilan 100% milik Anda.",
-    "helpTitle": "Pusat bantuan — jawaban untuk klien dan spesialis | AI Marketplace",
-    "helpDesc": "Cara memasang proyek, cara kedua pihak menyelesaikan pembayaran, cara menyusun profil yang menarik klien, dan apa yang dilakukan saat terjadi konflik. Jawaban atas pertanyaan yang paling umum.",
+    "helpTitle": "Pusat bantuan — tanya jawab | AI Marketplace",
+    "helpDesc": "Cara memasang proyek, cara kedua pihak menyelesaikan pembayaran, cara menyusun profil yang menarik klien, dan apa yang dilakukan saat konflik.",
     "whyTitle": "Mengapa AI Marketplace — komisi 0% | AI Marketplace",
-    "whyDesc": "Kami tidak memungut apa pun dari penghasilan spesialis, karena pembayaran berlangsung langsung antarpihak. Bandingkan sisa penghasilan di sini dan di platform lain.",
+    "whyDesc": "Kami tidak memungut apa pun dari penghasilan spesialis — pembayaran berlangsung langsung antarpihak. Bandingkan dengan platform lain.",
     "aboutTitle": "Tentang kami — cara kerja AI Marketplace | AI Marketplace",
     "aboutDesc": "Didirikan pada 2024. Cara kerja platform, apa yang melindungi kedua pihak, dan tim yang membangunnya.",
     "careersTitle": "Karier — posisi terbuka | AI Marketplace",

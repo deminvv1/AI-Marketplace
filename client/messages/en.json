@@ -13,7 +13,6 @@
     "headline1": "Find AI specialists",
     "headline2": "who deliver results",
     "searchPlaceholder": "Search for any service...",
-    "onlineLabel": "Specialists Online",
     "chips": [
       "AI Development",
       "Healthcare AI",
@@ -146,7 +145,7 @@
     "haveAccount": "Already have an account?",
     "logIn": "Log in",
     "createTitle": "Create account",
-    "createSubtitle": "Join 12,840 AI specialists and clients worldwide.",
+    "createSubtitle": "Create an account free of charge — the platform takes no commission.",
     "signInTitle": "Sign in",
     "signInSubtitle": "Sign in to your account.",
     "welcomeBackTitle": "Welcome back",
@@ -196,7 +195,8 @@
     "newPasswordCta": "Save password",
     "passwordUpdated": "Password updated. Signing you in…",
     "backToSignIn": "Back to sign in",
-    "resetLinkInvalid": "This reset link has expired or was already used. Request a new one."
+    "resetLinkInvalid": "This reset link has expired or was already used. Request a new one.",
+    "linkHint": "We will email you a sign-in link — open it and you are in. Nothing to remember, nothing to leak."
   },
   "careers": {
     "title": "Careers",
@@ -230,7 +230,7 @@
     "workTitle": "Find AI work and projects | AI Marketplace",
     "workDesc": "Browse open AI projects by category — machine learning, computer vision, automation, data. Keep 100% of what you earn.",
     "helpTitle": "Help Center — clients and specialists | AI Marketplace",
-    "helpDesc": "How to post a project, how the two sides settle, how to build a profile that attracts clients, and what to do about a conflict. Answers to the most common questions.",
+    "helpDesc": "How to post a project, how the two sides settle, how to build a profile that attracts clients, and what to do about a conflict.",
     "whyTitle": "Why AI Marketplace — 0% commission | AI Marketplace",
     "whyDesc": "We take nothing from specialist earnings, because payment goes directly between the parties. Compare what you keep here against other platforms.",
     "aboutTitle": "About us — how AI Marketplace works | AI Marketplace",

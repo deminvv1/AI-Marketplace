@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Тот же знак, что в шапке, но утолщённый: на 16 пикселях тонкие линии
+       исчезают, и во вкладке остаётся зелёный квадрат без рисунка. -->
+  <rect width="32" height="32" rx="7" fill="#14a800"/>
+  <circle cx="16" cy="9"  r="3.4" fill="white"/>
+  <circle cx="8.5" cy="23" r="3.4" fill="white"/>
+  <circle cx="23.5" cy="23" r="3.4" fill="white"/>
+  <line x1="16" y1="9"  x2="8.5"  y2="23" stroke="white" stroke-opacity="0.8" stroke-width="2.4" stroke-linecap="round"/>
+  <line x1="16" y1="9"  x2="23.5" y2="23" stroke="white" stroke-opacity="0.8" stroke-width="2.4" stroke-linecap="round"/>
+  <line x1="8.5" y1="23" x2="23.5" y2="23" stroke="white" stroke-opacity="0.8" stroke-width="2.4" stroke-linecap="round"/>
+</svg>

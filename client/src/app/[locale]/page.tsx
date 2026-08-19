@@ -90,13 +90,6 @@ function HeroSection() {
 
       </div>
 
-      <div style={{ position: "absolute", bottom: 28, left: 28, zIndex: 20, background: "rgba(6,10,28,0.80)", backdropFilter: "blur(18px)", border: "1px solid rgba(100,135,255,0.2)", borderRadius: 14, padding: "0.55rem 1.1rem", display: "flex", alignItems: "center", gap: 10 }}>
-        <span className="animate-pulse" style={{ width: 8, height: 8, borderRadius: "50%", background: "#a78bfa", boxShadow: "0 0 10px #a78bfa", display: "inline-block", flexShrink: 0 }} />
-        <div>
-          <div style={{ fontSize: "1rem", fontWeight: 700, color: "#fff", letterSpacing: "0.03em" }}>2 684</div>
-          <div style={{ fontSize: "0.58rem", color: "rgba(165,192,255,0.55)", letterSpacing: "0.12em", textTransform: "uppercase" }}>{t("onlineLabel")}</div>
-        </div>
-      </div>
     </section>
   );
 }

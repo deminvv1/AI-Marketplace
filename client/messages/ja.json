@@ -13,7 +13,6 @@
     "headline1": "成果を出す",
     "headline2": "AI専門家を見つけよう",
     "searchPlaceholder": "サービスや専門家を検索...",
-    "onlineLabel": "人の専門家がオンライン",
     "chips": [
       "AI開発",
       "医療AI",
@@ -146,7 +145,7 @@
     "haveAccount": "すでにアカウントをお持ちですか？",
     "logIn": "ログイン",
     "createTitle": "アカウントを作成",
-    "createSubtitle": "世界12,840人のAIスペシャリストとクライアントに加わりましょう。",
+    "createSubtitle": "登録は無料です。プラットフォームは手数料を取りません。",
     "signInTitle": "ログイン",
     "signInSubtitle": "アカウントにログインしてください。",
     "welcomeBackTitle": "おかえりなさい",
@@ -196,7 +195,8 @@
     "newPasswordCta": "パスワードを保存",
     "passwordUpdated": "パスワードを更新しました。ログインしています…",
     "backToSignIn": "ログインに戻る",
-    "resetLinkInvalid": "このリンクは期限切れか、すでに使用済みです。新しく取得してください。"
+    "resetLinkInvalid": "このリンクは期限切れか、すでに使用済みです。新しく取得してください。",
+    "linkHint": "ログイン用のリンクをメールでお送りします。開くだけで入れます。覚えるパスワードも、漏れるパスワードもありません。"
   },
   "careers": {
     "title": "採用情報",
