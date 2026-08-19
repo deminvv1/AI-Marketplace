@@ -25,8 +25,16 @@ export function LanguageSwitcher() {
 
   function pick(code: Locale) {
     setOpen(false);
-    // next-intl stores the choice in its own cookie and keeps the current path.
+    // next-intl запоминает выбор в своей cookie и сохраняет текущий путь.
     router.replace(pathname, { locale: code });
+
+    // Страницы кабинета живут вне сегмента /[locale], поэтому язык им раздаёт
+    // корневой макет — а он при таком переходе не перерисовывается, и тексты
+    // остались бы на прежнем языке. refresh() перезапрашивает серверную часть
+    // без полной перезагрузки страницы: без белого экрана и без потери места
+    // прокрутки. На публичных страницах этого не нужно — там переводы
+    // раздаёт макет языкового сегмента, который перерисовывается сам.
+    router.refresh();
   }
 
   return (

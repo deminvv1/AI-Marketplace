@@ -1,8 +1,9 @@
-import { hasLocale } from "next-intl";
-import { getTranslations } from "next-intl/server";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { SITE_URL, pageAlternates, localeUrl, OG_IMAGE } from "@/lib/seo";
+import { HtmlLangSync } from "@/components/html-lang-sync";
 import type { Metadata } from "next";
 
 export async function generateMetadata({
@@ -45,6 +46,18 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  // The provider lives in the root layout — see app/layout.tsx.
-  return children;
+  // Свой поставщик переводов на уровне языкового сегмента.
+  //
+  // В корневом макете он тоже есть — ради страниц кабинета, которые живут вне
+  // /[locale]. Но корневой макет при переходе с /ru на /de не перерисовывается,
+  // и тексты оставались на прежнем языке до перезагрузки страницы. Этот
+  // поставщик перерисовывается вместе с сегментом и перекрывает корневой.
+  const messages = await getMessages({ locale });
+
+  return (
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      <HtmlLangSync locale={locale} />
+      {children}
+    </NextIntlClientProvider>
+  );
 }
