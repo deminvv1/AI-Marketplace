@@ -13,7 +13,6 @@
     "headline1": "KI‑Experten finden,",
     "headline2": "die wirklich liefern",
     "searchPlaceholder": "Nach Diensten oder Experten suchen...",
-    "trustedBy": "Vertrauen von:",
     "onlineLabel": "Experten online",
     "chips": [
       "KI‑Entwicklung",
@@ -23,20 +22,15 @@
       "Industrie 4.0"
     ]
   },
-  "trusted": {
-    "label": "Vertrauen von über 800.000 Kunden"
-  },
   "stats": {
-    "title": "Das weltweit führende KI-Talentnetzwerk",
-    "description": "Von Startups bis Fortune 500 — Unternehmen jeder Größe finden auf AI Marketplace die Talente, die sie voranbringen.",
-    "specialistsValue": "12.400+",
-    "specialistsLabel": "KI‑Experten",
-    "countriesValue": "128",
-    "countriesLabel": "Länder",
-    "commissionValue": "0 %",
-    "commissionLabel": "Provision",
-    "ratingValue": "4,9★",
-    "ratingLabel": "Ø Bewertung"
+    "title": "So funktioniert die Plattform",
+    "description": "Keine Provision, kein Vermittler. Auftraggeber und Spezialist vereinbaren die Bedingungen selbst und rechnen direkt miteinander ab.",
+    "commissionValue": "0%",
+    "commissionLabel": "Provision der Plattform",
+    "languagesValue": "12",
+    "languagesLabel": "Sprachen der Oberfläche",
+    "categoriesValue": "26",
+    "categoriesLabel": "KI-Kategorien"
   },
   "categories": {
     "title": "KI‑Experten für jede Branche",
@@ -58,7 +52,7 @@
     "h1Title": "Projekt veröffentlichen",
     "h1Desc": "Beschreiben Sie Ihren Bedarf und Budget. Wir finden die passenden Experten in Minuten.",
     "h2Title": "Angebote vergleichen",
-    "h2Desc": "Profile, Portfolios und Stundensätze geprüfter Experten vergleichen. Erst chatten, dann beauftragen.",
+    "h2Desc": "Profile, Portfolios und Sätze vergleichen. Erst sprechen, dann beauftragen.",
     "h3Title": "Direkt Bedingungen vereinbaren",
     "h3Desc": "Besprechen Sie Umfang, Frist und Bezahlung im Chat. Die Plattform hält sich aus der Abrechnung heraus — deshalb liegt unsere Provision bei null.",
     "w1Title": "Profil erstellen",
@@ -67,9 +61,6 @@
     "w2Desc": "Finden Sie Projekte, die zu Ihrer Expertise passen. Schreiben Sie ein überzeugendes Angebot.",
     "w3Title": "Sicher bezahlt werden",
     "w3Desc": "Arbeit dokumentiert, Geld gesichert. Auszahlung in Ihrer bevorzugten Methode weltweit."
-  },
-  "testimonials": {
-    "title": "Echte Ergebnisse auf AI Marketplace"
   },
   "cta": {
     "headline": "Finden Sie KI‑Experten für Ihr nächstes Projekt",
@@ -103,10 +94,6 @@
   "about": {
     "heroTitle": "Wir bauen die Plattform, die KI-Spezialisten verdienen",
     "heroDesc": "AI Marketplace entstand, weil jede bestehende Plattform 10–20 % von Spezialisten einbehält, die bereits hart daran arbeiten, die Zukunft zu gestalten. Wir haben Nein zu diesem Modell gesagt – und etwas Besseres gebaut.",
-    "statFounded": "Gegründet",
-    "statSpecialists": "Verifizierte Spezialisten",
-    "statCountries": "Länder",
-    "statCommission": "Provision",
     "v1Title": "Spezialisten an erster Stelle",
     "v1Desc": "Jede Produktentscheidung beginnt mit einer Frage: Hilft das den Spezialisten, mehr zu verdienen und besser zu arbeiten? Wir behalten niemals einen Anteil ihres Einkommens ein.",
     "v2Title": "Transparenz",
@@ -225,7 +212,7 @@
   },
   "press": {
     "title": "Presse",
-    "lead": "AI Marketplace verbindet Auftraggeber mit geprüften KI-Spezialisten in 128 Ländern — ohne Provision auf die Honorare der Spezialisten. Gegründet 2024.",
+    "lead": "AI Marketplace bringt Auftraggeber und KI-Spezialisten weltweit zusammen: ohne Provision auf die Einnahmen der Spezialisten und ohne Zahlungen über die Plattform.",
     "kitTitle": "Pressemappe",
     "kitDesc": "Logos als SVG und PNG, Markenfarben, Produkt-Screenshots, Fotos und Biografien der Gründer sowie aktuelle Plattformzahlen. Auf Anfrage erhältlich.",
     "kitCta": "Pressemappe anfordern",
@@ -235,11 +222,11 @@
   },
   "meta": {
     "title": "AI Marketplace — KI-Spezialisten weltweit beauftragen",
-    "description": "Die internationale Plattform, die KI-Spezialisten und Auftraggeber in 128 Ländern verbindet. Keine Provision auf die Honorare der Spezialisten.",
+    "description": "Die internationale Plattform, die KI-Spezialisten und Auftraggeber weltweit zusammenbringt. Keine Provision auf die Einnahmen der Spezialisten.",
     "ogTitle": "AI Marketplace",
-    "ogDescription": "Geprüfte KI-Spezialisten beauftragen oder KI-Aufträge finden. 128 Länder, 0 % Provision.",
+    "ogDescription": "KI-Spezialisten beauftragen oder KI-Aufträge finden. Keine Provision, direkter Kontakt.",
     "hireTitle": "KI-Spezialisten beauftragen — 9 Kategorien | AI Marketplace",
-    "hireDesc": "KI-Entwickler, ML-Engineers, Data Scientists und Automatisierungsexperten nach Kategorie. Geprüfte Spezialisten in 128 Ländern, 0 % Provision.",
+    "hireDesc": "KI-Entwickler, ML-Ingenieure, Data Scientists und Automatisierungsprofis nach Kategorie. Keine Provision, direkter Kontakt.",
     "workTitle": "KI-Aufträge und Projekte finden | AI Marketplace",
     "workDesc": "Offene KI-Projekte nach Kategorie: Machine Learning, Computer Vision, Automatisierung, Daten. Sie behalten 100 % Ihres Honorars.",
     "helpTitle": "Hilfe-Center — Antworten für Auftraggeber und Spezialisten | AI Marketplace",
@@ -258,15 +245,11 @@
     "privacyDesc": "Welche personenbezogenen Daten AI Marketplace erhebt, warum, wie lange sie gespeichert werden und welche Rechte Sie haben."
   },
   "why": {
-    "badge": "Durchschnittliche Bewertung 4,9 · über 12.400 Spezialisten",
+    "badge": "0 % Provision · direkter Kontakt",
     "heroTitle": "Die KI-Talentplattform, die wirklich für Sie arbeitet",
-    "heroDesc": "Keine weitere generische Freelancing-Seite mit angeflanschter KI-Kategorie. Wir sind von Grund auf für die KI-Wirtschaft gebaut — null Provision, geprüfte Spezialisten und Ihre Daten auf unserer eigenen Infrastruktur.",
+    "heroDesc": "Keine weitere Freelancer-Börse mit angeschraubter KI-Rubrik. Von Grund auf für die KI-Wirtschaft gebaut: ohne Provision, und Sie sprechen direkt mit der Person, die die Arbeit macht.",
     "ctaFind": "Spezialisten finden",
     "ctaJoin": "Als Spezialist beitreten",
-    "statCommission": "Provision der Plattform",
-    "statSpecialists": "Geprüfte Spezialisten",
-    "statCountries": "Vertretene Länder",
-    "statEarnings": "Durchschnittsverdienst gegenüber Wettbewerbern",
     "diffTitle": "Warum Spezialisten und Auftraggeber uns wählen",
     "diffSubtitle": "Wir haben gebaut, was uns selbst gefehlt hat — eine Plattform ohne Interessenkonflikt zwischen Spezialisten und der Plattform.",
     "d1T": "0 % Provision — dauerhaft",
@@ -275,12 +258,12 @@
     "d2D": "Weil wir nichts von Ihrem Honorar abziehen, bleibt bei gleichem Satz pro Projekt spürbar mehr übrig als auf konkurrierenden Plattformen.",
     "d3T": "Für KI gebaut, nicht daran angepasst",
     "d3D": "Jede Kategorie, jeder Filter und jede Matching-Regel ist um KI-Fähigkeiten herum entworfen — nicht von einer allgemeinen Freelancing-Plattform übernommen.",
-    "d4T": "Wirklich global — 128 Länder",
-    "d4D": "Vom Silicon Valley bis Bangalore, von Berlin bis São Paulo. Über 12.400 geprüfte Spezialisten in allen Zeitzonen, bereit nach Ihrem Zeitplan zu starten.",
+    "d4T": "Wirklich weltweit",
+    "d4D": "Vom Silicon Valley bis Bangalore, von Berlin bis São Paulo. Die Oberfläche spricht 12 Sprachen, damit jeder in seiner eigenen arbeiten kann.",
     "d5T": "Sie rechnen direkt ab, wir nehmen nichts",
     "d5D": "Die Plattform ist kein Zahlungsvermittler. Auftraggeber und Spezialist vereinbaren und rechnen untereinander ab — genau deshalb ist unsere Provision null, es gibt schlicht nichts abzuziehen.",
-    "d6T": "Geprüft, bewertet, verifiziert",
-    "d6D": "Jeder Spezialist durchläuft eine Skill-Prüfung. Bewertungen sind echt, Rezensionen stammen von echten Auftraggebern. Keine Fake-Profile, keine aufgeblähten Werte.",
+    "d6T": "Profile, Portfolios und Bewertungen",
+    "d6D": "Hinter jedem Profil steht sichtbare Arbeit: Portfolio, Beschreibung und Bewertungen von Auftraggebern, die tatsächlich beauftragt haben. Kaufen lässt sich hier nichts — bezahlte Platzierungen gibt es nicht.",
     "compareTitle": "Wie wir im Vergleich abschneiden",
     "compareNote": "* Toptal berechnet Auftraggebern rund 40 % Aufschlag auf den Satz des Spezialisten",
     "colFeature": "Merkmal",
@@ -313,7 +296,7 @@
     "t3Q": "Uns ist wichtig, dass Projektdaten nicht im Speicher eines US-Konzerns liegen. AI Market war die einzige ernsthafte Option.",
     "t3R": "Gründer, FinTech",
     "ctaTitle": "Bereit, mit KI-Spezialisten ohne Provision zu arbeiten?",
-    "ctaDesc": "Schließen Sie sich über 12.400 Spezialisten und Tausenden Auftraggebern an.",
+    "ctaDesc": "Konto anlegen und direkt ins Gespräch kommen. Kostenlos.",
     "ctaEarn": "Mehr verdienen",
     "vDirect": "Direkt zwischen den Parteien",
     "vThroughPlatform": "Über die Plattform"
@@ -337,7 +320,7 @@
     "q3": "Ist die Registrierung kostenlos?",
     "a3": "Ja, vollständig kostenlos für Auftraggeber wie für Spezialisten. Auf Transaktionen erheben wir keine Provision.",
     "q4": "In welchen Ländern funktioniert AI Marketplace?",
-    "a4": "Die Plattform ist in 128 Ländern verfügbar. Welche Zahlungsmethoden möglich sind, hängt vom Land ab — schreiben Sie uns bei Fragen zu einer bestimmten Methode in Ihrer Region.",
+    "a4": "Die Plattform steht weltweit offen. Zahlungen laufen nicht über sie: Methode und Währung wählen Auftraggeber und Spezialist selbst und rechnen direkt ab.",
     "q5": "Wie stelle ich ein Projekt ein?",
     "a5": "Nach der Anmeldung öffnen Sie Projekte → Neues Projekt. Beschreiben Sie die Aufgabe, legen Sie ein Budget fest und wählen Sie Festpreis oder Stundenabrechnung. Passende Spezialisten sehen das Projekt sofort.",
     "q6": "Wie läuft die Bezahlung ab?",
@@ -374,7 +357,7 @@
   },
   "hire": {
     "heroTitle": "KI-Spezialisten nach Fähigkeit finden",
-    "heroDesc": "Über 12.400 geprüfte KI-Spezialisten in neun Kategorien. Wählen Sie eine Fähigkeit und sehen Sie sofort passende Leute.",
+    "heroDesc": "KI-Spezialisten in 9 Kategorien. Wählen Sie eine Fähigkeit und sehen Sie sofort passende Profile.",
     "explore": "Ansehen: {category}",
     "c1": "KI und Automatisierung",
     "t1": "Sehen Sie, wie KI-Spezialisten Ihre Abläufe und Ihr Produkt verändern.",

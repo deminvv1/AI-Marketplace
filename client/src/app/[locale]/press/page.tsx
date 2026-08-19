@@ -7,15 +7,14 @@ import { Download, Mail } from "lucide-react";
 
 export default function PressPage() {
   const t = useTranslations("press");
-  const tAbout = useTranslations("about");
+  const tStats = useTranslations("stats");
   const locale = useLocale();
   const isRtl = locale === "ar";
 
   const STATS: { value: string; label: string }[] = [
-    { value: "2024",     label: tAbout("statFounded") },
-    { value: "12,400+",  label: tAbout("statSpecialists") },
-    { value: "128",      label: tAbout("statCountries") },
-    { value: "0%",       label: tAbout("statCommission") },
+    { value: "0%", label: tStats("commissionLabel") },
+    { value: "12", label: tStats("languagesLabel") },
+    { value: "26", label: tStats("categoriesLabel") },
   ];
 
   return (

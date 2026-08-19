@@ -13,7 +13,6 @@
     "headline1": "Find AI specialists",
     "headline2": "who deliver results",
     "searchPlaceholder": "Search for any service...",
-    "trustedBy": "Trusted by:",
     "onlineLabel": "Specialists Online",
     "chips": [
       "AI Development",
@@ -23,20 +22,15 @@
       "Industry 4.0"
     ]
   },
-  "trusted": {
-    "label": "Trusted by 800,000+ clients"
-  },
   "stats": {
-    "title": "The world's leading AI talent network",
-    "description": "From startups to Fortune 500 — companies of every size trust AI Marketplace to find the talent that moves them forward.",
-    "specialistsValue": "12,400+",
-    "specialistsLabel": "AI Specialists",
-    "countriesValue": "128",
-    "countriesLabel": "Countries",
+    "title": "How the platform works",
+    "description": "No commission and no intermediary. The client and the specialist agree the terms and settle directly with each other.",
     "commissionValue": "0%",
-    "commissionLabel": "Commission Fee",
-    "ratingValue": "4.9★",
-    "ratingLabel": "Avg. Rating"
+    "commissionLabel": "Platform commission",
+    "languagesValue": "12",
+    "languagesLabel": "Interface languages",
+    "categoriesValue": "26",
+    "categoriesLabel": "AI categories"
   },
   "categories": {
     "title": "AI specialists across every industry",
@@ -58,7 +52,7 @@
     "h1Title": "Post your project",
     "h1Desc": "Tell us what you need and your budget. Get matched with top-rated specialists in minutes.",
     "h2Title": "Review proposals",
-    "h2Desc": "Compare profiles, portfolios, and hourly rates from vetted specialists. Chat before you hire.",
+    "h2Desc": "Compare profiles, portfolios and rates. Chat before you hire.",
     "h3Title": "Agree the terms directly",
     "h3Desc": "Discuss scope, deadline and payment in the chat. The platform stays out of the settlement — which is why our commission is zero.",
     "w1Title": "Create your profile",
@@ -67,9 +61,6 @@
     "w2Desc": "Find projects that match your expertise. Write a proposal and stand out from the crowd.",
     "w3Title": "Get paid securely",
     "w3Desc": "Work tracked, hours logged, money secured. Get paid via your preferred method globally."
-  },
-  "testimonials": {
-    "title": "Proven results on AI Marketplace"
   },
   "cta": {
     "headline": "Find AI specialists who can help you build what's next",
@@ -103,10 +94,6 @@
   "about": {
     "heroTitle": "We're building the platform AI specialists deserve",
     "heroDesc": "AI Marketplace was created because every existing platform takes 10–20% from specialists who already work hard to build the future. We said no to that model — and built something better.",
-    "statFounded": "Founded",
-    "statSpecialists": "Verified specialists",
-    "statCountries": "Countries",
-    "statCommission": "Commission",
     "v1Title": "Specialists first",
     "v1Desc": "Every product decision starts with one question: does this help specialists earn more and work better? We never take a cut of their income.",
     "v2Title": "Transparency",
@@ -225,7 +212,7 @@
   },
   "press": {
     "title": "Press",
-    "lead": "AI Marketplace connects clients with vetted AI specialists in 128 countries, with zero commission on specialist earnings. Founded in 2024.",
+    "lead": "AI Marketplace connects clients with AI specialists around the world: no commission on what specialists earn, and no payments passing through the platform.",
     "kitTitle": "Press kit",
     "kitDesc": "Logos in SVG and PNG, brand colours, product screenshots, founder photos and biographies, and current platform statistics. Available on request.",
     "kitCta": "Request press kit",
@@ -235,11 +222,11 @@
   },
   "meta": {
     "title": "AI Marketplace — hire AI specialists worldwide",
-    "description": "The international platform connecting AI specialists with clients in 128 countries. Zero commission on specialist earnings.",
+    "description": "The international platform connecting AI specialists with clients around the world. No commission on specialist earnings.",
     "ogTitle": "AI Marketplace",
-    "ogDescription": "Hire vetted AI specialists, or find AI work. 128 countries, 0% commission.",
+    "ogDescription": "Hire AI specialists, or find AI work. No commission, direct contact.",
     "hireTitle": "Hire AI specialists — 9 categories | AI Marketplace",
-    "hireDesc": "Browse AI developers, ML engineers, data scientists and automation experts by category. Vetted specialists in 128 countries, 0% commission.",
+    "hireDesc": "Browse AI developers, ML engineers, data scientists and automation experts by category. No commission, direct contact with specialists.",
     "workTitle": "Find AI work and projects | AI Marketplace",
     "workDesc": "Browse open AI projects by category — machine learning, computer vision, automation, data. Keep 100% of what you earn.",
     "helpTitle": "Help Center — clients and specialists | AI Marketplace",
@@ -258,15 +245,11 @@
     "privacyDesc": "What personal data AI Marketplace collects, why, how long it is kept, and the rights you have over it."
   },
   "why": {
-    "badge": "4.9 average rating · 12,400+ specialists",
+    "badge": "0% commission · direct contact",
     "heroTitle": "The AI talent platform that actually works for you",
-    "heroDesc": "Not another generic freelancing site with an AI category bolted on. We are built from the ground up for the AI economy — zero commission, verified specialists, and your data on our own infrastructure.",
+    "heroDesc": "Not another generic freelancing site with an AI category bolted on. Built from the ground up for the AI economy — no commission, and you deal directly with the person doing the work.",
     "ctaFind": "Find a specialist",
     "ctaJoin": "Join as a specialist",
-    "statCommission": "Platform commission",
-    "statSpecialists": "Verified specialists",
-    "statCountries": "Countries represented",
-    "statEarnings": "Avg. specialist earnings vs competitors",
     "diffTitle": "Why specialists and clients choose us",
     "diffSubtitle": "We built what we wished existed — a platform with no conflict of interest between specialists and the platform itself.",
     "d1T": "0% commission — ever",
@@ -275,12 +258,12 @@
     "d2D": "Because we don't skim your income, specialists here consistently earn more per project than on competing platforms — at the very same rate card.",
     "d3T": "Built for AI, not adapted to it",
     "d3D": "Every category, filter and matching rule is designed around AI skills — not repurposed from a generic freelancing platform.",
-    "d4T": "Genuinely global — 128 countries",
-    "d4D": "From Silicon Valley to Bangalore, from Berlin to São Paulo. 12,400+ vetted specialists across every timezone, ready to start on your schedule.",
+    "d4T": "Genuinely global",
+    "d4D": "From Silicon Valley to Bangalore, from Berlin to São Paulo. The interface speaks 12 languages, so people can work in their own.",
     "d5T": "You settle directly, we take nothing",
     "d5D": "The platform is not a payment intermediary. Client and specialist agree the terms and settle between themselves — which is precisely why our commission is zero and there is nothing to deduct.",
-    "d6T": "Vetted, rated, verified",
-    "d6D": "Every specialist passes skill verification. Ratings are real and reviews come from real clients. No fake profiles, no inflated scores.",
+    "d6T": "Profiles, portfolios and reviews",
+    "d6D": "Every profile shows the work behind it: portfolio, description, and reviews from clients who actually hired. Nothing here can be bought — there are no paid placements.",
     "compareTitle": "How we compare",
     "compareNote": "* Toptal charges clients roughly a 40% markup over the specialist rate",
     "colFeature": "Feature",
@@ -313,7 +296,7 @@
     "t3Q": "It matters to us that project data isn't sitting in a bucket owned by a US megacorp. AI Market was the only serious option.",
     "t3R": "Founder, FinTech",
     "ctaTitle": "Ready to work with AI specialists at zero commission?",
-    "ctaDesc": "Join 12,400+ specialists and thousands of clients already on the platform.",
+    "ctaDesc": "Create an account and start talking to people directly. It costs nothing.",
     "ctaEarn": "Start earning more",
     "vDirect": "Directly between the parties",
     "vThroughPlatform": "Through the platform"
@@ -337,7 +320,7 @@
     "q3": "Is registration free?",
     "a3": "Yes, completely free for clients and specialists alike. We take 0% commission on every transaction.",
     "q4": "Which countries can use AI Marketplace?",
-    "a4": "The platform works in 128 countries. Available payment methods depend on your country — write to us if you have a question about a specific method in your region.",
+    "a4": "The platform is open worldwide. Payments do not pass through it: the client and the specialist agree the method and the currency themselves and settle directly.",
     "q5": "How do I post a project?",
     "a5": "After signing in, go to Projects → New project. Describe the task, set a budget and choose fixed price or hourly billing. The project becomes visible to matching specialists straight away.",
     "q6": "How does payment work?",
@@ -374,7 +357,7 @@
   },
   "hire": {
     "heroTitle": "Find AI talent by skill",
-    "heroDesc": "Browse 12,400+ verified AI specialists across 9 categories. Pick a skill to see matching specialists straight away.",
+    "heroDesc": "Browse AI specialists across 9 categories. Pick a skill to see matching specialists straight away.",
     "explore": "Explore {category}",
     "c1": "AI & Automation",
     "t1": "See how AI specialists can reshape your workflows and your product.",

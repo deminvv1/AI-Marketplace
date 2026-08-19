@@ -9,7 +9,7 @@ import {
   FileText, MessagesSquare, CheckCircle2, Lock, BadgeCheck, Star, Flag,
 } from "lucide-react";
 
-const STAT_VALUES = ["2024", "12,400+", "128", "0%"];
+const STAT_VALUES = ["0%", "12", "26"];
 const VALUE_ICONS = [TrendingUp, ShieldCheck, Globe, Zap];
 const VALUE_KEYS = ["v1", "v2", "v3", "v4"] as const;
 
@@ -28,10 +28,12 @@ const TEAM = [
   { name: "Daniel R.", role: "Head of Product", bio: "Ex-Upwork product manager. Spent 4 years understanding exactly what freelancing platforms get wrong." },
 ];
 
-const STAT_KEYS = ["statFounded", "statSpecialists", "statCountries", "statCommission"] as const;
+const STAT_KEYS = ["commissionLabel", "languagesLabel", "categoriesLabel"] as const;
 
 export default function AboutPage() {
   const t = useTranslations("about");
+  // Подписи под числами общие для всех страниц — живут в разделе stats.
+  const tStats = useTranslations("stats");
   const locale = useLocale();
   const p = locale === "en" ? "" : `/${locale}`;
   const isRtl = locale === "ar";
@@ -58,7 +60,7 @@ export default function AboutPage() {
           {STAT_KEYS.map((key, i) => (
             <div key={key} style={{ textAlign: "center" }}>
               <div style={{ fontSize: "clamp(1.8rem,3vw,2.4rem)", fontWeight: 800, color: "#4338ca", letterSpacing: "-0.03em" }}>{STAT_VALUES[i]}</div>
-              <div style={{ fontSize: "0.82rem", color: "#6b7280", marginTop: 4 }}>{t(key)}</div>
+              <div style={{ fontSize: "0.82rem", color: "#6b7280", marginTop: 4 }}>{tStats(key)}</div>
             </div>
           ))}
         </div>

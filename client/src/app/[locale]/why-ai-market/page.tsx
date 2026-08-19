@@ -10,8 +10,8 @@ const DIFF_ICONS = [DollarSign, TrendingUp, Zap, Globe, ShieldCheck, Award];
 const DIFF_KEYS = ["d1", "d2", "d3", "d4", "d5", "d6"] as const;
 const DIFF_ACCENTS = ["#6366f1", "#8b5cf6", "#6366f1", "#8b5cf6", "#6366f1", "#8b5cf6"];
 
-const STAT_VALUES = ["0%", "12,400+", "128", "+35%"];
-const STAT_KEYS = ["statCommission", "statSpecialists", "statCountries", "statEarnings"] as const;
+const STAT_VALUES = ["0%", "12", "26"];
+const STAT_KEYS = ["commissionLabel", "languagesLabel", "categoriesLabel"] as const;
 
 const TESTIMONIAL_KEYS = [
   { q: "t1Q", r: "t1R", name: "Arjun M.", country: "🇮🇳" },
@@ -40,6 +40,8 @@ const COMPETITORS = ["Upwork", "Fiverr", "Toptal", "FL.ru", "Kwork"];
 
 export default function WhyAIMarket() {
   const t = useTranslations("why");
+  // Подписи под числами общие для всех страниц — живут в разделе stats.
+  const tStats = useTranslations("stats");
   const locale = useLocale();
   const isRtl = locale === "ar";
   const p = locale === "en" ? "" : `/${locale}`;
@@ -81,7 +83,7 @@ export default function WhyAIMarket() {
           {STAT_KEYS.map((key, i) => (
             <div key={key} style={{ textAlign: "center" }}>
               <div style={{ fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 800, color: "#4338ca", letterSpacing: "-0.03em" }}>{STAT_VALUES[i]}</div>
-              <div style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 4 }}>{t(key)}</div>
+              <div style={{ fontSize: "0.8rem", color: "#6b7280", marginTop: 4 }}>{tStats(key)}</div>
             </div>
           ))}
         </div>

@@ -13,7 +13,6 @@
     "headline1": "Sonuç üreten",
     "headline2": "AI uzmanlarını bulun",
     "searchPlaceholder": "Hizmet veya uzman ara...",
-    "trustedBy": "Güvenen kurumlar:",
     "onlineLabel": "Uzman Çevrimiçi",
     "chips": [
       "AI Geliştirme",
@@ -23,20 +22,15 @@
       "Endüstri 4.0"
     ]
   },
-  "trusted": {
-    "label": "800.000'den fazla müşterinin tercihi"
-  },
   "stats": {
-    "title": "Dünyanın önde gelen AI yetenek ağı",
-    "description": "Startuplardan Fortune 500 şirketlerine — her ölçekteki işletme, ilerlemeyi sağlayan yetenekleri AI Marketplace'te buluyor.",
-    "specialistsValue": "12.400+",
-    "specialistsLabel": "AI Uzmanı",
-    "countriesValue": "128",
-    "countriesLabel": "Ülke",
-    "commissionValue": "%0",
-    "commissionLabel": "Komisyon",
-    "ratingValue": "4,9★",
-    "ratingLabel": "Ort. Puan"
+    "title": "Platform nasıl işliyor",
+    "description": "Ne komisyon var ne aracı. Koşulları işveren ile uzman kendisi belirler ve doğrudan ödeşir.",
+    "commissionValue": "0%",
+    "commissionLabel": "Platform komisyonu",
+    "languagesValue": "12",
+    "languagesLabel": "Arayüz dili",
+    "categoriesValue": "26",
+    "categoriesLabel": "YZ kategorisi"
   },
   "categories": {
     "title": "Her sektör için AI uzmanları",
@@ -58,7 +52,7 @@
     "h1Title": "Projenizi yayınlayın",
     "h1Desc": "İhtiyacınızı ve bütçenizi anlatın. En iyi uzmanlarla dakikalar içinde eşleşelim.",
     "h2Title": "Teklifleri değerlendirin",
-    "h2Desc": "Onaylı uzmanların profillerini, portfolyolarını ve ücretlerini karşılaştırın. İşe almadan önce sohbet edin.",
+    "h2Desc": "Profilleri, portföyleri ve ücretleri karşılaştırın. İş vermeden önce konuşun.",
     "h3Title": "Koşulları doğrudan konuşun",
     "h3Desc": "Kapsamı, süreyi ve ödemeyi sohbette konuşun. Platform ödemeye karışmaz — komisyonumuzun sıfır olmasının sebebi bu.",
     "w1Title": "Profilinizi oluşturun",
@@ -67,9 +61,6 @@
     "w2Desc": "Uzmanlığınıza uygun projeler bulun. Öne çıkan bir teklif yazın.",
     "w3Title": "Güvenle ödeme alın",
     "w3Desc": "İş takip edilir, para güvende. Tercih ettiğiniz yöntemle dünya genelinde çekim yapın."
-  },
-  "testimonials": {
-    "title": "AI Marketplace'teki gerçek başarılar"
   },
   "cta": {
     "headline": "Bir sonraki büyük projeniz için AI uzmanlarını bulun",
@@ -103,10 +94,6 @@
   "about": {
     "heroTitle": "Yapay zeka uzmanlarının hak ettiği platformu inşa ediyoruz",
     "heroDesc": "AI Marketplace, mevcut her platformun geleceği inşa etmek için zaten çok çalışan uzmanlardan %10–20 komisyon alması nedeniyle doğdu. Bu modele hayır dedik ve daha iyisini inşa ettik.",
-    "statFounded": "Kuruluş",
-    "statSpecialists": "Doğrulanmış uzman",
-    "statCountries": "Ülke",
-    "statCommission": "Komisyon",
     "v1Title": "Uzmanlar önce gelir",
     "v1Desc": "Her ürün kararı tek bir soruyla başlar: bu uzmanların daha fazla kazanmasına ve daha iyi çalışmasına yardımcı oluyor mu? Gelirlerinden hiçbir zaman pay almayız.",
     "v2Title": "Şeffaflık",
@@ -225,7 +212,7 @@
   },
   "press": {
     "title": "Basın",
-    "lead": "AI Marketplace, 128 ülkede müşterileri incelenmiş yapay zekâ uzmanlarıyla buluşturur ve uzman kazancından komisyon almaz. 2024'te kuruldu.",
+    "lead": "AI Marketplace dünyanın her yerinden işverenleri ve yapay zekâ uzmanlarını buluşturur: uzmanın kazancından komisyon alınmaz ve ödemeler platform üzerinden geçmez.",
     "kitTitle": "Basın kiti",
     "kitDesc": "SVG ve PNG logolar, marka renkleri, ürün ekran görüntüleri, kurucuların fotoğrafları ve özgeçmişleri, güncel platform istatistikleri. Talep üzerine.",
     "kitCta": "Basın kiti isteyin",
@@ -235,11 +222,11 @@
   },
   "meta": {
     "title": "AI Marketplace — dünya genelinde yapay zekâ uzmanları",
-    "description": "Yapay zekâ uzmanlarını ve işverenleri 128 ülkede buluşturan uluslararası platform. Uzman kazancından sıfır komisyon.",
+    "description": "Yapay zekâ uzmanlarını ve işverenleri dünya genelinde buluşturan uluslararası platform. Uzman kazancından komisyon alınmaz.",
     "ogTitle": "AI Marketplace",
-    "ogDescription": "İncelenmiş yapay zekâ uzmanları bulun ya da iş bulun. 128 ülke, %0 komisyon.",
+    "ogDescription": "Yapay zekâ uzmanı bulun ya da YZ işi bulun. Komisyon yok, doğrudan iletişim.",
     "hireTitle": "Yapay zekâ uzmanı bulun — 9 kategori | AI Marketplace",
-    "hireDesc": "Yapay zekâ geliştiricileri, ML mühendisleri, veri bilimciler ve otomasyon uzmanları kategoriye göre. 128 ülkede incelenmiş uzmanlar, %0 komisyon.",
+    "hireDesc": "YZ geliştiricileri, ML mühendisleri, veri bilimciler ve otomasyon uzmanları — kategoriye göre. Komisyon yok, doğrudan iletişim.",
     "workTitle": "Yapay zekâ işleri ve projeleri bulun | AI Marketplace",
     "workDesc": "Kategoriye göre açık yapay zekâ projeleri: makine öğrenmesi, bilgisayarlı görü, otomasyon, veri. Kazancınızın %100'ü sizde kalır.",
     "helpTitle": "Yardım merkezi — işveren ve uzman soruları | AI Marketplace",
@@ -258,15 +245,11 @@
     "privacyDesc": "AI Marketplace hangi kişisel verileri toplar, neden, ne kadar süre saklar ve bu veriler üzerinde hangi haklarınız var."
   },
   "why": {
-    "badge": "Ortalama puan 4,9 · 12.400'den fazla uzman",
+    "badge": "%0 komisyon · doğrudan iletişim",
     "heroTitle": "Gerçekten sizin için çalışan yapay zekâ yetenek platformu",
-    "heroDesc": "Üzerine yapay zekâ kategorisi eklenmiş sıradan bir serbest çalışma sitesi değil. Yapay zekâ ekonomisi için sıfırdan kurulduk: sıfır komisyon, doğrulanmış uzmanlar ve kendi altyapımızda duran verileriniz.",
+    "heroDesc": "Yanına «YZ» bölümü eklenmiş sıradan bir freelance sitesi değil. Baştan yapay zekâ için kuruldu: komisyon yok ve işi yapacak kişiyle doğrudan konuşuyorsunuz.",
     "ctaFind": "Uzman bul",
     "ctaJoin": "Uzman olarak katıl",
-    "statCommission": "Platform komisyonu",
-    "statSpecialists": "Doğrulanmış uzman",
-    "statCountries": "Temsil edilen ülke",
-    "statEarnings": "Uzman ortalama kazancı (rakiplere göre)",
     "diffTitle": "Uzmanlar ve işverenler neden bizi seçiyor",
     "diffSubtitle": "Kendimizin aradığı şeyi kurduk: uzmanlarıyla çıkar çatışması olmayan bir platform.",
     "d1T": "%0 komisyon — kalıcı olarak",
@@ -275,12 +258,12 @@
     "d2D": "Gelirinizden pay almadığımız için aynı ücret tarifesiyle proje başına elinizde rakip platformlara göre belirgin şekilde daha fazlası kalır.",
     "d3T": "Yapay zekâ için kuruldu, sonradan uyarlanmadı",
     "d3D": "Her kategori, her filtre ve her eşleştirme kuralı yapay zekâ becerileri etrafında tasarlandı; genel bir serbest çalışma platformundan devşirilmedi.",
-    "d4T": "Gerçekten küresel — 128 ülke",
-    "d4D": "Silikon Vadisi'nden Bangalore'a, Berlin'den São Paulo'ya. Tüm saat dilimlerinde 12.400'den fazla incelenmiş uzman, size uygun zamanda başlamaya hazır.",
+    "d4T": "Gerçekten dünya çapında",
+    "d4D": "Silikon Vadisi'nden Bangalore'a, Berlin'den São Paulo'ya. Arayüz 12 dil konuşuyor, herkes kendi dilinde çalışsın diye.",
     "d5T": "Doğrudan ödersiniz, biz hiçbir şey almayız",
     "d5D": "Platform bir ödeme aracısı değildir. İşveren ile uzman kendi aralarında anlaşır ve ödeşir — komisyonumuzun sıfır olmasının nedeni tam da bu; kesecek bir şey yok.",
-    "d6T": "İncelenmiş, puanlanmış, doğrulanmış",
-    "d6D": "Her uzman beceri doğrulamasından geçer. Puanlar gerçek, yorumlar gerçek işverenlerden. Sahte profil yok, şişirilmiş puan yok.",
+    "d6T": "Profiller, portföyler ve değerlendirmeler",
+    "d6D": "Her profilin arkasında görünen bir iş var: portföy, açıklama ve gerçekten iş veren müşterilerin yorumları. Burada satın alınabilecek hiçbir şey yok — ücretli öne çıkarma yapılmıyor.",
     "compareTitle": "Rakiplerle karşılaştırma",
     "compareNote": "* Toptal, uzman ücretinin üzerine işverenden yaklaşık %40 ek alır",
     "colFeature": "Özellik",
@@ -313,7 +296,7 @@
     "t3Q": "Proje verilerinin bir ABD devinin deposunda durmaması bizim için önemli. AI Market tek ciddi seçenekti.",
     "t3R": "Kurucu, FinTech",
     "ctaTitle": "Yapay zekâ uzmanlarıyla komisyonsuz çalışmaya hazır mısınız?",
-    "ctaDesc": "Platformdaki 12.400'den fazla uzmana ve binlerce işverene katılın.",
+    "ctaDesc": "Hesap açın ve doğrudan konuşmaya başlayın. Ücretsiz.",
     "ctaEarn": "Daha fazla kazanmaya başla",
     "vDirect": "Taraflar arasında doğrudan",
     "vThroughPlatform": "Platform üzerinden"
@@ -337,7 +320,7 @@
     "q3": "Kayıt ücretsiz mi?",
     "a3": "Evet, hem işverenler hem uzmanlar için tamamen ücretsiz. İşlemlerden komisyon almıyoruz.",
     "q4": "AI Marketplace hangi ülkelerde çalışıyor?",
-    "a4": "Platform 128 ülkede kullanılabiliyor. Ödeme yöntemleri ülkeye göre değişir — bölgenizdeki belirli bir yöntemi merak ediyorsanız bize yazın.",
+    "a4": "Platform dünya genelinde açıktır. Ödemeler buradan geçmez: yöntemi ve para birimini işveren ile uzman kendisi seçer ve doğrudan ödeşir.",
     "q5": "Projeyi nasıl yayınlarım?",
     "a5": "Giriş yaptıktan sonra Projeler → Yeni proje bölümüne gidin. İşi anlatın, bütçe belirleyin ve sabit fiyat mı saatlik mi olacağını seçin. Proje, uygun uzmanlara anında görünür.",
     "q6": "Ödeme nasıl işliyor?",
@@ -374,7 +357,7 @@
   },
   "hire": {
     "heroTitle": "Yapay zekâ uzmanını yeteneğe göre bulun",
-    "heroDesc": "Dokuz kategoride 12.400'den fazla incelenmiş uzman. Bir yetenek seçin, uygun kişileri hemen görün.",
+    "heroDesc": "9 kategoride yapay zekâ uzmanları. Bir beceri seçin, uygun kişileri hemen görün.",
     "explore": "İncele: {category}",
     "c1": "Yapay zekâ ve otomasyon",
     "t1": "Yapay zekâ uzmanlarının süreçlerinizi ve ürününüzü nasıl dönüştürdüğünü görün.",

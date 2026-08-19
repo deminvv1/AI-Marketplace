@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
+import { FaqSchema } from "@/components/seo/structured-data";
 import { ChevronDown, Mail, MessageCircle, FileText } from "lucide-react";
 
 /** Category key → the question/answer key pairs it holds. */
@@ -52,6 +53,15 @@ export default function HelpPage() {
   ];
 
   return (
+    <>
+      {/* Все 19 вопросов уходят в разметку — Google и Яндекс раскрывают их
+          прямо в выдаче. Тексты те же, что на странице: расхождение считается
+          обманом поисковика. */}
+      <FaqSchema
+        items={FAQ_GROUPS.flatMap(({ items }) =>
+          items.map((n) => ({ question: t(`q${n}`), answer: t(`a${n}`) })),
+        )}
+      />
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
@@ -108,5 +118,6 @@ export default function HelpPage() {
 
       <Footer />
     </div>
+    </>
   );
 }

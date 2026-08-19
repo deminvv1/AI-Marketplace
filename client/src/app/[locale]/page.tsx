@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/landing/Header";
 import { Footer } from "@/components/landing/Footer";
+import { OrganizationSchema, WebSiteSchema } from "@/components/seo/structured-data";
 import GlobeGL from "@/components/globe/GlobeGL";
 
 // ── Star canvas ───────────────────────────────────────────────────────────────
@@ -87,14 +88,6 @@ function HeroSection() {
           ))}
         </div>
 
-        <div className="hero-trusted-row" style={{ marginTop: "2.8rem", display: "flex", alignItems: "center", gap: "1.8rem", flexWrap: "wrap" }}>
-          <span style={{ color: "rgba(255,255,255,0.45)", fontSize: "0.8rem", letterSpacing: "0.06em", textTransform: "uppercase" }}>
-            {t("trustedBy")}
-          </span>
-          {["Airbnb", "Google", "Microsoft", "Meta", "Netflix"].map((name) => (
-            <span key={name} style={{ color: "rgba(255,255,255,0.6)", fontSize: "0.92rem", fontWeight: 600, letterSpacing: "-0.01em" }}>{name}</span>
-          ))}
-        </div>
       </div>
 
       <div style={{ position: "absolute", bottom: 28, left: 28, zIndex: 20, background: "rgba(6,10,28,0.80)", backdropFilter: "blur(18px)", border: "1px solid rgba(100,135,255,0.2)", borderRadius: 14, padding: "0.55rem 1.1rem", display: "flex", alignItems: "center", gap: 10 }}>
@@ -109,30 +102,16 @@ function HeroSection() {
 }
 
 // ── Trusted logos strip ───────────────────────────────────────────────────────
-const LOGOS = ["Airbnb", "Databricks", "Cloudflare", "Microsoft", "Grammarly", "BambooHR", "Shutterstock"];
-
-function TrustedSection() {
-  const t = useTranslations("trusted");
-  return (
-    <div style={{ background: "#fafafa", borderTop: "1px solid #f0f0f0", borderBottom: "1px solid #f0f0f0", padding: "20px 0", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px", display: "flex", alignItems: "center", gap: "2.5rem", flexWrap: "wrap", justifyContent: "center" }}>
-        <span style={{ fontSize: "0.78rem", color: "#9ca3af", letterSpacing: "0.06em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{t("label")}</span>
-        {LOGOS.map((l) => (
-          <span key={l} style={{ fontSize: "0.95rem", fontWeight: 700, color: "#6b7280", letterSpacing: "-0.01em" }}>{l}</span>
-        ))}
-      </div>
-    </div>
-  );
-}
 
 // ── Stats ─────────────────────────────────────────────────────────────────────
 function StatsSection() {
   const t = useTranslations("stats");
+  // Только проверяемые числа: комиссия, языки, категории. Выдуманные
+  // «12 400+ специалистов» и «4.9 рейтинг» убраны — в базе их нет.
   const STATS = [
-    { value: t("specialistsValue"), label: t("specialistsLabel") },
-    { value: t("countriesValue"),   label: t("countriesLabel") },
-    { value: t("commissionValue"),  label: t("commissionLabel") },
-    { value: t("ratingValue"),      label: t("ratingLabel") },
+    { value: t("commissionValue"), label: t("commissionLabel") },
+    { value: t("languagesValue"),  label: t("languagesLabel") },
+    { value: t("categoriesValue"), label: t("categoriesLabel") },
   ];
   return (
     <section style={{ padding: "64px 24px", background: "#fff", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }}>
@@ -271,44 +250,6 @@ function HowItWorksSection() {
   );
 }
 
-// ── Testimonials ──────────────────────────────────────────────────────────────
-const TESTIMONIALS = [
-  { quote: "We discovered CTO-level AI expertise on the platform—someone who accelerated our roadmap from months to weeks.", name: "Sarah M.", role: "CEO", company: "TechVenture", initials: "SM", color: "#0ea5e9" },
-  { quote: "AI Marketplace isn't just a hiring platform—it's a strategic partner. It helped us fill every technical gap.", name: "Marcus L.", role: "Co-Founder & CEO", company: "DataFlow", initials: "ML", color: "#14a800" },
-  { quote: "I found two incredible AI developers and ended up hiring both. The global pool of talent is exceptional.", name: "Julia K.", role: "Marketing Director", company: "GrowthCo", initials: "JK", color: "#f59e0b" },
-  { quote: "This platform is paramount to our success. We fully consider our AI specialists part of our team.", name: "Daniel R.", role: "CTO", company: "BuildStack", initials: "DR", color: "#8b5cf6" },
-  { quote: "We needed to be lean and targeted. AI Marketplace helped us find people who are heart-driven and technically excellent.", name: "Amanda P.", role: "Founder & CEO", company: "ScaleOps", initials: "AP", color: "#ec4899" },
-  { quote: "The safety features are great, but what builds our confidence is consistently finding experts who deliver on complex AI projects.", name: "Leo T.", role: "Product Lead", company: "InnovateCo", initials: "LT", color: "#ef4444" },
-];
-
-function TestimonialsSection() {
-  const t = useTranslations("testimonials");
-  return (
-    <section style={{ padding: "72px 0", background: "#fff", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto", padding: "0 24px" }}>
-        <h2 style={{ fontSize: "clamp(1.6rem,3vw,2.2rem)", fontWeight: 700, color: "#111827", marginBottom: "2.5rem", letterSpacing: "-0.02em" }}>{t("title")}</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 300px), 1fr))", gap: 20 }}>
-          {TESTIMONIALS.map((item) => (
-            <div key={item.name} style={{ border: "1px solid #e5e7eb", borderRadius: 12, padding: "28px 28px 24px", background: "#fff", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 20 }}>
-              <p style={{ fontSize: "0.9rem", color: "#374151", lineHeight: 1.65, fontStyle: "italic" }}>{`“${item.quote}”`}</p>
-              <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                <div style={{ width: 42, height: 42, borderRadius: "50%", background: item.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "0.78rem", fontWeight: 700, flexShrink: 0 }}>{item.initials}</div>
-                <div>
-                  <div style={{ fontSize: "0.88rem", fontWeight: 600, color: "#111827" }}>{item.name}</div>
-                  <div style={{ fontSize: "0.78rem", color: "#6b7280" }}>{item.role}, {item.company}</div>
-                </div>
-                <div style={{ marginLeft: "auto", display: "flex", gap: 2 }}>
-                  {[...Array(5)].map((_, i) => <Star key={i} size={12} style={{ fill: "#f59e0b", color: "#f59e0b" }} />)}
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // ── CTA ───────────────────────────────────────────────────────────────────────
 function CTASection() {
   const t = useTranslations("cta");
@@ -328,21 +269,25 @@ function CTASection() {
 
 // ── Page ──────────────────────────────────────────────────────────────────────
 export default function LocaleLandingPage() {
+  const locale = useLocale();
+  const tMeta = useTranslations("meta");
+
   return (
     <main>
+      {/* Описание сайта для Google и Яндекса. Текст берём тот же, что в
+          описании страницы, — расхождение поисковики считают обманом. */}
+      <OrganizationSchema locale={locale} description={tMeta("description")} />
+      <WebSiteSchema locale={locale} />
       <style>{`
         @media (max-width: 767px) {
           .cta-inner-box { padding: 40px 20px !important; border-radius: 12px !important; }
-          .hero-trusted-row { gap: 0.6rem 1rem !important; margin-top: 1.6rem !important; }
         }
       `}</style>
       <Header />
       <HeroSection />
-      <TrustedSection />
       <StatsSection />
       <CategoriesSection />
       <HowItWorksSection />
-      <TestimonialsSection />
       <CTASection />
       <Footer />
     </main>

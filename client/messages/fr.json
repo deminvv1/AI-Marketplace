@@ -13,7 +13,6 @@
     "headline1": "Trouvez des experts en IA",
     "headline2": "qui livrent des résultats concrets",
     "searchPlaceholder": "Rechercher un service ou un expert...",
-    "trustedBy": "Ils nous font confiance :",
     "onlineLabel": "Experts en ligne",
     "chips": [
       "Développement IA",
@@ -23,20 +22,15 @@
       "Industrie 4.0"
     ]
   },
-  "trusted": {
-    "label": "Plus de 800 000 clients nous font confiance"
-  },
   "stats": {
-    "title": "Le premier réseau mondial de talents en IA",
-    "description": "Des startups aux entreprises du Fortune 500 — toutes tailles confondues font confiance à AI Marketplace pour trouver les talents qui les font avancer.",
-    "specialistsValue": "12 400+",
-    "specialistsLabel": "Experts en IA",
-    "countriesValue": "128",
-    "countriesLabel": "Pays",
-    "commissionValue": "0 %",
-    "commissionLabel": "Commission",
-    "ratingValue": "4,9★",
-    "ratingLabel": "Note moyenne"
+    "title": "Comment la plateforme fonctionne",
+    "description": "Ni commission, ni intermédiaire. Le client et le spécialiste fixent eux-mêmes les conditions et se règlent directement.",
+    "commissionValue": "0%",
+    "commissionLabel": "Commission de la plateforme",
+    "languagesValue": "12",
+    "languagesLabel": "Langues de l'interface",
+    "categoriesValue": "26",
+    "categoriesLabel": "Catégories IA"
   },
   "categories": {
     "title": "Des experts en IA pour chaque secteur",
@@ -58,7 +52,7 @@
     "h1Title": "Publiez votre projet",
     "h1Desc": "Décrivez votre besoin et votre budget. Nous vous mettons en relation avec les meilleurs experts en quelques minutes.",
     "h2Title": "Comparez les propositions",
-    "h2Desc": "Consultez profils, portfolios et tarifs d'experts vérifiés. Échangez avant de recruter.",
+    "h2Desc": "Comparez profils, portfolios et tarifs. Échangez avant de recruter.",
     "h3Title": "Convenez des conditions directement",
     "h3Desc": "Discutez du périmètre, du délai et du paiement dans la messagerie. La plateforme reste en dehors du règlement — c'est pour cela que notre commission est nulle.",
     "w1Title": "Créez votre profil",
@@ -67,9 +61,6 @@
     "w2Desc": "Trouvez des projets qui correspondent à votre expertise. Rédigez une proposition percutante.",
     "w3Title": "Recevez vos paiements en toute sécurité",
     "w3Desc": "Travail suivi, argent protégé. Retirez vos fonds avec la méthode de votre choix, partout dans le monde."
-  },
-  "testimonials": {
-    "title": "Des résultats concrets sur AI Marketplace"
   },
   "cta": {
     "headline": "Trouvez des experts en IA pour bâtir votre prochain succès",
@@ -103,10 +94,6 @@
   "about": {
     "heroTitle": "Nous construisons la plateforme que les spécialistes IA méritent",
     "heroDesc": "AI Marketplace est né parce que chaque plateforme existante prélève 10 à 20 % sur les revenus des spécialistes qui œuvrent déjà dur pour construire l'avenir. Nous avons dit non à ce modèle — et construit quelque chose de meilleur.",
-    "statFounded": "Fondation",
-    "statSpecialists": "Spécialistes vérifiés",
-    "statCountries": "Pays",
-    "statCommission": "Commission",
     "v1Title": "Les spécialistes d'abord",
     "v1Desc": "Chaque décision produit commence par une question : est-ce que cela aide les spécialistes à gagner plus et à mieux travailler ? Nous ne prélevons jamais de part sur leurs revenus.",
     "v2Title": "Transparence",
@@ -225,7 +212,7 @@
   },
   "press": {
     "title": "Presse",
-    "lead": "AI Marketplace met en relation des clients et des spécialistes de l'IA vérifiés dans 128 pays, sans commission sur les revenus des spécialistes. Fondée en 2024.",
+    "lead": "AI Marketplace met en relation des clients et des spécialistes de l'IA dans le monde entier : sans commission sur ce que gagnent les spécialistes et sans paiement transitant par la plateforme.",
     "kitTitle": "Dossier de presse",
     "kitDesc": "Logos en SVG et PNG, couleurs de la marque, captures du produit, photos et biographies des fondateurs, statistiques à jour de la plateforme. Sur demande.",
     "kitCta": "Demander le dossier",
@@ -235,11 +222,11 @@
   },
   "meta": {
     "title": "AI Marketplace — recrutez des spécialistes de l'IA",
-    "description": "La plateforme internationale qui relie spécialistes de l'IA et clients dans 128 pays. Aucune commission sur les revenus des spécialistes.",
+    "description": "La plateforme internationale qui relie spécialistes de l'IA et clients partout dans le monde. Sans commission sur les revenus des spécialistes.",
     "ogTitle": "AI Marketplace",
-    "ogDescription": "Recrutez des spécialistes de l'IA vérifiés ou trouvez des missions. 128 pays, 0 % de commission.",
+    "ogDescription": "Recrutez des spécialistes de l'IA ou trouvez des missions IA. Sans commission, contact direct.",
     "hireTitle": "Recruter des spécialistes de l'IA — 9 catégories | AI Marketplace",
-    "hireDesc": "Développeurs IA, ingénieurs ML, data scientists et experts en automatisation par catégorie. Spécialistes vérifiés dans 128 pays, 0 % de commission.",
+    "hireDesc": "Développeurs IA, ingénieurs ML, data scientists et experts en automatisation, par catégorie. Sans commission, contact direct.",
     "workTitle": "Trouver des missions et projets IA | AI Marketplace",
     "workDesc": "Projets IA ouverts par catégorie : machine learning, vision par ordinateur, automatisation, données. Vous gardez 100 % de vos revenus.",
     "helpTitle": "Centre d'aide — réponses clients et spécialistes | AI Marketplace",
@@ -258,15 +245,11 @@
     "privacyDesc": "Quelles données personnelles AI Marketplace collecte, pourquoi, combien de temps elles sont conservées et quels droits vous avez."
   },
   "why": {
-    "badge": "Note moyenne 4,9 · plus de 12 400 spécialistes",
+    "badge": "0 % de commission · contact direct",
     "heroTitle": "La plateforme de talents IA qui travaille vraiment pour vous",
-    "heroDesc": "Pas un énième site de freelance générique avec une catégorie IA ajoutée après coup. Nous sommes conçus dès l'origine pour l'économie de l'IA : zéro commission, des spécialistes vérifiés et vos données sur notre propre infrastructure.",
+    "heroDesc": "Pas un site de freelance de plus avec une rubrique IA ajoutée après coup. Conçu dès le départ pour l'économie de l'IA : sans commission, et vous parlez directement à la personne qui fera le travail.",
     "ctaFind": "Trouver un spécialiste",
     "ctaJoin": "Devenir spécialiste",
-    "statCommission": "Commission de la plateforme",
-    "statSpecialists": "Spécialistes vérifiés",
-    "statCountries": "Pays représentés",
-    "statEarnings": "Revenu moyen face aux concurrents",
     "diffTitle": "Pourquoi spécialistes et clients nous choisissent",
     "diffSubtitle": "Nous avons construit ce qui nous manquait : une plateforme sans conflit d'intérêts avec ses propres spécialistes.",
     "d1T": "0 % de commission, pour toujours",
@@ -275,12 +258,12 @@
     "d2D": "Comme nous ne prélevons rien sur vos revenus, à tarif égal il vous reste nettement plus par mission que sur les plateformes concurrentes.",
     "d3T": "Conçue pour l'IA, pas adaptée à l'IA",
     "d3D": "Chaque catégorie, chaque filtre et chaque règle de mise en relation est pensée autour des compétences en IA, et non reprise d'une plateforme généraliste.",
-    "d4T": "Vraiment mondiale — 128 pays",
-    "d4D": "De la Silicon Valley à Bangalore, de Berlin à São Paulo. Plus de 12 400 spécialistes vérifiés sur tous les fuseaux horaires, prêts à démarrer selon votre calendrier.",
+    "d4T": "Vraiment mondial",
+    "d4D": "De la Silicon Valley à Bangalore, de Berlin à São Paulo. L'interface parle 12 langues, pour que chacun travaille dans la sienne.",
     "d5T": "Vous réglez directement, nous ne prenons rien",
     "d5D": "La plateforme n'est pas un intermédiaire de paiement. Client et spécialiste conviennent et règlent entre eux — c'est justement pourquoi notre commission est nulle : il n'y a rien à prélever.",
-    "d6T": "Vérifiés, notés, contrôlés",
-    "d6D": "Chaque spécialiste passe une vérification de compétences. Les notes sont réelles et les avis viennent de vrais clients. Pas de faux profils, pas de scores gonflés.",
+    "d6T": "Profils, portfolios et avis",
+    "d6D": "Derrière chaque profil, le travail est visible : portfolio, description et avis de clients qui ont réellement recruté. Rien ne s'achète ici : aucune mise en avant payante.",
     "compareTitle": "Comment nous nous situons",
     "compareNote": "* Toptal facture au client environ 40 % de marge au-dessus du tarif du spécialiste",
     "colFeature": "Critère",
@@ -313,7 +296,7 @@
     "t3Q": "Il compte pour nous que les données du projet ne dorment pas chez un géant américain. AI Market était la seule option sérieuse.",
     "t3R": "Fondateur, FinTech",
     "ctaTitle": "Prêt à travailler avec des spécialistes IA sans commission ?",
-    "ctaDesc": "Rejoignez plus de 12 400 spécialistes et des milliers de clients déjà présents.",
+    "ctaDesc": "Créez un compte et échangez directement. C'est gratuit.",
     "ctaEarn": "Gagner davantage",
     "vDirect": "Directement entre les parties",
     "vThroughPlatform": "Via la plateforme"
@@ -337,7 +320,7 @@
     "q3": "L'inscription est-elle gratuite ?",
     "a3": "Oui, entièrement gratuite pour les clients comme pour les spécialistes. Nous ne prélevons aucune commission sur les transactions.",
     "q4": "Dans quels pays AI Marketplace fonctionne-t-il ?",
-    "a4": "La plateforme est disponible dans 128 pays. Les moyens de paiement dépendent du pays : écrivez-nous si vous avez une question sur un moyen précis dans votre région.",
+    "a4": "La plateforme est ouverte partout dans le monde. Les paiements n'y transitent pas : le client et le spécialiste choisissent eux-mêmes le moyen et la devise, et se règlent directement.",
     "q5": "Comment publier un projet ?",
     "a5": "Une fois connecté, allez dans Projets → Nouveau projet. Décrivez la mission, fixez un budget et choisissez un prix forfaitaire ou une facturation horaire. Le projet devient aussitôt visible pour les spécialistes concernés.",
     "q6": "Comment fonctionne le paiement ?",
@@ -374,7 +357,7 @@
   },
   "hire": {
     "heroTitle": "Trouvez un spécialiste IA par compétence",
-    "heroDesc": "Plus de 12 400 spécialistes vérifiés dans neuf catégories. Choisissez une compétence et voyez aussitôt les profils qui correspondent.",
+    "heroDesc": "Des spécialistes de l'IA dans 9 catégories. Choisissez une compétence pour voir aussitôt les profils correspondants.",
     "explore": "Voir : {category}",
     "c1": "IA et automatisation",
     "t1": "Découvrez comment les spécialistes de l'IA transforment vos processus et votre produit.",
