@@ -7,7 +7,8 @@
     "logIn": "Anmelden",
     "seeAllSkills": "Alle Bereiche",
     "browseAllProjects": "Alle Projekte",
-    "createProfile": "Profil erstellen"
+    "createProfile": "Profil erstellen",
+    "home": "Startseite"
   },
   "hero": {
     "headline1": "KI‑Experten finden,",
@@ -59,7 +60,8 @@
     "w2Title": "Projekte finden und bewerben",
     "w2Desc": "Finden Sie Projekte, die zu Ihrer Expertise passen. Schreiben Sie ein überzeugendes Angebot.",
     "w3Title": "Sicher bezahlt werden",
-    "w3Desc": "Arbeit dokumentiert, Geld gesichert. Auszahlung in Ihrer bevorzugten Methode weltweit."
+    "w3Desc": "Arbeit dokumentiert, Geld gesichert. Auszahlung in Ihrer bevorzugten Methode weltweit.",
+    "directLabel": "Ohne Vermittler"
   },
   "cta": {
     "headline": "Finden Sie KI‑Experten für Ihr nächstes Projekt",
@@ -88,7 +90,24 @@
     "careers": "Karriere",
     "press": "Presse",
     "terms": "Nutzungsbedingungen",
-    "privacy": "Datenschutzerklärung"
+    "privacy": "Datenschutzerklärung",
+    "cat_musicAudio": "Musik & Audio",
+    "cat_healthcare": "KI im Gesundheitswesen",
+    "cat_fintech": "KI im Finanzwesen",
+    "cat_manufacturing": "Fertigung & Industrie 4.0",
+    "cat_legal": "KI im Rechtsbereich",
+    "cat_agriculture": "KI in der Landwirtschaft",
+    "cat_energy": "KI für Energie & Umwelt",
+    "cat_logistics": "KI in Logistik & Transport",
+    "cat_realEstate": "KI in der Immobilienwirtschaft",
+    "cat_retail": "KI im Handel & E-Commerce",
+    "cat_edtech": "KI in der Bildung",
+    "cat_research": "KI in Forschung & Wissenschaft",
+    "cat_hr": "KI im Recruiting",
+    "cat_cybersecurity": "KI in der Cybersicherheit",
+    "cat_photography": "KI in Fotografie & Bild",
+    "cat_endToEnd": "Projekte schlüsselfertig",
+    "cat_serviceCatalog": "Leistungskatalog"
   },
   "about": {
     "heroTitle": "Wir bauen die Plattform, die KI-Spezialisten verdienen",

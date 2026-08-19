@@ -7,7 +7,8 @@
     "logIn": "Iniciar sesión",
     "seeAllSkills": "Ver todas las áreas",
     "browseAllProjects": "Ver todos los proyectos",
-    "createProfile": "Crear mi perfil"
+    "createProfile": "Crear mi perfil",
+    "home": "Inicio"
   },
   "hero": {
     "headline1": "Encuentra especialistas en IA",
@@ -59,7 +60,8 @@
     "w2Title": "Explora y aplica",
     "w2Desc": "Encuentra proyectos acordes a tu experiencia. Escribe una propuesta y destácate.",
     "w3Title": "Cobra de forma segura",
-    "w3Desc": "Trabajo registrado, dinero protegido. Retira con tu método preferido en cualquier parte del mundo."
+    "w3Desc": "Trabajo registrado, dinero protegido. Retira con tu método preferido en cualquier parte del mundo.",
+    "directLabel": "Sin intermediario"
   },
   "cta": {
     "headline": "Encuentra especialistas en IA para construir lo que viene",
@@ -88,7 +90,24 @@
     "careers": "Empleo",
     "press": "Prensa",
     "terms": "Términos del servicio",
-    "privacy": "Política de privacidad"
+    "privacy": "Política de privacidad",
+    "cat_musicAudio": "Música y audio",
+    "cat_healthcare": "IA en salud",
+    "cat_fintech": "IA en finanzas y fintech",
+    "cat_manufacturing": "Industria y manufactura 4.0",
+    "cat_legal": "IA en el ámbito legal",
+    "cat_agriculture": "IA en agricultura",
+    "cat_energy": "IA en energía y medio ambiente",
+    "cat_logistics": "IA en logística y transporte",
+    "cat_realEstate": "IA en el sector inmobiliario",
+    "cat_retail": "IA en comercio y e-commerce",
+    "cat_edtech": "IA en educación",
+    "cat_research": "IA en ciencia e investigación",
+    "cat_hr": "IA en selección de personal",
+    "cat_cybersecurity": "IA en ciberseguridad",
+    "cat_photography": "IA en fotografía e imagen",
+    "cat_endToEnd": "Proyectos llave en mano",
+    "cat_serviceCatalog": "Catálogo de servicios"
   },
   "about": {
     "heroTitle": "Construimos la plataforma que los especialistas en IA merecen",

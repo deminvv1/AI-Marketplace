@@ -6,6 +6,7 @@ import { categoryBySlug } from "@/lib/categories";
 import { SKILL_KEYS } from "@/lib/skill-keys";
 import { fetchSpecialists } from "@/lib/catalog";
 import { routing } from "@/i18n/routing";
+import { BreadcrumbSchema } from "@/components/seo/structured-data";
 
 /**
  * Посадочная страница направления.
@@ -29,6 +30,7 @@ export default async function CategoryPage({
   const cat = categoryBySlug(category)!;
 
   const t = await getTranslations({ locale, namespace: "catalog" });
+  const tNav = await getTranslations({ locale, namespace: "nav" });
   const tHire = await getTranslations({ locale, namespace: "hire" });
   const tSkills = await getTranslations({ locale, namespace: "skills" });
   const name = tHire(cat.nameKey);
@@ -49,11 +51,28 @@ export default async function CategoryPage({
     <div style={{ minHeight: "100vh", background: "#fff", fontFamily: "system-ui, -apple-system, Arial, sans-serif" }} dir={isRtl ? "rtl" : "ltr"}>
       <Header />
 
+      <BreadcrumbSchema
+        locale={locale}
+        trail={[
+          { name: tNav("home"), path: "" },
+          { name: t("allCategories"), path: "/browse" },
+          { name, path: `/browse/${cat.slug}` },
+        ]}
+      />
+
       <section style={{ background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)", padding: "120px 24px 64px" }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
-          <Link href={`${p}/browse`} style={{ color: "rgba(255,255,255,0.7)", fontSize: "0.82rem", textDecoration: "none", letterSpacing: "0.04em" }}>
-            ← {t("allCategories")}
-          </Link>
+          {/* Видимый путь: он же в разметке выше — Google требует, чтобы
+              крошки в разметке совпадали с тем, что видит человек. */}
+          <nav aria-label="breadcrumb" style={{ display: "flex", gap: 8, alignItems: "center", fontSize: "0.82rem", color: "rgba(255,255,255,0.65)" }}>
+            <Link href={p || "/"} style={{ color: "inherit", textDecoration: "none" }}>{tNav("home")}</Link>
+            <span aria-hidden="true">/</span>
+            <Link href={`${p}/browse`} style={{ color: "inherit", textDecoration: "none" }}>
+              {t("allCategories")}
+            </Link>
+            <span aria-hidden="true">/</span>
+            <span style={{ color: "rgba(255,255,255,0.9)" }}>{name}</span>
+          </nav>
           <h1 style={{ fontSize: "clamp(2rem,5vw,2.9rem)", fontWeight: 800, color: "#fff", letterSpacing: "-0.03em", margin: "16px 0 18px" }}>
             {t("heading", { category: name })}
           </h1>

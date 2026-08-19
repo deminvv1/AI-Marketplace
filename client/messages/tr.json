@@ -7,7 +7,8 @@
     "logIn": "Giriş Yap",
     "seeAllSkills": "Tüm Alanlara Bak",
     "browseAllProjects": "Tüm Projelere Bak",
-    "createProfile": "Profil Oluştur"
+    "createProfile": "Profil Oluştur",
+    "home": "Ana sayfa"
   },
   "hero": {
     "headline1": "Sonuç üreten",
@@ -59,7 +60,8 @@
     "w2Title": "Proje bulun ve başvurun",
     "w2Desc": "Uzmanlığınıza uygun projeler bulun. Öne çıkan bir teklif yazın.",
     "w3Title": "Güvenle ödeme alın",
-    "w3Desc": "İş takip edilir, para güvende. Tercih ettiğiniz yöntemle dünya genelinde çekim yapın."
+    "w3Desc": "İş takip edilir, para güvende. Tercih ettiğiniz yöntemle dünya genelinde çekim yapın.",
+    "directLabel": "Aracı yok"
   },
   "cta": {
     "headline": "Bir sonraki büyük projeniz için AI uzmanlarını bulun",
@@ -88,7 +90,24 @@
     "careers": "Kariyer",
     "press": "Basın",
     "terms": "Kullanım Koşulları",
-    "privacy": "Gizlilik Politikası"
+    "privacy": "Gizlilik Politikası",
+    "cat_musicAudio": "Müzik ve ses",
+    "cat_healthcare": "Sağlıkta yapay zekâ",
+    "cat_fintech": "Finans ve fintekte yapay zekâ",
+    "cat_manufacturing": "Üretim ve Endüstri 4.0",
+    "cat_legal": "Hukukta yapay zekâ",
+    "cat_agriculture": "Tarımda yapay zekâ",
+    "cat_energy": "Enerji ve çevrede yapay zekâ",
+    "cat_logistics": "Lojistik ve ulaşımda yapay zekâ",
+    "cat_realEstate": "Gayrimenkulde yapay zekâ",
+    "cat_retail": "Perakende ve e-ticarette yapay zekâ",
+    "cat_edtech": "Eğitimde yapay zekâ",
+    "cat_research": "Bilim ve araştırmada yapay zekâ",
+    "cat_hr": "İşe alımda yapay zekâ",
+    "cat_cybersecurity": "Siber güvenlikte yapay zekâ",
+    "cat_photography": "Fotoğraf ve görselde yapay zekâ",
+    "cat_endToEnd": "Anahtar teslim projeler",
+    "cat_serviceCatalog": "Hizmet kataloğu"
   },
   "about": {
     "heroTitle": "Yapay zeka uzmanlarının hak ettiği platformu inşa ediyoruz",

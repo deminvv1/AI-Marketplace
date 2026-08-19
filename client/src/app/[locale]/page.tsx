@@ -227,7 +227,7 @@ function HowItWorksSection() {
                     <div style={{ width: 56, height: 56, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 4px 16px rgba(99,102,241,0.3)" }}>
                       <DollarSign size={28} style={{ color: "#fff" }} />
                     </div>
-                    <span style={{ fontSize: "0.82rem", color: "#6366f1", fontWeight: 600 }}>Secure Payment</span>
+                    <span style={{ fontSize: "0.82rem", color: "#6366f1", fontWeight: 600 }}>{t("directLabel")}</span>
                   </div>
                 )}
               </div>

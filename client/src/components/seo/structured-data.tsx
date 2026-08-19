@@ -78,3 +78,31 @@ export function FaqSchema({ items }: { items: { question: string; answer: string
     />
   );
 }
+
+/**
+ * Путь до страницы. Google показывает его в выдаче вместо голого адреса:
+ * «aimarketplace.io › Каталог › Данные и аналитика» читается человеком, а
+ * длинная ссылка — нет.
+ */
+export function BreadcrumbSchema({
+  locale,
+  trail,
+}: {
+  locale: string;
+  trail: { name: string; path: string }[];
+}) {
+  return (
+    <JsonLd
+      data={{
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        itemListElement: trail.map(({ name, path }, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name,
+          item: localeUrl(locale, path),
+        })),
+      }}
+    />
+  );
+}

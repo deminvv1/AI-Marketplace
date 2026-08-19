@@ -46,13 +46,29 @@ const CATEGORY_PAGES: { key: string; slug: string }[] = [
   { key: "c8", slug: "industry" },
 ];
 
-const CATEGORIES = [
-  "Music & Audio", "Healthcare AI", "FinTech & Finance AI",
-  "Manufacturing & Industry 4.0", "Legal AI & LegalTech", "Agriculture & Precision Farming AI",
-  "Energy & Environment AI", "Logistics & Transportation AI", "Real Estate PropTech AI",
-  "Retail & E-Commerce AI", "EdTech & E-Learning AI", "Research & Science AI",
-  "HR & Recruitment AI", "Cybersecurity AI", "Photography & Image AI",
-  "End-to-End Projects", "Service Catalog",
+/**
+ * Узкие отрасли: своей страницы у них нет, ссылка ведёт в поиск по каталогу.
+ * `query` — английское название, оно уходит в запрос и переводить его нельзя,
+ * иначе поиск перестанет находить людей. Переводится только подпись.
+ */
+const INDUSTRIES: { key: string; query: string }[] = [
+  { key: "cat_musicAudio",     query: "Music & Audio" },
+  { key: "cat_healthcare",     query: "Healthcare AI" },
+  { key: "cat_fintech",        query: "FinTech & Finance AI" },
+  { key: "cat_manufacturing",  query: "Manufacturing & Industry 4.0" },
+  { key: "cat_legal",          query: "Legal AI & LegalTech" },
+  { key: "cat_agriculture",    query: "Agriculture & Precision Farming AI" },
+  { key: "cat_energy",         query: "Energy & Environment AI" },
+  { key: "cat_logistics",      query: "Logistics & Transportation AI" },
+  { key: "cat_realEstate",     query: "Real Estate PropTech AI" },
+  { key: "cat_retail",         query: "Retail & E-Commerce AI" },
+  { key: "cat_edtech",         query: "EdTech & E-Learning AI" },
+  { key: "cat_research",       query: "Research & Science AI" },
+  { key: "cat_hr",             query: "HR & Recruitment AI" },
+  { key: "cat_cybersecurity",  query: "Cybersecurity AI" },
+  { key: "cat_photography",    query: "Photography & Image AI" },
+  { key: "cat_endToEnd",       query: "End-to-End Projects" },
+  { key: "cat_serviceCatalog", query: "Service Catalog" },
 ];
 
 type FooterLink = { label: string; href: string };
@@ -171,9 +187,9 @@ export function Footer() {
                 <Link href={`${p}/browse/${slug}`} className="footer-link">{tHire(key)}</Link>
               </li>
             ))}
-            {CATEGORIES.map((c) => (
-              <li key={c}>
-                <Link href={`${p}/browse?q=${encodeURIComponent(c)}`} className="footer-link">{c}</Link>
+            {INDUSTRIES.map(({ key, query }) => (
+              <li key={key}>
+                <Link href={`${p}/browse?q=${encodeURIComponent(query)}`} className="footer-link">{t(key)}</Link>
               </li>
             ))}
           </ul>

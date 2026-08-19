@@ -7,7 +7,8 @@
     "logIn": "登录",
     "seeAllSkills": "查看所有技能",
     "browseAllProjects": "浏览全部项目",
-    "createProfile": "创建个人主页"
+    "createProfile": "创建个人主页",
+    "home": "首页"
   },
   "hero": {
     "headline1": "找到真正能交付成果的",
@@ -59,7 +60,8 @@
     "w2Title": "浏览并投递",
     "w2Desc": "找到匹配你专业领域的项目，写好提案脱颖而出。",
     "w3Title": "安全收款",
-    "w3Desc": "工作有记录，资金有保障，通过全球支持的方式提现。"
+    "w3Desc": "工作有记录，资金有保障，通过全球支持的方式提现。",
+    "directLabel": "没有中间人"
   },
   "cta": {
     "headline": "找到 AI 专家，共同构建下一个突破",
@@ -88,7 +90,24 @@
     "careers": "加入我们",
     "press": "媒体",
     "terms": "服务条款",
-    "privacy": "隐私政策"
+    "privacy": "隐私政策",
+    "cat_musicAudio": "音乐与音频",
+    "cat_healthcare": "医疗 AI",
+    "cat_fintech": "金融与金融科技 AI",
+    "cat_manufacturing": "制造与工业 4.0",
+    "cat_legal": "法律 AI",
+    "cat_agriculture": "农业 AI",
+    "cat_energy": "能源与环境 AI",
+    "cat_logistics": "物流与运输 AI",
+    "cat_realEstate": "房地产 AI",
+    "cat_retail": "零售与电商 AI",
+    "cat_edtech": "教育 AI",
+    "cat_research": "科研 AI",
+    "cat_hr": "招聘 AI",
+    "cat_cybersecurity": "网络安全 AI",
+    "cat_photography": "摄影与图像 AI",
+    "cat_endToEnd": "全流程项目",
+    "cat_serviceCatalog": "服务目录"
   },
   "about": {
     "heroTitle": "我们正在构建AI专家应得的平台",

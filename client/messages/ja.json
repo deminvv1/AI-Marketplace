@@ -7,7 +7,8 @@
     "logIn": "ログイン",
     "seeAllSkills": "すべての分野を見る",
     "browseAllProjects": "すべての案件を見る",
-    "createProfile": "プロフィールを作成"
+    "createProfile": "プロフィールを作成",
+    "home": "ホーム"
   },
   "hero": {
     "headline1": "成果を出す",
@@ -59,7 +60,8 @@
     "w2Title": "案件を探して応募",
     "w2Desc": "あなたの専門性に合った案件を見つけ、印象的な提案を作成しましょう。",
     "w3Title": "安全に報酬を受け取る",
-    "w3Desc": "作業記録と資金保護が完備。世界中でお好みの方法で出金できます。"
+    "w3Desc": "作業記録と資金保護が完備。世界中でお好みの方法で出金できます。",
+    "directLabel": "仲介なし"
   },
   "cta": {
     "headline": "次のプロジェクトを実現するAI専門家を見つけよう",
@@ -88,7 +90,24 @@
     "careers": "採用情報",
     "press": "プレス",
     "terms": "利用規約",
-    "privacy": "プライバシーポリシー"
+    "privacy": "プライバシーポリシー",
+    "cat_musicAudio": "音楽と音声",
+    "cat_healthcare": "医療の AI",
+    "cat_fintech": "金融・フィンテックの AI",
+    "cat_manufacturing": "製造とインダストリー 4.0",
+    "cat_legal": "法務の AI",
+    "cat_agriculture": "農業の AI",
+    "cat_energy": "エネルギーと環境の AI",
+    "cat_logistics": "物流と輸送の AI",
+    "cat_realEstate": "不動産の AI",
+    "cat_retail": "小売と EC の AI",
+    "cat_edtech": "教育の AI",
+    "cat_research": "研究・科学の AI",
+    "cat_hr": "採用の AI",
+    "cat_cybersecurity": "セキュリティの AI",
+    "cat_photography": "写真と画像の AI",
+    "cat_endToEnd": "一括請負の案件",
+    "cat_serviceCatalog": "サービス一覧"
   },
   "about": {
     "heroTitle": "AIスペシャリストが本当に必要とするプラットフォームを作っています",

@@ -7,7 +7,8 @@
     "logIn": "Masuk",
     "seeAllSkills": "Lihat Semua Bidang",
     "browseAllProjects": "Lihat Semua Proyek",
-    "createProfile": "Buat Profil Saya"
+    "createProfile": "Buat Profil Saya",
+    "home": "Beranda"
   },
   "hero": {
     "headline1": "Temukan ahli AI",
@@ -59,7 +60,8 @@
     "w2Title": "Jelajahi dan lamar",
     "w2Desc": "Temukan proyek yang sesuai keahlian Anda. Tulis proposal yang menonjol.",
     "w3Title": "Terima pembayaran dengan aman",
-    "w3Desc": "Pekerjaan tercatat, uang terlindungi. Cairkan dengan metode favorit Anda di mana saja."
+    "w3Desc": "Pekerjaan tercatat, uang terlindungi. Cairkan dengan metode favorit Anda di mana saja.",
+    "directLabel": "Tanpa perantara"
   },
   "cta": {
     "headline": "Temukan ahli AI untuk membangun hal berikutnya",
@@ -88,7 +90,24 @@
     "careers": "Karier",
     "press": "Pers",
     "terms": "Ketentuan Layanan",
-    "privacy": "Kebijakan Privasi"
+    "privacy": "Kebijakan Privasi",
+    "cat_musicAudio": "Musik dan audio",
+    "cat_healthcare": "AI di bidang kesehatan",
+    "cat_fintech": "AI di keuangan dan fintech",
+    "cat_manufacturing": "Manufaktur dan Industri 4.0",
+    "cat_legal": "AI di bidang hukum",
+    "cat_agriculture": "AI di pertanian",
+    "cat_energy": "AI untuk energi dan lingkungan",
+    "cat_logistics": "AI di logistik dan transportasi",
+    "cat_realEstate": "AI di properti",
+    "cat_retail": "AI di ritel dan e-commerce",
+    "cat_edtech": "AI di pendidikan",
+    "cat_research": "AI di riset dan sains",
+    "cat_hr": "AI untuk rekrutmen",
+    "cat_cybersecurity": "AI untuk keamanan siber",
+    "cat_photography": "AI untuk fotografi dan citra",
+    "cat_endToEnd": "Proyek menyeluruh",
+    "cat_serviceCatalog": "Katalog layanan"
   },
   "about": {
     "heroTitle": "Kami membangun platform yang layak didapatkan ahli AI",

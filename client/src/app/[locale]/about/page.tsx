@@ -22,12 +22,6 @@ const TRUST_KEYS = ["trust1", "trust2", "trust3", "trust4"] as const;
 // Offset anchor targets so the fixed header doesn't cover section headings.
 const ANCHOR_OFFSET = { scrollMarginTop: 84 } as const;
 
-const TEAM = [
-  { name: "Alex M.", role: "CEO & Co-founder", bio: "Former ML engineer. Built AI products at two unicorns before founding AI Marketplace." },
-  { name: "Marina K.", role: "CTO & Co-founder", bio: "10 years building distributed systems. Previously led engineering at a top-5 European fintech." },
-  { name: "Daniel R.", role: "Head of Product", bio: "Ex-Upwork product manager. Spent 4 years understanding exactly what freelancing platforms get wrong." },
-];
-
 const STAT_KEYS = ["commissionLabel", "languagesLabel", "categoriesLabel"] as const;
 
 export default function AboutPage() {
@@ -147,24 +141,6 @@ export default function AboutPage() {
                 </div>
               );
             })}
-          </div>
-        </div>
-      </section>
-
-      {/* Team */}
-      <section style={{ padding: "72px 24px", background: "#fff" }}>
-        <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(min(100%, 260px), 1fr))", gap: 24 }}>
-            {TEAM.map(member => (
-              <div key={member.name} style={{ padding: 28, borderRadius: 12, border: "1px solid #e5e7eb", background: "#fafafa" }}>
-                <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg, #6366f1, #8b5cf6)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: "1.1rem", fontWeight: 700, marginBottom: 16 }}>
-                  {member.name[0]}
-                </div>
-                <div style={{ fontWeight: 700, color: "#111827", marginBottom: 4 }}>{member.name}</div>
-                <div style={{ fontSize: "0.82rem", color: "#6366f1", fontWeight: 600, marginBottom: 10 }}>{member.role}</div>
-                <p style={{ fontSize: "0.88rem", color: "#6b7280", lineHeight: 1.6 }}>{member.bio}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

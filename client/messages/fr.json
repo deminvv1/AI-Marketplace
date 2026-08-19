@@ -7,7 +7,8 @@
     "logIn": "Se connecter",
     "seeAllSkills": "Voir tous les domaines",
     "browseAllProjects": "Voir tous les projets",
-    "createProfile": "Créer mon profil"
+    "createProfile": "Créer mon profil",
+    "home": "Accueil"
   },
   "hero": {
     "headline1": "Trouvez des experts en IA",
@@ -59,7 +60,8 @@
     "w2Title": "Postulez aux missions",
     "w2Desc": "Trouvez des projets qui correspondent à votre expertise. Rédigez une proposition percutante.",
     "w3Title": "Recevez vos paiements en toute sécurité",
-    "w3Desc": "Travail suivi, argent protégé. Retirez vos fonds avec la méthode de votre choix, partout dans le monde."
+    "w3Desc": "Travail suivi, argent protégé. Retirez vos fonds avec la méthode de votre choix, partout dans le monde.",
+    "directLabel": "Sans intermédiaire"
   },
   "cta": {
     "headline": "Trouvez des experts en IA pour bâtir votre prochain succès",
@@ -88,7 +90,24 @@
     "careers": "Carrières",
     "press": "Presse",
     "terms": "Conditions d'utilisation",
-    "privacy": "Politique de confidentialité"
+    "privacy": "Politique de confidentialité",
+    "cat_musicAudio": "Musique et audio",
+    "cat_healthcare": "IA en santé",
+    "cat_fintech": "IA en finance et fintech",
+    "cat_manufacturing": "Industrie et production 4.0",
+    "cat_legal": "IA juridique",
+    "cat_agriculture": "IA en agriculture",
+    "cat_energy": "IA énergie et environnement",
+    "cat_logistics": "IA logistique et transport",
+    "cat_realEstate": "IA immobilier",
+    "cat_retail": "IA commerce et e-commerce",
+    "cat_edtech": "IA éducation",
+    "cat_research": "IA recherche et science",
+    "cat_hr": "IA recrutement",
+    "cat_cybersecurity": "IA cybersécurité",
+    "cat_photography": "IA photographie et image",
+    "cat_endToEnd": "Projets clés en main",
+    "cat_serviceCatalog": "Catalogue de services"
   },
   "about": {
     "heroTitle": "Nous construisons la plateforme que les spécialistes IA méritent",

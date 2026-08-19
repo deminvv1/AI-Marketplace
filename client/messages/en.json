@@ -7,7 +7,8 @@
     "logIn": "Log in",
     "seeAllSkills": "See all skills",
     "browseAllProjects": "Browse all projects",
-    "createProfile": "Create your profile"
+    "createProfile": "Create your profile",
+    "home": "Home"
   },
   "hero": {
     "headline1": "Find AI specialists",
@@ -59,7 +60,8 @@
     "w2Title": "Browse and apply",
     "w2Desc": "Find projects that match your expertise. Write a proposal and stand out from the crowd.",
     "w3Title": "Get paid securely",
-    "w3Desc": "Work tracked, hours logged, money secured. Get paid via your preferred method globally."
+    "w3Desc": "Work tracked, hours logged, money secured. Get paid via your preferred method globally.",
+    "directLabel": "No middleman"
   },
   "cta": {
     "headline": "Find AI specialists who can help you build what's next",
@@ -88,7 +90,24 @@
     "careers": "Careers",
     "press": "Press",
     "terms": "Terms of Service",
-    "privacy": "Privacy Policy"
+    "privacy": "Privacy Policy",
+    "cat_musicAudio": "Music & Audio",
+    "cat_healthcare": "Healthcare AI",
+    "cat_fintech": "FinTech & Finance AI",
+    "cat_manufacturing": "Manufacturing & Industry 4.0",
+    "cat_legal": "Legal AI & LegalTech",
+    "cat_agriculture": "Agriculture & Precision Farming AI",
+    "cat_energy": "Energy & Environment AI",
+    "cat_logistics": "Logistics & Transportation AI",
+    "cat_realEstate": "Real Estate PropTech AI",
+    "cat_retail": "Retail & E-Commerce AI",
+    "cat_edtech": "EdTech & E-Learning AI",
+    "cat_research": "Research & Science AI",
+    "cat_hr": "HR & Recruitment AI",
+    "cat_cybersecurity": "Cybersecurity AI",
+    "cat_photography": "Photography & Image AI",
+    "cat_endToEnd": "End-to-End Projects",
+    "cat_serviceCatalog": "Service Catalog"
   },
   "about": {
     "heroTitle": "We're building the platform AI specialists deserve",
