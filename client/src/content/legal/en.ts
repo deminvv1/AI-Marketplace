@@ -75,7 +75,7 @@ export const EN: LegalDocs = {
   privacy: [
     {
       title: "1. Who is responsible for your data",
-      body: `The Platform at aimarketplace.io is run by a private individual — an independent developer — acting as the data controller. There is no company behind it and no commercial exploitation of your data. Contact for any privacy question: ${LEGAL_EMAIL}.`,
+      body: `The Platform at aiservicemarket.com is run by a private individual — an independent developer — acting as the data controller. There is no company behind it and no commercial exploitation of your data. Contact for any privacy question: ${LEGAL_EMAIL}.`,
     },
     {
       title: "2. What we collect",

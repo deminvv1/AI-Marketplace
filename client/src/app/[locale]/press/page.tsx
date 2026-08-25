@@ -49,8 +49,8 @@ export default function PressPage() {
       <section style={{ padding: "72px 24px 88px", background: "#fff" }}>
         <div style={{ maxWidth: 900, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))", gap: 24 }}>
           {([
-            { icon: Download, title: t("kitTitle"),     desc: t("kitDesc"),     cta: t("kitCta"),     mail: "press@aimarketplace.io?subject=Press%20kit%20request" },
-            { icon: Mail,     title: t("contactTitle"), desc: t("contactDesc"), cta: t("contactCta"), mail: "press@aimarketplace.io" },
+            { icon: Download, title: t("kitTitle"),     desc: t("kitDesc"),     cta: t("kitCta"),     mail: "press@aiservicemarket.com?subject=Press%20kit%20request" },
+            { icon: Mail,     title: t("contactTitle"), desc: t("contactDesc"), cta: t("contactCta"), mail: "press@aiservicemarket.com" },
           ]).map(({ icon: Icon, title, desc, cta, mail }) => (
             <div key={title} style={{ padding: 32, borderRadius: 16, border: "1px solid #e5e7eb", background: "#f9fafb", display: "flex", flexDirection: "column" }}>
               <div style={{ width: 44, height: 44, borderRadius: 10, background: "#ede9fe", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 18 }}>

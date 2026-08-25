@@ -81,7 +81,7 @@ export function FaqSchema({ items }: { items: { question: string; answer: string
 
 /**
  * Путь до страницы. Google показывает его в выдаче вместо голого адреса:
- * «aimarketplace.io › Каталог › Данные и аналитика» читается человеком, а
+ * «aiservicemarket.com › Каталог › Данные и аналитика» читается человеком, а
  * длинная ссылка — нет.
  */
 export function BreadcrumbSchema({

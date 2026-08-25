@@ -9,7 +9,7 @@ import { routing } from "@/i18n/routing";
  * that other host instead — so keep this in sync with DNS.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL ?? "https://aimarketplace.io"
+  process.env.NEXT_PUBLIC_SITE_URL ?? "https://aiservicemarket.com"
 ).replace(/\/$/, "");
 
 /** Absolute URL of `path` in `locale`. English carries no prefix. */

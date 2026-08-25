@@ -41,7 +41,7 @@ export default function CareersPage() {
               return (
                 <a
                   key={key}
-                  href={`mailto:careers@aimarketplace.io?subject=${encodeURIComponent(t(key))}`}
+                  href={`mailto:careers@aiservicemarket.com?subject=${encodeURIComponent(t(key))}`}
                   className="career-card"
                   style={{
                     display: "flex", alignItems: "center", gap: 18,
@@ -71,7 +71,7 @@ export default function CareersPage() {
           <h2 style={{ fontSize: "1.15rem", fontWeight: 700, color: "#111827", marginBottom: 12 }}>{t("applyTitle")}</h2>
           <p style={{ fontSize: "0.95rem", color: "#374151", lineHeight: 1.75, marginBottom: 22 }}>{t("applyDesc")}</p>
           <a
-            href="mailto:careers@aimarketplace.io"
+            href="mailto:careers@aiservicemarket.com"
             style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", background: "#6366f1", color: "#fff", borderRadius: 30, fontWeight: 600, fontSize: "0.92rem", textDecoration: "none" }}
           >
             {t("applyCta")}

@@ -10,10 +10,10 @@
 
 | Адрес | Что там | Откуда переезжает |
 |---|---|---|
-| `aimarketplace.io` | сайт | Vercel, остаётся |
-| `auth.aimarketplace.io` | Supabase: вход, база, файлы | Supabase Cloud (Франкфурт) |
-| `api.aimarketplace.io` | сервер приложений | Render |
-| `id.aimarketplace.io` | Keycloak: вход через Яндекс | новое |
+| `aiservicemarket.com` | сайт | Vercel, остаётся |
+| `auth.aiservicemarket.com` | Supabase: вход, база, файлы | Supabase Cloud (Франкфурт) |
+| `api.aiservicemarket.com` | сервер приложений | Render |
+| `id.aiservicemarket.com` | Keycloak: вход через Яндекс | новое |
 
 Панель Supabase Studio наружу не открывается — только через SSH-туннель.
 
@@ -101,8 +101,8 @@ psql "$TARGET" -f data.sql
 ### 6. Переключение сайта
 
 В настройках Vercel заменить `NEXT_PUBLIC_SUPABASE_URL` на
-`https://auth.aimarketplace.io`, ключ — на новый, `NEXT_PUBLIC_API_URL` — на
-`https://api.aimarketplace.io`, и выложить заново.
+`https://auth.aiservicemarket.com`, ключ — на новый, `NEXT_PUBLIC_API_URL` — на
+`https://api.aiservicemarket.com`, и выложить заново.
 
 Код клиента при этом **не меняется**: и `@supabase/ssr`, и проверка токена на
 сервере работают с самостоятельной сборкой один в один.

@@ -149,10 +149,10 @@ export default function AboutPage() {
       <section style={{ padding: "72px 24px", background: "#f9fafb" }}>
         <div style={{ maxWidth: 800, margin: "0 auto", textAlign: "center" }}>
           <a
-            href="mailto:hello@aimarketplace.io"
+            href="mailto:hello@aiservicemarket.com"
             style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", background: "#6366f1", color: "#fff", borderRadius: 30, fontWeight: 600, fontSize: "0.95rem", textDecoration: "none" }}
           >
-            <Mail size={16} /> hello@aimarketplace.io
+            <Mail size={16} /> hello@aiservicemarket.com
           </a>
         </div>
       </section>

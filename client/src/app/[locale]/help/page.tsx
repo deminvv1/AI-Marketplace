@@ -47,9 +47,9 @@ export default function HelpPage() {
   const isRtl = locale === "ar";
 
   const CONTACT_CARDS = [
-    { icon: Mail,          title: t("cardEmailTitle"), desc: "hello@aimarketplace.io", href: "mailto:hello@aimarketplace.io" },
+    { icon: Mail,          title: t("cardEmailTitle"), desc: "hello@aiservicemarket.com", href: "mailto:hello@aiservicemarket.com" },
     { icon: MessageCircle, title: t("cardChatTitle"),  desc: t("cardChatDesc"),        href: "/messages" },
-    { icon: FileText,      title: t("cardLegalTitle"), desc: "legal@aimarketplace.io", href: "mailto:legal@aimarketplace.io" },
+    { icon: FileText,      title: t("cardLegalTitle"), desc: "legal@aiservicemarket.com", href: "mailto:legal@aiservicemarket.com" },
   ];
 
   return (
@@ -110,7 +110,7 @@ export default function HelpPage() {
         <div style={{ marginTop: 32, padding: 28, borderRadius: 12, background: "#f9fafb", border: "1px solid #e5e7eb", textAlign: "center" }}>
           <p style={{ fontSize: "0.95rem", color: "#374151", fontWeight: 600, marginBottom: 8 }}>{t("stillTitle")}</p>
           <p style={{ fontSize: "0.88rem", color: "#6b7280", marginBottom: 20 }}>{t("stillDesc")}</p>
-          <a href="mailto:hello@aimarketplace.io" style={{ display: "inline-block", padding: "10px 24px", background: "#6366f1", color: "#fff", borderRadius: 30, fontWeight: 600, fontSize: "0.9rem", textDecoration: "none" }}>
+          <a href="mailto:hello@aiservicemarket.com" style={{ display: "inline-block", padding: "10px 24px", background: "#6366f1", color: "#fff", borderRadius: 30, fontWeight: 600, fontSize: "0.9rem", textDecoration: "none" }}>
             {t("stillCta")}
           </a>
         </div>
