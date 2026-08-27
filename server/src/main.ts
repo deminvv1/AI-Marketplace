@@ -5,7 +5,10 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  // rawBody нужен для проверки подписи писем: подпись считается по исходному
+  // тексту запроса, а не по разобранным данным — при пересборке JSON порядок
+  // ключей и пробелы меняются, и подпись перестаёт сходиться.
+  const app = await NestFactory.create(AppModule, { rawBody: true });
 
   app.use(helmet({
     crossOriginEmbedderPolicy: false,  // needed for Socket.io

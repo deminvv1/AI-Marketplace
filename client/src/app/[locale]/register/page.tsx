@@ -235,7 +235,12 @@ function RegisterForm() {
       const { data, error } = await supabase.auth.signUp({
         email: trimmedEmail,
         password,
-        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+          // Письма отправляет наш сервер, и язык он берёт отсюда: у самой
+          // службы входа шаблон один на всех, выбрать язык нельзя.
+          data: { locale },
+        },
       });
       setLoading(false);
       if (error) { setError(translateAuthError(error.message)); return; }
@@ -266,7 +271,10 @@ function RegisterForm() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInWithOtp({
       email: trimmedEmail,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      options: {
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
+        data: { locale },
+      },
     });
     setLoading(false);
     if (error) setError(translateAuthError(error.message));

@@ -24,6 +24,7 @@ import { BlocksModule } from './blocks/blocks.module';
 import { TaxonomyModule } from './taxonomy/taxonomy.module';
 import { ChatModule } from './chat/chat.module';
 import { AdminModule } from './admin/admin.module';
+import { AuthHooksModule } from './auth-hooks/auth-hooks.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { AdminModule } from './admin/admin.module';
     BlocksModule,
     ChatModule,
     AdminModule,
+    AuthHooksModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: ThrottlerGuard },
