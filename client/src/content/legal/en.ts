@@ -4,7 +4,7 @@ export const EN: LegalDocs = {
   terms: [
     {
       title: "1. Who runs this platform",
-      body: `AI Marketplace ("the Platform") is run by a private individual — an independent developer — and not by a company. There is no registered legal entity behind it. The Platform is provided free of charge: no fees, no commission, no paid features, and the operator earns nothing from it. Contact: ${LEGAL_EMAIL}.`,
+      body: `AI Marketplace ("the Platform") is owned and run by a private individual, not by a company. There is no registered legal entity behind it. The Platform is provided free of charge: no fees, no commission, no paid features, and the operator earns nothing from it. Contact: ${LEGAL_EMAIL}.`,
     },
     {
       title: "2. Acceptance of these Terms",
@@ -75,7 +75,7 @@ export const EN: LegalDocs = {
   privacy: [
     {
       title: "1. Who is responsible for your data",
-      body: `The Platform at aiservicemarket.com is run by a private individual — an independent developer — acting as the data controller. There is no company behind it and no commercial exploitation of your data. Contact for any privacy question: ${LEGAL_EMAIL}.`,
+      body: `The Platform at aiservicemarket.com is owned and run by a private individual, who is the data controller. There is no company behind it and no commercial exploitation of your data. Contact for any privacy question: ${LEGAL_EMAIL}.`,
     },
     {
       title: "2. What we collect",
